@@ -1,0 +1,169 @@
+{
+    "copyright": "Copyright (c) 2024 Reborn",
+    "all_rights_reserved": "Tous droits réservés",
+    "welcome_title": "Bienvenue sur Boongo",
+    "welcome_description": "Consultez des livres, des revues, des journaux, des cartes géogrpahiques, etc.",
+    "about_boongo": "A propos de l’appli Boongo",
+    "about_reborn": "A propos de l’entreprise Reborn",
+    "privacy_title": "Politique de confidentialité",
+    "terms_title": "Conditions d’utilisation",
+    "terms_accept1": "En créant votre compte, vous acceptez nos ",
+    "terms_accept1_": "En vous abonnant, vous acceptez nos ",
+    "terms_accept2": " et notre politique de ",
+    "change_lang": "Changer de langue",
+    "back_home": "Retour à l’accueil",
+    "load_more": "Charger plus",
+    "see_more": "Voir plus",
+    "see_less": "Voir moins",
+    "page": "Page",
+    "notepad": {
+        "title": "Enregistrez des résumés",
+        "title_edit": "Editer le résumé",
+        "page_number": "Numéro page",
+        "enter_note": "Entrer votre note"
+    },
+    "video_ended": "La vidéo est terminée !",
+    "success": {
+        "whatsapp": "Whatsapp est bien ouvert."
+    },
+    "error": "Erreur :",
+    "error_message": {
+        "login_before_operation": "Vous devez avant tout vous identifier pour effectuer cette opération.",
+        "pending_after_payment": "Lorsque vous effectuerez votre paiement, votre abonnement sera validé dans les minutes qui suivent.",
+        "no_server_response": "Aucune réponse reçue du serveur.",
+        "cannot_be_empty": "Ceci ne peut pas être vide."
+    },
+    "empty_list": {
+        "title": "La liste est vide",
+        "description_popular": "Ici, seront affichés les œuvres les plus consultées par les membres.",
+        "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
+        "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",
+        "description_medias": "Ici, seront affichés les médias qui pourront être consultés par les membres.",
+        "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres."
+    },
+    "back_list": "Retour à la liste",
+    "work_details": {
+        "title": "Détails sur l’œuvre",
+        "type": "Type : ",
+        "categories": "Catégories : ",
+        "category": "Catégorie : ",
+        "author": "Auteur : ",
+        "subscription_info": "Abonnez-vous pour être en mesure de consulter, ou bien devenez partenaire pour publier vos propres ouvrages."
+    },
+    "most_popular": "Les plus populaires",
+    "have_account": "Vous avez déjà un compte ?",
+    "no_account": "Vous n’avez pas de compte ?",
+    "select_date": "Sélectionner la date",
+    "search": "Rechercher ...",
+    "search_description": "Rechercher un livre, une revue, un média ou une carte.",
+    "show": "Afficher",
+    "hide": "Cacher",
+    "all_m": "Tous",
+    "all_f": "Toutes",
+    "see_all": "Voir tout",
+    "see_details": "Voir détails",
+    "expand": "Etendre",
+    "cut": "Couper",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "send": "Envoyer",
+    "cancel": "Annuler",
+    "update": "Mettre à jour",
+    "change": "Modifier",
+    "register": "Inscription",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "i_login": "Je vais me connecter",
+    "personal_infos": "Infos personnelles",
+    "change_password": "Modifier mot de passe",
+    "subscription":  {
+        "title": "Choisir un abonnement",
+        "type": "Type d’abonnement",
+        "price": "Prix",
+        "link": "S’abonner"
+    },
+    "addToCart": "Ajouter au panier",
+    "withdrawFromCart": "Retirer du panier",
+    "pay": "Payer maintenant",
+
+    "navigation": {
+        "home": "Accueil",
+        "search": "Rechercher une œuvre",
+        "reading": "Lecture",
+        "summary": "Résumés",
+        "about": "A propos",
+        "terms": "Conditions",
+        "privacy": "Confidentialité",
+        "contact": "Nous contacter",
+        "book": "Ouvrages",
+        "magazine": "Mags, revues et journaux",
+        "mapping": "Cartograhie",
+        "media": "Médias",
+        "notification": "Notifications",
+        "account": "Mon profil",
+        "update_account": "Éditer compte",
+        "cart": "Mon panier",
+        "work": "Mes œuvres"
+    },
+
+    "auth": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "surname": "Post-nom",
+        "gender": {
+            "label": "Sexe",
+            "male": "Masculin",
+            "female": "Féminin"
+        },
+        "birthdate": "Date de naissance",
+        "city": "Ville",
+        "country": {
+            "title": "Choisir un pays",
+            "label": "Pays"
+        },
+        "address_1": "Adresse 1",
+        "address_2": "Adresse 2 (Facultative)",
+        "p_o_box": "Boite Postale",
+        "email": "E-mail",
+        "phone": "N° de téléphone",
+        "username": "Pseudo",
+        "login_username": "E-mail, n° de téléphone ou pseudo",
+        "password": {
+            "label": "Mot de passe",
+            "former": "Ancien mot de passe",
+            "new": "Nouveau mot de passe",
+            "error": "Le mot de passe est incorrect",
+            "forgotten": "Mot de passe oublié",
+            "reset": "Réinitialiser mot de passe",
+            "reset_message": "Vous pouvez envoyer votre numéro de téléphone pour que nous modifiions votre mot de passe que nous vous enverrons par SMS et/ou WhatsApp."
+        },
+        "confirm_password": {
+            "label": "Confirmer mot de passe",
+            "new": "Confirmer nouveau mot de passe",
+            "error": "La confirmation ne correspond pas"
+        },
+        "avatar": {
+            "label": "Modifier votre avatar",
+            "upload": "Uploader une photo",
+            "camera": "Utiliser la caméra"
+        },
+        "status": {
+            "disabled": {
+                "title": "Compte désactivé",
+                "description": "Vous avez désactivé votre compte. Veuillez le réactiver pour effectuer des opérations spécifique.",
+                "link1": "Désactiver mon compte",
+                "link2": "Réactiver mon compte"
+            },
+            "blocked": {
+                "title": "Compte bloqué",
+                "description": "Votre compte est bloqué pour l'instant parce que vous ne respectez pas nos conditions d’utilisation. Veuillez nous contacter en cliquant sur le bouton ci-dessous.",
+                "link1": "Réclamer mon déblocage"
+            }
+        },
+        "my_works": {
+            "description": "Devenez un de nos partenaires pour pouvoir publier vos ouvrages qui seront visibles par tous. Et cela vous donnera l'avantage d'acquérir de l'argent selon les consultations du public.",
+            "terms_link": "Veuillez cliquer ci-dessous pour voir nos conditions.",
+            "start_button": "Devenir partenaire"
+        }
+    }
+}

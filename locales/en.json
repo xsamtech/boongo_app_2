@@ -1,0 +1,169 @@
+{
+    "copyright": "Copyright (c) 2024 Reborn",
+    "all_rights_reserved": "All rights reserved",
+    "welcome_title": "Welcome on Boongo",
+    "welcome_description": "Check out books, magazines, newspapers, geographical maps, etc.",
+    "about_boongo": "About the Boongo app",
+    "about_reborn": "About the Reborn company",
+    "privacy_title": "Privacy policy",
+    "terms_title": "Terms of use",
+    "terms_accept1": "By creating your account, you accept our ",
+    "terms_accept1_": "By subscribing, you accept our ",
+    "terms_accept2": " and our policy for ",
+    "change_lang": "Change language",
+    "back_home": "Back to home",
+    "load_more": "Load more",
+    "see_more": "See more",
+    "see_less": "See less",
+    "page": "Page",
+    "notepad": {
+        "title": "Save summaries",
+        "title_edit": "Edit the summary",
+        "page_number": "Page number",
+        "enter_note": "Enter your note"
+    },
+    "video_ended": "The video is finished!",
+    "success": {
+        "whatsapp": "Whatsapp is open."
+    },
+    "error": "Error:",
+    "error_message": {
+        "login_before_operation": "You must first identify yourself to carry out this operation.",
+        "pending_after_payment": "When you make your payment, your subscription will be validated within minutes.",
+        "no_server_response": "No response received from the server.",
+        "cannot_be_empty": "This cannot be empty."
+    },
+    "empty_list": {
+        "title": "The list is empty",
+        "description_popular": "Here, the works most consulted by members will be displayed.",
+        "description_books": "Here, the books will be displayed which can be consulted by members.",
+        "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
+        "description_medias": "Here, the medias will be displayed which can be consulted by members.",
+        "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
+    },
+    "back_list": "Back to the list",
+    "work_details": {
+        "title": "Details about the work",
+        "type": "Type: ",
+        "categories": "Categories: ",
+        "category": "Category: ",
+        "author": "Author: ",
+        "subscription_info": "Subscribe to be able to consult, or become partner to publish your own works."
+    },
+    "most_popular": "The most popular",
+    "have_account": "Already have an account?",
+    "no_account": "Don’t have an account?",
+    "select_date": "Select the date",
+    "search": "Search...",
+    "search_description": "Search for a book, magazine, media or map.",
+    "show": "Show",
+    "hide": "Hide",
+    "all_m": "All",
+    "all_f": "All",
+    "see_all": "See all",
+    "see_details": "See details",
+    "expand": "Expand",
+    "cut": "Cut",
+    "confirm": "Confirm",
+    "save": "Save",
+    "send": "Send",
+    "cancel": "Cancel",
+    "update": "Update",
+    "change": "Change",
+    "register": "Register",
+    "login": "Log in",
+    "logout": "Log out",
+    "i_login": "I will log in",
+    "personal_infos": "Personal infos",
+    "change_password": "Change password",
+    "subscription":  {
+        "title": "Choose a subscription",
+        "type": "Subscription type",
+        "price": "Price",
+        "link": "Subscribe"
+    },
+    "addToCart": "Add to cart",
+    "withdrawFromCart": "Withdraw from cart",
+    "pay": "Pay now",
+
+    "navigation": {
+        "home": "Home",
+        "search": "Search a work",
+        "reading": "Reading",
+        "summary": "Summaries",
+        "about": "About",
+        "terms": "Terms",
+        "privacy": "Privacy",
+        "contact": "Contact us",
+        "book": "Books",
+        "magazine": "Magazines & journals",
+        "mapping": "Mapping",
+        "media": "Medias",
+        "notification": "Notifications",
+        "account": "My profile",
+        "update_account": "Edit account",
+        "cart": "My cart",
+        "work": "My works"
+    },
+
+    "auth": {
+        "firstname": "First name",
+        "lastname": "Last name",
+        "surname": "Surname",
+        "gender": {
+            "label": "Gender",
+            "male": "Male",
+            "female": "Female"
+        },
+        "birthdate": "Date of birth",
+        "city": "City",
+        "country": {
+            "title": "Choose a country",
+            "label": "Country"
+        },
+        "address_1": "Address 1",
+        "address_2": "Address 2 (Optional)",
+        "p_o_box": "P.O. Box",
+        "email": "E-mail",
+        "phone": "Phone number",
+        "username": "Username",
+        "login_username": "E-mail, phone or username",
+        "password": {
+            "label": "Password",
+            "former": "Former password",
+            "new": "New password",
+            "error": "The password is incorrect",
+            "forgotten": "Forgotten password",
+            "reset": "Reset password",
+            "reset_message": "You can send your phone number so that we can change your password which we will send to you by SMS and/or WhatsApp."
+        },
+        "confirm_password": {
+            "label": "Confirm password",
+            "new": "Confirm new password",
+            "error": "The confirmation didn't match"
+        },
+        "avatar": {
+            "label": "Change your avatar",
+            "upload": "Upload a photo",
+            "camera": "Use the camera"
+        },
+        "status": {
+            "disabled": {
+                "title": "Account disabled",
+                "description": "You have deactivated your account. Please reactivate it to perform specific operations.",
+                "link1": "Disable my account",
+                "link2": "Reactivate my account"
+            },
+            "blocked": {
+                "title": "Account blocked",
+                "description": "Your account is currently blocked because you do not comply with our terms of use. Please contact us by clicking the button below.",
+                "link1": "Claim my unlocking"
+            }
+        },
+        "my_works": {
+            "description": "Become one of our partners to be able to publish your works which will be visible to all. And this will give you the advantage of acquiring money according to public consultations.",
+            "terms_link": "Please click below to see our terms.",
+            "start_button": "Become a partner"
+        }
+    }
+}

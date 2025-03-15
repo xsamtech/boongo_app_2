@@ -1,0 +1,169 @@
+{
+    "copyright": "Copyright (c) 2024 Reborn",
+    "all_rights_reserved": "Makoki nyonso mazali ya biso",
+    "welcome_title": "Boyei malamu na Boongo",
+    "welcome_description": "Botala ba livres, ba magazines, ba journaux, ba cartes géographiques, etc.",
+    "about_boongo": "Na ntina na appli Boongo",
+    "about_reborn": "Na ntina na mosala Reborn",
+    "privacy_title": "Politiki ya kobatela makambo ya moto ye moko",
+    "terms_title": "Mibeko ya kosalela",
+    "terms_accept1": "Na kosala compte na yo, ondimi na biso",
+    "terms_accept1_": "Na kosala abonnément, ondimi na biso",
+    "terms_accept2": "mpe politiki na biso ya",
+    "change_lang": "Ko bobongola monoko",
+    "back_home": "Kozonga na lokasa ya ebandeli",
+    "load_more": "Tondisa mingi",
+    "see_more": "Tala misusu",
+    "see_less": "Tala moke",
+    "page": "Lokasa",
+    "notepad": {
+        "title": "Bomba ba résumés",
+        "title_edit": "Bongisa résumé",
+        "page_number": "Motángo ya lokasa",
+        "enter_note": "Kotisa note na yo"
+    },
+    "video_ended": "Video esili!",
+    "success": {
+        "whatsapp": "Whatsapp ezali polele."
+    },
+    "error": "Libunga :",
+    "error_message": {
+        "login_before_operation": "Esengeli liboso omi identifier mpo na kosala opération oyo.",
+        "pending_after_payment": "Tango okofuta, abonnément na yo ekozala validé na ba ngonga elandi.",
+        "no_server_response": "Eyano moko te ezwami uta na serveur.",
+        "cannot_be_empty": "Oyo ekoki kozala mpamba te."
+    },
+    "empty_list": {
+        "title": "Liste ezali pamba",
+        "description_popular": "Awa, misala oyo ba membres ba consulté mingi ekolakisama.",
+        "description_books": "Awa, misala mikolakisama miye mikoki kozala consulte na ba membres.",
+        "description_mags": "Awa, eko lakisama ba journals, ba journaux to ba magazines oyo ba membres bakoki ko consulte.",
+        "description_medias": "Awa, eko lakisama ba médias oyo ba membres bakoki ko consulte.",
+        "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte."
+    },
+    "back_list": "Zonga na liste",
+    "work_details": {
+        "title": "Makambo ya mikemike na ntina ya oeuvre",
+        "type": "Lolenge : ",
+        "categories": "Catégories : ",
+        "category": "Catégorie : ",
+        "author": "Mokomi : ",
+        "subscription_info": "Abonnez-vous po ozala na makoki ya ko consulter, to okoma partenaire pona kobimisa ba oeuvres nayo moko."
+    },
+    "most_popular": "Oyo eza na lupemba ya makasi",
+    "have_account": "Ozali déjà na compte?",
+    "no_account": "Ozali na compte te?"
+    "select_date": "Pona mokolo",
+    "search": "Luka ...",
+    "search_description": "Luka buku, zulunalo, bapanzi sango to karte.",
+    "show": "Kolakisa",
+    "hide": "Kobombana",
+    "all_m": "Nyonso",
+    "all_f": "Nyonso",
+    "see_all": "Tala nionso",
+    "see_details": "Tala makambo na mikemike",
+    "expand": "Kokomisa mingi",
+    "cut": "Kokata",
+    "confirm": "Kondimisa",
+    "save": "Ko bomba",
+    "send": "Kotinda",
+    "cancel": "Kolongola",
+    "update": "Bongola",
+    "change": "Bongola",
+    "register": "Komikomisa",
+    "login": "Bokangami",
+    "logout": "Kokata bokangami",
+    "i_login": "Nakota na appli",
+    "personal_infos": "Ba sango ya moto ye moko",
+    "change_password": "Kobongola mot de passe",
+    "subscription":  {
+        "title": "Pona abonnément moko",
+        "type": "Lolenge ya abonnément",
+        "price": "Ntalo",
+        "link": "S’abonner"
+    },
+    "addToCart": "Ajouter au panier",
+    "withdrawFromCart": "Retirer du panier",
+    "pay": "Futa sikoyo",
+
+    "navigation": {
+        "home": "Boyei malamu",
+        "search": "Koluka oeuvre moko",
+        "reading": "Kotanga",
+        "summary": "Résumés",
+        "about": "A propos",
+        "terms": "Conditions",
+        "privacy": "Confidentialité",
+        "contact": "Kokutana na biso",
+        "book": "Ouvrages",
+        "magazine": "Mags, revues et journaux",
+        "mapping": "Cartograhie",
+        "media": "Médias",
+        "notification": "Notifications",
+        "account": "Profil na ngai",
+        "update_account": "Kobongisa compte",
+        "cart": "Kitunga na ngai",
+        "work": "Ba œuvres na ngai"
+    },
+
+    "auth": {
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "surname": "Post-nom",
+        "gender": {
+            "label": "Sexe",
+            "male": "Masculin",
+            "female": "Féminin"
+        },
+        "birthdate": "Date de naissance",
+        "city": "Ville",
+        "country": {
+            "title": "Choisir un pays",
+            "label": "Pays"
+        },
+        "address_1": "Adresse 1",
+        "address_2": "Adresse 2 (Facultative)",
+        "p_o_box": "Boite Postale",
+        "email": "E-mail",
+        "phone": "N° de téléphone",
+        "username": "Pseudo",
+        "login_username": "E-mail, n° de téléphone ou pseudo",
+        "password": {
+            "label": "Mot de passe",
+            "former": "Ancien mot de passe",
+            "new": "Nouveau mot de passe",
+            "error": "Le mot de passe est incorrect",
+            "forgotten": "Mot de passe oublié",
+            "reset": "Réinitialiser mot de passe",
+            "reset_message": "Okoki kotinda nimero nayo ya telefone mpo ete tokoka kobongola mot de passe na yo oyo tokotindela yo na nzela ya SMS mpe/to WhatsApp."
+        },
+        "confirm_password": {
+            "label": "Confirmer mot de passe",
+            "new": "Confirmer nouveau mot de passe",
+            "error": "Confirmation ekokani te"
+        },
+        "avatar": {
+            "label": "Modifier votre avatar",
+            "upload": "Uploader une photo",
+            "camera": "Utiliser la caméra"
+        },
+        "status": {
+            "disabled": {
+                "title": "Compte désactivé",
+                "description": "Osili ko désactiver compte na yo. Svp zongisa reactiver yango pona kosala ba opérations spécifiques.",
+                "link1": "Désactiver mon compte",
+                "link2": "Réactiver mon compte"
+            },
+            "blocked": {
+                "title": "Compte ekangami",
+                "description": "Compte na yo ekangami sikoyo mpo ozali kotosa mibeko na biso ya kosalela te. Bo contacter biso na ko cliquer bouton oyo ezali awa na se.",
+                "link1": "Reclamer déverrouillage na ngai"
+            }
+        },
+        "my_works": {
+            "description": "koma moko ya ba partenaires na biso po ozala na makoki ya kobimisa misala na yo oyo ekozala komonana na bato banso. Mpe yango ekopesa yo avantage ya kozua mbongo selon ba consultations publiques.",
+            "terms_link": "Svp fina na se pona komona ba conditions na biso.",
+            "start_button": "koma partenaire"
+        }
+    }
+}
