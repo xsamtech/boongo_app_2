@@ -1,9 +1,9 @@
 {
-    "copyright": "Copyright (c) 2024 Reborn",
+    "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "Tous droits réservés",
-    "welcome_title": "Bienvenue sur Boongo",
-    "welcome_description": "Consultez des livres, des revues, des journaux, des cartes géogrpahiques, etc.",
-    "about_boongo": "A propos de l’appli Boongo",
+    "welcome_title": "Votre appli de covoiturage",
+    "welcome_description": "Trouver une voiture qui prend la même direction que vous pour vous accompagner.",
+    "about_pepoo": "A propos de l’appli Pepoo",
     "about_reborn": "A propos de l’entreprise Reborn",
     "privacy_title": "Politique de confidentialité",
     "terms_title": "Conditions d’utilisation",
@@ -16,6 +16,17 @@
     "see_more": "Voir plus",
     "see_less": "Voir moins",
     "page": "Page",
+    "my_position": "Ma position",
+    "type_position": "Taper une autre position",
+    "change_position": "Changer ma position actuelle",
+    "my_current_position": "Ma position actuelle",
+    "give_destination": "Donner ma destination",
+    "find_vehicles": "Trouver des véhicules disponibles selon votre position actuelle",
+    "driver": "Chauffeur",
+    "passenger": "Passager",
+    "Mark": "Marque",
+    "Model": "Modèle",
+    "number": "Matricule",
     "notepad": {
         "title": "Enregistrez des résumés",
         "title_edit": "Editer le résumé",
@@ -35,11 +46,7 @@
     },
     "empty_list": {
         "title": "La liste est vide",
-        "description_popular": "Ici, seront affichés les œuvres les plus consultées par les membres.",
-        "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
-        "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",
-        "description_medias": "Ici, seront affichés les médias qui pourront être consultés par les membres.",
-        "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres."
+        "description": "Il n’y a pas encore de vehicule disponible sur le trajet de votre position à votre destination."
     },
     "back_list": "Retour à la liste",
     "work_details": {
@@ -73,6 +80,7 @@
     "register": "Inscription",
     "login": "Connexion",
     "logout": "Déconnexion",
+    "exit": "Quitter la session",
     "i_login": "Je vais me connecter",
     "personal_infos": "Infos personnelles",
     "change_password": "Modifier mot de passe",
@@ -88,22 +96,15 @@
 
     "navigation": {
         "home": "Accueil",
-        "search": "Rechercher une œuvre",
-        "reading": "Lecture",
-        "summary": "Résumés",
+        "search": "Où allez-vous ?",
         "about": "A propos",
         "terms": "Conditions",
         "privacy": "Confidentialité",
         "contact": "Nous contacter",
-        "book": "Ouvrages",
-        "magazine": "Mags, revues et journaux",
-        "mapping": "Cartograhie",
-        "media": "Médias",
-        "notification": "Notifications",
-        "account": "Mon profil",
-        "update_account": "Éditer compte",
-        "cart": "Mon panier",
-        "work": "Mes œuvres"
+        "history": "Historique des commandes",
+        "payment_method": "Mode de paiement",
+        "favorite_places": "Lieux favoris",
+        "settings": "Paramètres"
     },
 
     "auth": {

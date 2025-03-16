@@ -328,6 +328,19 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const loginTest = () => {
+        setIsLoading(true);
+
+        const userData = { 'id': 1, 'firstname': 'Zachée', 'lastname': 'Kabongo', 'username': 'saintesprit', 'gender': 'M' };
+
+        setUserInfo(userData);
+
+        AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+        ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+        setIsLoading(false);
+    };
+
     const logout = () => {
         setIsLoading(true);
 
@@ -382,7 +395,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, splashLoading, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription, login, logout }}>
+            value={{ isLoading, userInfo, splashLoading, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription, login, loginTest, logout }}>
             {children}
         </AuthContext.Provider>
     );

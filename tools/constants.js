@@ -18,41 +18,70 @@ export const COLORS = {
     dark_light: '#e3e3e3',
     white: '#fff',
     black: '#000',
+    purple: '#643487',
+    purple_transparent: 'rgba(100, 52, 135, 0.3)',
+    yellow: '#eaa829',
+    yellow_transparent: 'rgba(234, 168, 41, 0.3)',
     iconColor: '#eaebef'
 };
 
-export const ICON_SIZE = {
-    s0_3: 45,
-    s0_4: 40,
-    s0_5: 35,
-    s1: 25,
-    s2: 23,
-    s3: 21,
-    s4: 19,
-    s5: 16,
-    s6: 14,
+export const IMAGE_SIZE = {
+    s01: 14,
+    s02: 16,
+    s03: 19,
+    s04: 21,
+    s05: 23,
+    s06: 25,
+    s07: 30,
+    s08: 35,
+    s09: 40,
+    s10: 41,
+    s11: 42,
+    s12: 43,
+    s13: 45,
+    s14: 50,
+    s15: 64,
+    s16: 75,
+    s17: 96,
+    s18: 100,
+    s19: 120,
+    s20: 150,
+    s21: 200,
 };
 
 export const TEXT_SIZE = {
     title: 22,
-    secondary: 14
+    label: 14,
+    paragraph: 16,
+    normal: 18,
 };
 
 export const PADDING = {
-    horizontal: 10,
-    vertical: 10
+    p00: 5,
+    p01: 10,
+    p02: 12,
+    p03: 14,
+    p04: 16,
+    p05: 18,
+    p06: 19,
+    p07: 20,
+    p08: 21,
+    p09: 23,
+    p10: 25,
+    p11: 28,
+    p12: 30,
+    p13: 32,
+    p14: 35,
 };
 
 export const API = {
-    // url: 'http://192.168.43.78/boongo/public/api'
-    url: 'https://boongo7.com/api'
+    url: 'http://192.168.43.78/pepoo/public/api'
 };
 
 export const WEB = {
-    // url: 'http://192.168.43.78/boongo/public'
-    url: 'https://boongo7.com'
+    url: 'http://192.168.43.78/pepoo/public'
 };
 
 export const PHONE = {
-    admin: '+243815737600'
+    admin: '+243813329097'
 };
