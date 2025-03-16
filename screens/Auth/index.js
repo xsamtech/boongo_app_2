@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import homeStyles from '../style';
 
-const OnboardScreen = ({ route }) => {
+const OnboardScreen = () => {
   // =============== Language ===============
   const { t } = useTranslation();
 
