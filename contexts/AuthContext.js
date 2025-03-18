@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
+    const [daysDifference, setDaysDifference] = useState(0);
 
     const getDaysDifference = () => {
         // Supposons que la date soit dans data.date

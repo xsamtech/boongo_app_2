@@ -7,11 +7,11 @@ import { View, Text, TextInput, ScrollView, Linking, ToastAndroid } from 'react-
 import { Button } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import homeStyles from '../Home/style';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { AuthContext } from '../../contexts/AuthContext';
 import TextBrand from '../../assets/img/text.svg';
 import { COLORS, PHONE } from '../../tools/constants';
+import homeStyles from '../style';
 
 const sendWhatsAppMessage = async (message) => {
   const phoneNumber = PHONE.admin;

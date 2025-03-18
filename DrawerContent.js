@@ -12,7 +12,6 @@ import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS, PADDING, TEXT_SIZE } from './tools/constants';
 import homeStyles from './screens/style';
-import Marker from './assets/img/marker.svg';
 
 const DrawerList = [
     { icon: 'home-outline', label: 'Accueil', navigateTo: 'Home' },

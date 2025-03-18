@@ -7,11 +7,11 @@ import { useNavigation } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, Linking } from 'react-native';
 import { Button, Divider } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import homeStyles from '../Home/style';
 import { AuthContext } from '../../contexts/AuthContext';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { COLORS } from '../../tools/constants';
 import TextBrand from '../../assets/img/text.svg';
+import homeStyles from '../style';
 
 const RegisterScreen = () => {
   // =============== Language ===============

@@ -7,11 +7,11 @@ import { View, Text, TouchableOpacity, TextInput, ScrollView, Linking } from 're
 import { Button, Divider } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import homeStyles from '../Home/style';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { AuthContext } from '../../contexts/AuthContext';
-import TextBrand from '../../assets/img/text.svg';
 import { PADDING } from '../../tools/constants';
+import TextBrand from '../../assets/img/text.svg';
+import homeStyles from '../style';
 
 const LoginScreen = ({ route }) => {
   // =============== Language ===============

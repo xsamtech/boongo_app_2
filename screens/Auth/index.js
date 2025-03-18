@@ -2,7 +2,7 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,8 @@ import homeStyles from '../style';
 const OnboardScreen = () => {
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Get data ===============
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <ScrollView

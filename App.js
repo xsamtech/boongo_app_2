@@ -2,7 +2,9 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
+import { AuthContext, AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import SecureScreen from 'react-native-secure-screen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS, PADDING } from './tools/constants';
-import { AuthContext } from './contexts/AuthContext';
 import DrawerContent from './DrawerContent';
 import Logo from './assets/img/logo.svg';
 import AboutScreen from './screens/About';
@@ -25,6 +26,7 @@ import RegisterScreen from './screens/Auth/register';
 import PasswordResetScreen from './screens/Auth/password-reset';
 import HomeScreen from './screens/Home';
 import LanguageScreen from './screens/language';
+import SplashScreen from './screens/Home/splash_screen';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -186,11 +188,15 @@ const DrawerNav = () => {
 
 const App = () => {
   // =============== Get data ===============
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo, isLoading } = useContext(AuthContext);
 
   useEffect(() => {
     SecureScreen.set();
   }, []);
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
 
   return (
     <NavigationContainer>
@@ -203,4 +209,8 @@ const App = () => {
   );
 }
 
-export default App
+export default () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
