@@ -14,21 +14,6 @@ export const AuthProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
-    const [daysDifference, setDaysDifference] = useState(0);
-
-    const getDaysDifference = () => {
-        // Supposons que la date soit dans data.date
-        const apiDate = new Date(userInfo.date);
-        const today = new Date();
-
-        // Calculer la différence en millisecondes
-        const differenceInTime = apiDate - today;
-
-        // Convertir en jours
-        const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-
-        setDaysDifference(differenceInDays);
-    };
 
     const register = (firstname, lastname, surname, gender, birthdate, city, country, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, role_id) => {
         setIsLoading(true);
@@ -396,7 +381,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, splashLoading, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription, login, loginTest, logout }}>
+            value={{ isLoading, userInfo, splashLoading, login, loginTest, logout, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription }}>
             {children}
         </AuthContext.Provider>
     );

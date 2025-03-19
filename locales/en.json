@@ -2,8 +2,13 @@
     "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "All rights reserved",
     "welcome_title": "Your ride sharing app",
-    "welcome_description": "Find a car that is going in the same direction as you to accompany you.",
-    "about_pepoo": "About the Pepoo app",
+    "welcome_description": {
+        "work": "Publish your works of all types (book, magazine & newspaper or geographical map) to make them accessible to the public, and interact with subscribers to your works.",
+        "school": "Register your institution (school, academic or other), interact with teachers or students, and share your programs and events.",
+        "government": "Register your government institution (ministry, public company, or other) to be able to share your events and interact with the public."
+    },
+    "slogan": "The knowledge guide!",
+    "about_boongo": "About the Boongo app",
     "about_reborn": "About the Reborn company",
     "privacy_title": "Privacy policy",
     "terms_title": "Terms of use",
@@ -15,18 +20,8 @@
     "load_more": "Load more",
     "see_more": "See more",
     "see_less": "See less",
+    "dark_theme": "Dark mode",
     "page": "Page",
-    "my_position": "My position",
-    "type_position": "Type another position",
-    "change_position": "Change my current position",
-    "my_current_position": "My current position",
-    "give_destination": "Give my destination",
-    "find_vehicles": "Find available vehicles based on your current position",
-    "driver": "Driver",
-    "passenger": "Passenger",
-    "Mark": "Mark",
-    "Model": "Model",
-    "number": "Number",
     "notepad": {
         "title": "Save summaries",
         "title_edit": "Edit the summary",
@@ -46,7 +41,11 @@
     },
     "empty_list": {
         "title": "The list is empty",
-        "description": "There are no vehicles available yet on the route from your position to your destination."
+        "description_popular": "Here, the works most consulted by members will be displayed.",
+        "description_books": "Here, the books will be displayed which can be consulted by members.",
+        "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
+        "description_medias": "Here, the medias will be displayed which can be consulted by members.",
+        "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
     },
     "back_list": "Back to the list",
     "work_details": {
@@ -78,10 +77,10 @@
     "update": "Update",
     "change": "Change",
     "register": "Register",
+    "i_register": "Create account",
     "login": "Log in",
+    "i_login": "Sign in",
     "logout": "Log out",
-    "exit": "Exit session",
-    "i_login": "I will log in",
     "personal_infos": "Personal infos",
     "change_password": "Change password",
     "subscription":  {
@@ -96,15 +95,22 @@
 
     "navigation": {
         "home": "Home",
-        "search": "Where are you going?",
+        "search": "Search a work",
+        "reading": "Reading",
+        "summary": "Summaries",
         "about": "About",
-        "terms": "Conditions",
+        "terms": "Terms",
         "privacy": "Privacy",
         "contact": "Contact us",
-        "history": "Orders history",
-        "payment_method": "Payment method",
-        "favorite_places": "Favorite places",
-        "settings": "Settings"
+        "book": "Books",
+        "magazine": "Magazines & journals",
+        "mapping": "Mapping",
+        "media": "Medias",
+        "notification": "Notifications",
+        "account": "My profile",
+        "update_account": "Edit account",
+        "cart": "My cart",
+        "work": "My works"
     },
 
     "auth": {

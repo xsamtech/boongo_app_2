@@ -12,17 +12,17 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { PADDING } from '../../tools/constants';
 import TextBrand from '../../assets/img/text.svg';
 import homeStyles from '../style';
+import useColors from '../../hooks/useColors';
 
 const LoginScreen = ({ route }) => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-
   // =============== Authentication context ===============
   const { isLoading, login } = useContext(AuthContext);
-
   // =============== Navigation ===============
   const navigation = useNavigation();
-
   // =============== User data ===============
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
@@ -32,11 +32,10 @@ const LoginScreen = ({ route }) => {
     const { message } = route.params;
 
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <Spinner visible={isLoading} />
 
-        <ScrollView style={{ paddingVertical: 50, paddingHorizontal: 30 }}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p14, paddingHorizontal: PADDING.p10 }}>
 
           {/* Brand / Title */}
           <View style={homeStyles.authlogo}>

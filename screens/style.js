@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import { Dimensions, StyleSheet } from 'react-native';
-import { COLORS, PADDING, TEXT_SIZE } from '../tools/constants';
+import { PADDING, TEXT_SIZE } from '../tools/constants';
 
 const homeStyles = StyleSheet.create({
     // Miscellaneous
@@ -50,13 +50,20 @@ const homeStyles = StyleSheet.create({
         alignItems: 'center'
     },
 
+    // Boongo slogan
+    slogan: {
+        fontSize: TEXT_SIZE.label,
+        fontWeight: '200',
+        textAlign: 'center'
+    },
+
     // Maps
     mapContainer: {
         position: 'relative',
         overflow: 'hidden',
         marginTop: PADDING.p02,
         borderWidth: 1,
-        borderColor: COLORS.secondary,
+        borderColor: '#d3d3d3',
         borderRadius: 10
     },
 
@@ -74,7 +81,7 @@ const homeStyles = StyleSheet.create({
     },
 
     mapButton: {
-        backgroundColor: COLORS.dark_secondary,
+        backgroundColor: '#777',
         padding: PADDING.p00,
         marginBottom: 10,
         borderRadius: 5,
@@ -138,7 +145,7 @@ const homeStyles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 19,
         fontWeight: '700',
-        color: COLORS.purple
+        color: '#3a7ced'
     },
 
     cardEmptyText: {
@@ -183,6 +190,52 @@ const homeStyles = StyleSheet.create({
     paragraph: {
         fontSize: 14,
         fontWeight: '800'
+    },
+
+    // Onboard screen
+    onboardTop: {
+        height: Dimensions.get('window').height - 170,
+        paddingTop: PADDING.p10,
+        paddingHorizontal: PADDING.p01,
+        elevation: 3
+    },
+
+    onboardBottom: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#888',
+        paddingVertical: PADDING.p07,
+        paddingHorizontal: PADDING.p01,
+    },
+
+    onboardButton: {
+        flexDirection: 'row',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: PADDING.p03,
+        borderRadius: PADDING.p12
+    },
+
+    onboardButtonText: {
+        fontSize: TEXT_SIZE.paragraph,
+        textTransform: 'uppercase',
+    },
+
+    onboardSlide: {
+        marginTop: PADDING.p03,
+        flexDirection: 'row',
+    },
+
+    onboardSlideItem: {
+        paddingHorizontal: PADDING.p03
+    },
+
+    onboardSlideText: {
+        fontSize: 13,
+        letterSpacing: 0.3,
+        textAlign: 'center',
+        marginTop: PADDING.p05
     },
 
     // Floating button
@@ -271,12 +324,14 @@ const homeStyles = StyleSheet.create({
     authButton: {
         paddingVertical: 4,
         paddingHorizontal: 0,
-        marginTop: PADDING.p00,
+        paddingVertical: PADDING.p01,
+        borderRadius: PADDING.p05
     },
 
     authButtonText: {
         fontSize: 15,
         textTransform: 'uppercase',
+        textAlign: 'center'
     },
 
     // Drawer
@@ -309,7 +364,7 @@ const homeStyles = StyleSheet.create({
         bottom: 0,
         width: '100%',
         height: 140,
-        backgroundColor: COLORS.dark_light,
+        backgroundColor: '#e3e3e3',
         paddingVertical: PADDING.p00
     },
 
@@ -333,7 +388,7 @@ const homeStyles = StyleSheet.create({
         paddingHorizontal: PADDING.p03,
         textAlign: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: COLORS.purple_transparent
+        borderBottomColor: 'rgba(0, 89, 255, 0.3)'
     },
 
     button: {
@@ -370,7 +425,6 @@ const homeStyles = StyleSheet.create({
     },
 
     workCard: {
-        backgroundColor: COLORS.white,
         marginBottom: 14,
         padding: 15,
     },
@@ -391,7 +445,6 @@ const homeStyles = StyleSheet.create({
         height: (Dimensions.get('window').width / 2.5) * 1.5,
         marginRight: 10,
         borderWidth: 3,
-        borderColor: COLORS.light,
         borderRadius: 20
     },
 
@@ -403,7 +456,7 @@ const homeStyles = StyleSheet.create({
     workTitle: {
         fontSize: 19,
         fontWeight: '700',
-        color: COLORS.purple,
+        color: '#3a7ced',
         marginTop: 10,
     },
 
@@ -425,7 +478,6 @@ const homeStyles = StyleSheet.create({
 
     workDescText: {
         fontSize: 16,
-        color: COLORS.black,
         marginBottom: 10
     },
 
@@ -444,8 +496,8 @@ const homeStyles = StyleSheet.create({
 
     workDescBadge: {
         fontSize: 16,
-        color: COLORS.black,
-        backgroundColor: COLORS.secondary,
+        color: 'black',
+        backgroundColor: '#d3d3d3',
         marginBottom: 10,
         marginRight: 7,
         paddingTop: 3,
@@ -554,7 +606,7 @@ const homeStyles = StyleSheet.create({
 
     categoryBadgeSelected: {
         alignSelf: 'center',
-        backgroundColor: COLORS.dark_light,
+        backgroundColor: '#e3e3e3',
         marginHorizontal: PADDING.p05,
         paddingVertical: PADDING.p00 + 1,
         paddingHorizontal: PADDING.p03,
@@ -584,8 +636,7 @@ const homeStyles = StyleSheet.create({
         borderEndWidth: 0,
         borderTopLeftRadius: 7,
         borderBottomLeftRadius: 7,
-        fontSize: 16,
-        color: COLORS.black,
+        fontSize: 16
     },
 
     searchInputSubmit: {

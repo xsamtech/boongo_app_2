@@ -10,8 +10,9 @@ import { useNavigation } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { AuthContext } from '../../contexts/AuthContext';
 import TextBrand from '../../assets/img/text.svg';
-import { COLORS, PHONE } from '../../tools/constants';
+import { PHONE } from '../../tools/constants';
 import homeStyles from '../style';
+import useColors from '../../hooks/useColors';
 
 const sendWhatsAppMessage = async (message) => {
   const phoneNumber = PHONE.admin;
@@ -28,15 +29,14 @@ const sendWhatsAppMessage = async (message) => {
 };
 
 const PasswordResetScreen = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-
   // =============== Authentication context ===============
   const { isLoading, login } = useContext(AuthContext);
-
   // =============== Navigation ===============
   const navigation = useNavigation();
-
   // =============== User data ===============
   const [phone, setPhone] = useState('');
 

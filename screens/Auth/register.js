@@ -9,17 +9,17 @@ import { Button, Divider } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../../contexts/AuthContext';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { COLORS } from '../../tools/constants';
 import TextBrand from '../../assets/img/text.svg';
 import homeStyles from '../style';
+import useColors from '../../hooks/useColors';
 
 const RegisterScreen = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-
   // =============== Navigation ===============
   const navigation = useNavigation();
-
   // =============== Authentication context ===============
   const { isLoading, register } = useContext(AuthContext);
 

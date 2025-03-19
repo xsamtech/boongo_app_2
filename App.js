@@ -11,11 +11,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import SecureScreen from 'react-native-secure-screen';
+import { forbid } from 'react-native-secure-screen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS, PADDING } from './tools/constants';
+import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
 import Logo from './assets/img/logo.svg';
+import useColors from './hooks/useColors';
 import AboutScreen from './screens/About';
 import TermsScreen from './screens/About/terms';
 import PrivacyScreen from './screens/About/privacy';
@@ -26,7 +27,7 @@ import RegisterScreen from './screens/Auth/register';
 import PasswordResetScreen from './screens/Auth/password-reset';
 import HomeScreen from './screens/Home';
 import LanguageScreen from './screens/language';
-import SplashScreen from './screens/Home/splash_screen';
+import SplashScreen from './screens/splash_screen';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -36,6 +37,8 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AboutBottomTab = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Language ===============
@@ -125,6 +128,9 @@ const AboutBottomTab = () => {
 }
 
 const LoginStackNav = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
+
   return (
     <Stack.Navigator
       initialRouteName='Onboard'
@@ -143,6 +149,8 @@ const LoginStackNav = () => {
 };
 
 const HomeStackNav = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Language ===============
@@ -188,13 +196,17 @@ const DrawerNav = () => {
 
 const App = () => {
   // =============== Get data ===============
-  const { userInfo, isLoading } = useContext(AuthContext);
+  const { userInfo, splashLoading } = useContext(AuthContext);
 
   useEffect(() => {
-    SecureScreen.set();
+    const applySecurity = async () => {
+      await forbid();
+    };
+
+    applySecurity();
   }, []);
 
-  if (isLoading) {
+  if (splashLoading) {
     return <SplashScreen />;
   }
 
@@ -210,7 +222,9 @@ const App = () => {
 }
 
 export default () => (
-  <AuthProvider>
-    <App />
-  </AuthProvider>
+  <ThemeProvider>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  </ThemeProvider>
 );

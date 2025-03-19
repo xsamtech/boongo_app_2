@@ -2,29 +2,6 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-export const COLORS = {
-    danger: '#db3337',
-    light_danger: '#dbbbbf',
-    dark_danger: '#b91115',
-    primary: '#3a7ced',
-    light_primary: '#99aaff',
-    dark_primary: '#185acb',
-    secondary: '#d3d3d3',
-    dark_secondary: '#777',
-    info: '#3dbced',
-    success: '#2ba14d',
-    warning: '#ecad26',
-    light: '#f3f3f3',
-    dark_light: '#e3e3e3',
-    white: '#fff',
-    black: '#000',
-    purple: '#643487',
-    purple_transparent: 'rgba(100, 52, 135, 0.3)',
-    yellow: '#eaa829',
-    yellow_transparent: 'rgba(234, 168, 41, 0.3)',
-    iconColor: '#eaebef'
-};
-
 export const IMAGE_SIZE = {
     s01: 14,
     s02: 16,
@@ -50,6 +27,7 @@ export const IMAGE_SIZE = {
 };
 
 export const TEXT_SIZE = {
+    header: 25,
     title: 22,
     label: 14,
     paragraph: 16,

@@ -2,17 +2,16 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useRef, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, TouchableHighlight, TextInput } from 'react-native'
+import React from 'react'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import { Divider } from 'react-native-paper';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS, PADDING } from '../../tools/constants';
 import FooterComponent from '../footer';
-import TextBrand from '../../assets/img/logo-text.svg';
+import TextBrand from '../../assets/img/brand.svg';
 import homeStyles from '../style';
-import axios from 'axios';
 
 const HomeScreen = () => {
   // =============== Navigation ===============
