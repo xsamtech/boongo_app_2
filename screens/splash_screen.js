@@ -27,7 +27,7 @@ const SplashScreen = () => {
 
       <ActivityIndicator size='large' color={COLORS.danger} />
 
-      <Divider style={[homeStyles.authDivider, {marginTop: PADDING.p03}]} />
+      <Divider style={[homeStyles.authDivider, { marginTop: PADDING.p03 }]} />
       <FooterComponent color={COLORS.dark_secondary} />
     </View>
   );
