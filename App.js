@@ -12,6 +12,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { forbid } from 'react-native-secure-screen';
+import Orientation from 'react-native-orientation-locker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
@@ -130,6 +131,14 @@ const AboutBottomTab = () => {
 const LoginStackNav = () => {
   // =============== Colors ===============
   const COLORS = useColors();
+  // =============== Lock screen orientation ===============
+  useEffect(() => {
+    Orientation.lockToPortrait();
+
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  }, []);
 
   return (
     <Stack.Navigator

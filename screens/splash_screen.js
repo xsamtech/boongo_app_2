@@ -6,6 +6,7 @@ import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
+import { PADDING } from '../tools/constants';
 import FooterComponent from './footer';
 import useColors from '../hooks/useColors';
 import LogoText from '../assets/img/brand.svg';
@@ -26,7 +27,7 @@ const SplashScreen = () => {
 
       <ActivityIndicator size='large' color={COLORS.danger} />
 
-      <Divider style={homeStyles.authDivider} />
+      <Divider style={[homeStyles.authDivider, {marginTop: PADDING.p03}]} />
       <FooterComponent color={COLORS.dark_secondary} />
     </View>
   );

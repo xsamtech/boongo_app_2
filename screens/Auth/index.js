@@ -7,7 +7,6 @@ import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Dimensions } 
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import Carousel from 'pinar';
-import Orientation from 'react-native-orientation-locker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING, TEXT_SIZE } from '../../tools/constants';
 import useColors from '../../hooks/useColors';
@@ -26,14 +25,6 @@ const OnboardScreen = () => {
   const { t } = useTranslation();
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Lock screen orientation ===============
-  useEffect(() => {
-    Orientation.lockToPortrait();
-
-    return () => {
-      Orientation.unlockAllOrientations();
-    };
-  }, []);
 
   // =============== Refresh control ===============
   const onRefresh = useCallback(() => {

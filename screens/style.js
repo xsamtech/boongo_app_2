@@ -281,15 +281,13 @@ const homeStyles = StyleSheet.create({
     authlogo: {
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: -30,
-        marginBottom: PADDING.p01
     },
 
     authTitle: {
-        fontSize: 25,
-        fontWeight: 'bold',
+        fontSize: 28,
+        fontWeight: '400',
         textAlign: 'center',
-        marginBottom: 20
+        marginVertical: PADDING.p12
     },
 
     authTextWrapper: {
@@ -315,17 +313,17 @@ const homeStyles = StyleSheet.create({
     authTextarea: {
         height: 70,
         backgroundColor: 'rgba(255, 255, 255, 0)',
-        marginBottom: 10,
+        marginBottom: PADDING.p01,
         paddingHorizontal: 8,
         borderWidth: 1,
         borderRadius: 5
     },
 
     authButton: {
-        paddingVertical: 4,
+        marginVertical: PADDING.p03,
         paddingHorizontal: 0,
-        paddingVertical: PADDING.p01,
-        borderRadius: PADDING.p05
+        paddingVertical: PADDING.p00,
+        borderRadius: PADDING.p10
     },
 
     authButtonText: {

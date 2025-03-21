@@ -13,6 +13,7 @@ import { PADDING } from '../../tools/constants';
 import TextBrand from '../../assets/img/text.svg';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
+import FooterComponent from '../footer';
 
 const LoginScreen = ({ route }) => {
   // =============== Colors ===============
@@ -20,7 +21,7 @@ const LoginScreen = ({ route }) => {
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Authentication context ===============
-  const { isLoading, login } = useContext(AuthContext);
+  const { isLoading, login, loginTest } = useContext(AuthContext);
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== User data ===============
@@ -35,41 +36,40 @@ const LoginScreen = ({ route }) => {
       <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <Spinner visible={isLoading} />
 
-        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p14, paddingHorizontal: PADDING.p10 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p10, paddingHorizontal: PADDING.p10 }}>
 
           {/* Brand / Title */}
           <View style={homeStyles.authlogo}>
             <TextBrand width={154} height={50} />
-            {/* <Image source={require('../../assets/img/brand.png')} /> */}
           </View>
-          {/* <Text style={homeStyles.authTitle}>{t('login')}</Text> */}
+          <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_login')}</Text>
 
           {/* Username */}
           <TextInput
-            style={homeStyles.authInput}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
             value={username}
             placeholder={t('auth.login_username')}
+            placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setUsername(text)} />
 
           {/* Password */}
           <TextInput
-            style={homeStyles.authInput}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
             value={password}
             placeholder={t('auth.password.label')}
+            placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setPassword(text)} secureTextEntry />
 
+          {/* Forgotten password */}
+          <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.link_color }]}>{t('auth.password.forgotten')}</Text>
+          </TouchableOpacity>
+
           {/* Submit */}
-          <Button style={homeStyles.authButton} onPress={() => { login(username, password); }}>
-            <Text style={homeStyles.authButtonText}>{t('login')}</Text>
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary }]} onPress={() => { loginTest }}>
+            <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('login')}</Text>
           </Button>
 
-          {/* Register link */}
-          <View>
-            <Text style={homeStyles.authText}>{t('no_account')} <Text style={homeStyles.authLink} onPress={() => navigation.navigate('Register')}>{t('register')}</Text></Text>
-            <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>
-              <Text style={homeStyles.authLink}>{t('auth.password.forgotten')}</Text>
-            </TouchableOpacity>
-          </View>
           {message ?
             <View style={{ backgroundColor: '#fea', marginVertical: 0, paddingVertical: PADDING.vertical }}>
               <Text style={[homeStyles.authTermsText, { fontWeight: '600' }]}>{message}</Text>
@@ -77,86 +77,65 @@ const LoginScreen = ({ route }) => {
             :
             ''}
 
-          {/* Terms accept */}
-          <Divider style={homeStyles.authDivider} />
-          <Text style={homeStyles.authTermsText}>
-            {t('terms_accept1')} <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Terms' })}>{t('navigation.terms')}</Text>
-            {t('terms_accept2')} <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Privacy' })}>{t('navigation.privacy')}</Text>
-          </Text>
-
-          {/* Submit */}
-          <Button style={homeStyles.authCancel} onPress={() => navigation.navigate('Home_')}>
-            <Text style={homeStyles.authCancelText}>{t('back_home')}</Text>
-          </Button>
+          {/* Register link */}
+          <View style={{ marginVertical: PADDING.p05 }}>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.black }]}>{t('no_account')}</Text>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.link_color }]} onPress={() => navigation.navigate('Register')}>{t('i_register')}</Text>
+          </View>
 
           {/* Copyright */}
-          <Text style={homeStyles.authBottomText}>{t('copyright')} | {t('all_rights_reserved')}</Text>
-          <Text style={homeStyles.authBottomText}>
-            Designed by <Text style={homeStyles.authBottomLink} onPress={() => Linking.openURL('https://xsamtech.com')}> Xsam Technologies</Text>
-          </Text>
+          <FooterComponent color={COLORS.dark_secondary} />
         </ScrollView>
       </View>
     );
 
   } else {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: COLORS.white }}>
         <Spinner visible={isLoading} />
 
-        <ScrollView style={{ paddingVertical: 50, paddingHorizontal: 30 }}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p10, paddingHorizontal: PADDING.p10 }}>
 
           {/* Brand / Title */}
           <View style={homeStyles.authlogo}>
             <TextBrand width={154} height={50} />
-            {/* <Image source={require('../../assets/img/brand.png')} /> */}
           </View>
-          {/* <Text style={homeStyles.authTitle}>{t('login')}</Text> */}
+          <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_login')}</Text>
 
           {/* Username */}
           <TextInput
-            style={homeStyles.authInput}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
             value={username}
             placeholder={t('auth.login_username')}
+            placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setUsername(text)} />
 
           {/* Password */}
           <TextInput
-            style={homeStyles.authInput}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
             value={password}
             placeholder={t('auth.password.label')}
+            placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setPassword(text)} secureTextEntry />
 
+          {/* Forgotten password */}
+          <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.link_color }]}>{t('auth.password.forgotten')}</Text>
+          </TouchableOpacity>
+
           {/* Submit */}
-          <Button style={homeStyles.authButton} onPress={() => { login(username, password); }}>
-            <Text style={homeStyles.authButtonText}>{t('login')}</Text>
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary }]} onPress={() => { loginTest }}>
+            <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('login')}</Text>
           </Button>
 
           {/* Register link */}
-          <View>
-            <Text style={homeStyles.authText}>{t('no_account')} <Text style={homeStyles.authLink} onPress={() => navigation.navigate('Register')}>{t('register')}</Text></Text>
-            <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>
-              <Text style={homeStyles.authLink}>{t('auth.password.forgotten')}</Text>
-            </TouchableOpacity>
+          <View style={{ marginVertical: PADDING.p05 }}>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.black }]}>{t('no_account')}</Text>
+            <Text style={[homeStyles.authText, { textAlign: 'center', color: COLORS.link_color }]} onPress={() => navigation.navigate('Register')}>{t('i_register')}</Text>
           </View>
 
-          {/* Terms accept */}
-          <Divider style={homeStyles.authDivider} />
-          <Text style={homeStyles.authTermsText}>
-            {t('terms_accept1')} <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Terms' })}>{t('navigation.terms')}</Text>
-            {t('terms_accept2')} <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Privacy' })}>{t('navigation.privacy')}</Text>
-          </Text>
-
-          {/* Submit */}
-          <Button style={[homeStyles.authCancel, { paddingVertical: 0 }]} onPress={() => navigation.navigate('Home_')}>
-            <Text style={homeStyles.authCancelText}>{t('back_home')}</Text>
-          </Button>
-
           {/* Copyright */}
-          <Text style={homeStyles.authBottomText}>{t('copyright')} | {t('all_rights_reserved')}</Text>
-          <Text style={homeStyles.authBottomText}>
-            Designed by <Text style={homeStyles.authBottomLink} onPress={() => Linking.openURL('https://xsamtech.com')}> Xsam Technologies</Text>
-          </Text>
+          <FooterComponent color={COLORS.dark_secondary} />
         </ScrollView>
       </View>
     );
