@@ -2,17 +2,21 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, ScrollView, Linking, ToastAndroid } from 'react-native';
-import { Button } from 'react-native-paper';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, ScrollView, Linking, ToastAndroid, TouchableOpacity } from 'react-native';
+import { Button, Divider } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { PADDING, PHONE } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
+import ThemeContext from '../../contexts/ThemeContext';
+import FooterComponent from '../footer';
 import TextBrand from '../../assets/img/text.svg';
-import { PHONE } from '../../tools/constants';
-import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
+import homeStyles from '../style';
+import axios from 'axios';
 
 const sendWhatsAppMessage = async (message) => {
   const phoneNumber = PHONE.admin;
@@ -35,50 +39,100 @@ const PasswordResetScreen = () => {
   const { t } = useTranslation();
   // =============== Authentication context ===============
   const { isLoading, login } = useContext(AuthContext);
+  // =============== Handle theme ===============
+  const { theme } = useContext(ThemeContext);
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== User data ===============
+  // =============== Get data ===============
   const [phone, setPhone] = useState('');
+  // COUNTRY dropdown
+  const [isFocus, setIsFocus] = useState(false);
+  const [country, setCountry] = useState('');
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all' })
+      .then(function (response) {
+        const count = Object.keys(response.data).length;
+        let countryArray = [];
+
+        for (let i = 0; i < count; i++) {
+          const countryData = response.data[i];
+
+          countryArray.push({
+            value: countryData.name.common,
+            label: countryData.name.common,
+            phoneCode: countryData.idd.root ? `${countryData.idd.root}${(countryData.idd.suffixes[0] ? `${countryData.idd.suffixes[0]}` : '')}` : ''
+          });
+        }
+
+        setCountries(countryArray);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+  const handleCountryChange = (item) => {
+    setCountry(item.value);
+    setIsFocus(false);
+    setPhone(item.phoneCode); // Updates the phone field with the phone code
+  };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <Spinner visible={isLoading} />
 
-      <ScrollView style={{ paddingVertical: 50, paddingHorizontal: 30 }}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
-
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
         {/* Brand / Title */}
         <View style={homeStyles.authlogo}>
-          <TextBrand width={154} height={50} />
+          <TextBrand width={190} height={46} />
         </View>
+        <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('auth.password.forgotten')}</Text>
 
-        {/* Phone */}
+        {/* Country  */}
+        <Text style={{ color: COLORS.dark_secondary, paddingVertical: PADDING.p00, paddingHorizontal: PADDING.p01 }}>{t('auth.country.label')}</Text>
+        <Dropdown
+          style={[homeStyles.authInput, { color: COLORS.black, height: 50, borderColor: COLORS.light_secondary }]}
+          data={countries}
+          search
+          labelField='label'
+          valueField='value'
+          placeholder={!isFocus ? t('auth.country.title') : '...'}
+          placeholderStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}
+          selectedTextStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}
+          searchPlaceholder={t('search')}
+          maxHeight={300}
+          value={country}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={handleCountryChange} />
+
+        {/* Phone number */}
         <TextInput
-          style={[homeStyles.authInput, { marginBottom: 20 }]}
+          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+          keyboardType='phone-pad'
           value={phone}
           placeholder={t('auth.phone')}
+          placeholderTextColor={COLORS.dark_secondary}
           onChangeText={text => setPhone(text)} />
 
-        {/* Submit */}
+        {/* Submit / Cancel */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.danger }]} onPress={() => { sendWhatsAppMessage("Bonjour.\n\nJe voudrais modifier mon mot de passe.\n\nMon n° de téléphone : " + phone); }} disabled={phone.trim() === ''}>
-          <Text style={homeStyles.authButtonText}>{t('send')}</Text>
+          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
         </Button>
+        <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]} onPress={() => navigation.navigate('Login')}>
+          <Text style={[homeStyles.authButtonText, { color: COLORS.black }]}>{t('cancel')}</Text>
+        </TouchableOpacity>
 
-        {/* Terms accept */}
-        <View style={{ backgroundColor: '#fea', marginVertical: 30, padding: 20 }}>
-          <Text style={[homeStyles.authTermsText, { fontSize: 14, fontWeight: '300', color: COLORS.black, marginBottom: 0 }]}>{t('auth.password.reset_message')}</Text>
+        {/* Message */}
+        <View style={homeStyles.messageContainer}>
+          <Text style={homeStyles.messageText}>{t('auth.password.reset_message')}</Text>
         </View>
 
-        {/* Submit */}
-        <Button style={[homeStyles.authCancel, { paddingVertical: 0 }]} onPress={() => navigation.navigate('Login')}>
-          <Text style={homeStyles.authCancelText}>{t('i_login')}</Text>
-        </Button>
-
         {/* Copyright */}
-        <Text style={homeStyles.authBottomText}>{t('copyright')} | {t('all_rights_reserved')}</Text>
-        <Text style={homeStyles.authBottomText}>
-          Designed by <Text style={homeStyles.authBottomLink} onPress={() => Linking.openURL('https://xsamtech.com')}> Xsam Technologies</Text>
-        </Text>
+        <Divider style={[homeStyles.authDivider, { backgroundColor: COLORS.light_secondary }]} />
+        <FooterComponent color={COLORS.dark_secondary} />
       </ScrollView>
     </View>
   );

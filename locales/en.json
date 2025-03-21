@@ -28,6 +28,11 @@
         "page_number": "Page number",
         "enter_note": "Enter your note"
     },
+    "new": {
+        "book": "Publish a book",
+        "school": "Register school",
+        "government": "Register government institution"
+    },
     "video_ended": "The video is finished!",
     "success": {
         "whatsapp": "Whatsapp is open."
@@ -60,8 +65,11 @@
     "have_account": "Already have an account?",
     "no_account": "Don’t have an account?",
     "select_date": "Select the date",
-    "search": "Search...",
-    "search_description": "Search for a book, magazine, media or map.",
+    "search": "Search",
+    "search_result": "Results with « {{ query }} »",
+    "search_description": "Search on Boongo",
+    "reading": "Reading",
+    "summary": "Summary",
     "show": "Show",
     "hide": "Hide",
     "all_m": "All",
@@ -94,10 +102,82 @@
     "pay": "Pay now",
 
     "navigation": {
-        "home": "Home",
-        "search": "Search a work",
-        "reading": "Reading",
-        "summary": "Summaries",
+        "home": {
+            "title": "Home",
+            "news": "News",
+            "books": "Works"
+        },
+        "account": {
+            "title": "Account",
+            "profile": "Profile",
+            "my_works": "My works",
+            "subscribers": "Subscribers",
+            "subscriptions": "Subscriptions"
+        },
+        "school": {
+            "title": "School",
+            "new": "Enregistrer my school",
+            "course_schedule": "Schedule",
+            "event": "Events",
+            "authors": {
+                "title": "Authors",
+                "books": "Books"
+            },
+            "data": {
+                "name": "School name",
+                "description": "Describe your school",
+                "id_number": "ID number",
+                "address": "Address",
+                "phone": "Phone number",
+                "email": "Email",
+                "legal_status": "Legal status",
+                "year_of_creation": "Year of creation",
+                "website": "Website URL",
+                "choose_type": "Choose type"
+            }
+        },
+        "government": {
+            "title": "Government institutions",
+            "new": "Register an institution",
+            "event": "Events",
+            "data": {
+                "name": "Institution name",
+                "description": "Describe the institution",
+                "address": "Address",
+                "phone": "Phone number",
+                "email": "Email",
+                "website": "Website URL",
+                "choose_type": "Choose type"
+            }
+        },
+        "settings": {
+            "title" : "Settings",
+            "update_account": {
+                "title" : "Update account",
+                "description" : "Information about your account. You can download an archive of your personal data."
+            },
+            "privacy_and_safety" : {
+                "title" : "Privacy and safety",
+                "description" : "Manage your access and your visibility (of your information) with other members.",
+                "blocked_accounts" : {
+                    "title" : "Blocked accounts",
+                    "description" : "View all members you have blocked."
+                },
+                "2fa_login" : {
+                    "title" : "2-step login",
+                    "by_mail" : "By mail",
+                    "by_phone" : "By SMS"
+                }
+            },
+            "close_account" : {
+                "title" : "Account closure",
+                "description" : "Your account will be recoverable for 30 days. Be sure to save your personal information before closing your account.",
+                "save_perso_data" : "Save my personal data",
+                "link" : "Close account"
+            }
+        },
+        "media": "Medias",
+        "notification": "Notifications",
         "about": "About",
         "terms": "Terms",
         "privacy": "Privacy",
@@ -105,12 +185,7 @@
         "book": "Books",
         "magazine": "Magazines & journals",
         "mapping": "Mapping",
-        "media": "Medias",
-        "notification": "Notifications",
-        "account": "My profile",
-        "update_account": "Edit account",
-        "cart": "My cart",
-        "work": "My works"
+        "cart": "My cart"
     },
 
     "auth": {

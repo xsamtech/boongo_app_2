@@ -14,6 +14,24 @@ export const AuthProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
+    const [pushToken, setPushToken] = useState(null);
+
+    const getPushToken = async () => {
+        try {
+            const token = await messaging().getToken();
+
+            setPushToken(token);
+            await AsyncStorage.setItem('pushToken', token);
+
+        } catch (error) {
+            // If the user is logged in and the token does not exist, display the error
+            if (userInfo && Object.keys(userInfo).length > 0) {
+                ToastAndroid.show(`Error retrieving push token: ${error}`, ToastAndroid.LONG);
+                console.error(`Error retrieving push token: ${error}`);
+            }
+            // If the user is logged out, do not display anything
+        }
+    };
 
     const register = (firstname, lastname, surname, gender, birthdate, city, country, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, role_id) => {
         setIsLoading(true);
@@ -295,6 +313,7 @@ export const AuthProvider = ({ children }) => {
 
             console.log(`${message}`);
             setIsLoading(false);
+            getPushToken();
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
@@ -331,8 +350,10 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(true);
 
         AsyncStorage.removeItem('userInfo');
+        AsyncStorage.removeItem('pushToken');
 
         setUserInfo({});
+        setPushToken(null);
         setIsLoading(false);
     };
 
@@ -377,11 +398,12 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         isLoggedIn();
+        getPushToken();
     }, [])
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, splashLoading, login, loginTest, logout, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription }}>
+            value={{ isLoading, userInfo, splashLoading, pushToken, login, loginTest, logout, register, update, updateAvatar, changePassword, changeStatus, validateSubscription, invalidateSubscription }}>
             {children}
         </AuthContext.Provider>
     );

@@ -25,9 +25,9 @@ const SplashScreen = () => {
         <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
       </View>
 
-      <ActivityIndicator size='large' color={COLORS.danger} />
+      <ActivityIndicator size='large' color={COLORS.link_color} />
 
-      <Divider style={[homeStyles.authDivider, { marginTop: PADDING.p03 }]} />
+      <Divider style={[homeStyles.authDivider, { marginTop: PADDING.p07 }]} />
       <FooterComponent color={COLORS.dark_secondary} />
     </View>
   );

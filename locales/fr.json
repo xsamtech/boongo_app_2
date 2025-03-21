@@ -28,6 +28,11 @@
         "page_number": "Numéro page",
         "enter_note": "Entrer votre note"
     },
+    "new": {
+        "book": "Publier un ouvrage",
+        "school": "Enregistrer un établissement",
+        "government": "Enregistrer institution gouvernementale"
+    },
     "video_ended": "La vidéo est terminée !",
     "success": {
         "whatsapp": "Whatsapp est bien ouvert."
@@ -60,8 +65,11 @@
     "have_account": "Vous avez déjà un compte ?",
     "no_account": "Vous n’avez pas de compte ?",
     "select_date": "Sélectionner la date",
-    "search": "Rechercher ...",
-    "search_description": "Rechercher un livre, une revue, un média ou une carte.",
+    "search": "Rechercher",
+    "search_result": "Résultats avec « {{ query }} »",
+    "search_description": "Rechercher sur Boongo",
+    "reading": "Lecture",
+    "summary": "Résumés",
     "show": "Afficher",
     "hide": "Cacher",
     "all_m": "Tous",
@@ -94,23 +102,90 @@
     "pay": "Payer maintenant",
 
     "navigation": {
-        "home": "Accueil",
-        "search": "Rechercher une œuvre",
-        "reading": "Lecture",
-        "summary": "Résumés",
+        "home": {
+            "title": "Accueil",
+            "news": "Actualité",
+            "books": "Ouvrages"
+        },
+        "account": {
+            "title": "Compte",
+            "profile": "Profil",
+            "my_works": "Mes œuvres",
+            "subscribers": "Abonnés",
+            "subscriptions": "Abonnements"
+        },
+        "school": {
+            "title": "Établissements",
+            "new": "Enregistrer mon établissement",
+            "course_schedule": "Programme",
+            "event": "Événements",
+            "authors": {
+                "title": "Auteurs",
+                "books": "Ouvrages"
+            },
+            "data": {
+                "name": "Nom de l’établissement",
+                "description": "Décrivez votre établissement",
+                "id_number": "Numéro d’identification",
+                "address": "Adresse",
+                "phone": "N° de téléphone",
+                "email": "E-mail",
+                "legal_status": "Statut juridique",
+                "year_of_creation": "Année de création",
+                "website": "URL du site web",
+                "choose_type": "Choisir le type"
+            }
+        },
+        "government": {
+            "title": "Institutions gouvernementales",
+            "new": "Enregistrer une institution",
+            "event": "Événements",
+            "data": {
+                "name": "Nom de l’institution",
+                "description": "Décrivez l’institution",
+                "address": "Adresse",
+                "phone": "N° de téléphone",
+                "email": "E-mail",
+                "website": "URL du site web",
+                "choose_type": "Choisir le type"
+            }
+        },
+        "settings": {
+            "title" : "Paramètres",
+            "update_account": {
+                "title" : "Éditer compte",
+                "description" : "Informations concernant votre compte. Vous pouvez téléchargez une archive de vos données personnelles."
+            },
+            "privacy_and_safety" : {
+                "title" : "Confidentialité et sécurité",
+                "description" : "Gérez vos accès et votre visibilité (celles de vos informations) vis-à-vis des autres membres.",
+                "blocked_accounts" : {
+                    "title" : "Membres bloqués",
+                    "description" : "Afficher tous les membres que vous avez bloqués."
+                },
+                "2fa_login" : {
+                    "title" : "Connexion en 2 étapes",
+                    "by_mail" : "Par mail",
+                    "by_phone" : "Par SMS"
+                }
+            },
+            "close_account" : {
+                "title" : "Fermeture de compte",
+                "description" : "Votre compte sera récupérable pendant 30 jours. Assurez-vous d'enregistrer vos données personnelles avant de fermer votre compte.",
+                "save_perso_data" : "Enregistrer mes données personnelles",
+                "link" : "Fermer mon compte"
+            }
+        },
+        "media": "Médias",
+        "notification": "Notifications",
         "about": "A propos",
         "terms": "Conditions",
         "privacy": "Confidentialité",
         "contact": "Nous contacter",
         "book": "Ouvrages",
         "magazine": "Mags, revues et journaux",
-        "mapping": "Cartograhie",
-        "media": "Médias",
-        "notification": "Notifications",
-        "account": "Mon profil",
-        "update_account": "Éditer compte",
-        "cart": "Mon panier",
-        "work": "Mes œuvres"
+        "mapping": "Cartographie",
+        "cart": "Mon panier"
     },
 
     "auth": {

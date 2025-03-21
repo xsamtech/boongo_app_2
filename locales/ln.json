@@ -28,6 +28,11 @@
         "page_number": "Motángo ya lokasa",
         "enter_note": "Kotisa note na yo"
     },
+    "new": {
+        "book": "Bimisa buku",
+        "school": "Komisa eteyelo",
+        "government": "Komisa institution ya gouvernement"
+    },
     "video_ended": "Video esili!",
     "success": {
         "whatsapp": "Whatsapp ezali polele."
@@ -60,8 +65,11 @@
     "have_account": "Ozali déjà na compte?",
     "no_account": "Ozali na compte te?",
     "select_date": "Pona mokolo",
-    "search": "Luka ...",
-    "search_description": "Luka buku, zulunalo, bapanzi sango to karte.",
+    "search": "Luka",
+    "search_result": "Ba résultats na « {{ query }} »",
+    "search_description": "Luka na Boongo",
+    "reading": "Kotanga",
+    "summary": "Résumés",
     "show": "Kolakisa",
     "hide": "Kobombana",
     "all_m": "Nyonso",
@@ -94,23 +102,90 @@
     "pay": "Futa sikoyo",
 
     "navigation": {
-        "home": "Boyei malamu",
-        "search": "Koluka oeuvre moko",
-        "reading": "Kotanga",
-        "summary": "Résumés",
-        "about": "A propos",
-        "terms": "Conditions",
-        "privacy": "Confidentialité",
-        "contact": "Kokutana na biso",
-        "book": "Ouvrages",
-        "magazine": "Mags, revues et journaux",
-        "mapping": "Cartograhie",
-        "media": "Médias",
+        "home": {
+            "title": "Ebandeli",
+            "news": "Ba sango",
+            "books": "Ba buku"
+        },
+        "account": {
+            "title": "Compte",
+            "profile": "Profil",
+            "my_works": "Misala na nga",
+            "subscribers": "Ba abonné",
+            "subscriptions": "Ba abonema"
+        },
+        "school": {
+            "title": "Eteyelo",
+            "new": "Komisa eteyelo",
+            "course_schedule": "Programme",
+            "event": "Milulu",
+            "authors": {
+                "title": "Bakomi mikanda",
+                "books": "Ba buku"
+            },
+            "data": {
+                "name": "Kombo ya eteyelo",
+                "description": "Lobelá eteyelo na yo",
+                "id_number": "Nimero ya identification",
+                "address": "Adresi",
+                "phone": "Nimero ya téléfon",
+                "email": "E-mail",
+                "legal_status": "Statut juridique",
+                "year_of_creation": "Mbula ya bozalisi",
+                "website": "URL ya site web",
+                "choose_type": "Pona type"
+            }
+        },
+        "government": {
+            "title": "Ba institutions ya gouvernement",
+            "new": "Komisa institution",
+            "event": "Milulu",
+            "data": {
+                "name": "Kombo ya institution",
+                "description": "Lobelá institution",
+                "address": "Adresi",
+                "phone": "Nimero ya téléfon",
+                "email": "E-mail",
+                "website": "URL ya site web",
+                "choose_type": "Pona type"
+            }
+        },
+        "settings": {
+            "title" : "Ba paramètres",
+            "update_account": {
+                "title" : "Bongola compte",
+                "description" : "Ba informations oyo etali compte na yo. Okoki kozwa archive ya ba données personnelles na yo."
+            },
+            "privacy_and_safety" : {
+                "title" : "Nkuku pe bobateli makambu",
+                "description" : "Landela kokota na compte na yo pe visibilité na yo (ya ba informations na yo) na misu ya ba membres misusu.",
+                "blocked_accounts" : {
+                    "title" : "Ba membres o kanga",
+                    "description" : "Lakisa ba membres nionso oyo o bloqué."
+                },
+                "2fa_login" : {
+                    "title" : "Kokota na ba étapes mibale",
+                    "by_mail" : "Na nzela ya E-mail",
+                    "by_phone" : "Na nzela ya SMS"
+                }
+            },
+            "close_account" : {
+                "title" : "Bokangi ya compte",
+                "description" : "Compte na yo ekoki kozonga na mikolo 30. Sala makasi obomba ba données personnelles na yo avant ya kokanga compte na yo.",
+                "save_perso_data" : "Na bomba ba données personnelles na nga",
+                "link" : "Kanga compte na nga"
+            }
+        },
+        "media": "Ba imaje",
         "notification": "Notifications",
-        "account": "Profil na ngai",
-        "update_account": "Kobongisa compte",
-        "cart": "Kitunga na ngai",
-        "work": "Ba œuvres na ngai"
+        "about": "Oyo etali",
+        "terms": "Mibeko",
+        "privacy": "Nkuku",
+        "contact": "Benga biso",
+        "book": "Buku",
+        "magazine": "Mikanda",
+        "mapping": "Ba kartes",
+        "cart": "Kitunga na nga"
     },
 
     "auth": {

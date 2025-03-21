@@ -50,16 +50,18 @@ export const PADDING = {
     p12: 30,
     p13: 32,
     p14: 35,
+    p15: 40,
+    p16: 50,
 };
 
 export const API = {
-    url: 'http://192.168.43.78/pepoo/public/api'
+    url: 'http://boongo7.com/api'
 };
 
 export const WEB = {
-    url: 'http://192.168.43.78/pepoo/public'
+    url: 'http://boongo7.com'
 };
 
 export const PHONE = {
-    admin: '+243813329097'
+    admin: '+243815737600'
 };

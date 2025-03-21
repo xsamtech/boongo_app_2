@@ -57,6 +57,19 @@ const homeStyles = StyleSheet.create({
         textAlign: 'center'
     },
 
+    // Message
+    messageContainer: {
+        backgroundColor: 'rgba(255, 238, 170, 0.7)',
+        marginVertical: PADDING.p12,
+        paddingVertical: PADDING.p01,
+        paddingHorizontal: PADDING.p07
+    },
+
+    messageText: {
+        fontWeight: '400',
+        color: 'black'
+    },
+
     // Maps
     mapContainer: {
         position: 'relative',
@@ -302,6 +315,7 @@ const homeStyles = StyleSheet.create({
     },
 
     authInput: {
+        width: '100%',
         backgroundColor: 'rgba(255, 255, 255, 0)',
         marginBottom: 10,
         paddingHorizontal: 14,
@@ -320,16 +334,36 @@ const homeStyles = StyleSheet.create({
     },
 
     authButton: {
+        width: '100%',
         marginVertical: PADDING.p03,
         paddingHorizontal: 0,
         paddingVertical: PADDING.p00,
         borderRadius: PADDING.p10
     },
 
+    authCancel: {
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        paddingHorizontal: 0,
+        paddingVertical: PADDING.p01,
+        borderRadius: PADDING.p10,
+        borderWidth: 1
+    },
+
     authButtonText: {
         fontSize: 15,
         textTransform: 'uppercase',
         textAlign: 'center'
+    },
+
+    authDivider: {
+        marginVertical: PADDING.p07
+    },
+
+    authTermsText: {
+        fontSize: TEXT_SIZE.paragraph,
+        textAlign: 'center',
+        marginTop: PADDING.p03
     },
 
     // Drawer
