@@ -65,7 +65,7 @@ const LoginScreen = ({ route }) => {
           </TouchableOpacity>
 
           {/* Submit */}
-          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary }]} onPress={() => { loginTest }}>
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary }]} onPress={() => { login(username, password); }}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('login')}</Text>
           </Button>
 
