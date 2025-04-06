@@ -130,9 +130,10 @@
                 "address": "Adresi",
                 "phone": "Nimero ya téléfon",
                 "email": "E-mail",
+                "p_o_box": "Boite Postale",
                 "legal_status": "Statut juridique",
                 "year_of_creation": "Mbula ya bozalisi",
-                "website": "URL ya site web",
+                "website_url": "URL ya site web",
                 "choose_type": "Pona type"
             }
         },
@@ -146,7 +147,8 @@
                 "address": "Adresi",
                 "phone": "Nimero ya téléfon",
                 "email": "E-mail",
-                "website": "URL ya site web",
+                "p_o_box": "Boite Postale",
+                "website_url": "URL ya site web",
                 "choose_type": "Pona type"
             }
         },

@@ -130,9 +130,10 @@
                 "address": "Adresse",
                 "phone": "N° de téléphone",
                 "email": "E-mail",
+                "p_o_box": "Boite Postale",
                 "legal_status": "Statut juridique",
                 "year_of_creation": "Année de création",
-                "website": "URL du site web",
+                "website_url": "URL du site web",
                 "choose_type": "Choisir le type"
             }
         },
@@ -146,7 +147,8 @@
                 "address": "Adresse",
                 "phone": "N° de téléphone",
                 "email": "E-mail",
-                "website": "URL du site web",
+                "p_o_box": "Boite Postale",
+                "website_url": "URL du site web",
                 "choose_type": "Choisir le type"
             }
         },

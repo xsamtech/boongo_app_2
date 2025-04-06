@@ -130,9 +130,10 @@
                 "address": "Address",
                 "phone": "Phone number",
                 "email": "Email",
+                "p_o_box": "P.O. Box",
                 "legal_status": "Legal status",
                 "year_of_creation": "Year of creation",
-                "website": "Website URL",
+                "website_url": "Website URL",
                 "choose_type": "Choose type"
             }
         },
@@ -146,7 +147,8 @@
                 "address": "Address",
                 "phone": "Phone number",
                 "email": "Email",
-                "website": "Website URL",
+                "p_o_box": "P.O. Box",
+                "website_url": "Website URL",
                 "choose_type": "Choose type"
             }
         },
