@@ -2,8 +2,8 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
@@ -12,9 +12,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING, TEXT_SIZE } from '../../tools/constants';
 import useColors from '../../hooks/useColors';
 import LogoText from '../../assets/img/brand.svg';
-import ShareWork from '../../assets/img/share-work.svg';
-import ShareSchool from '../../assets/img/share-school.svg';
-import ShareGovernment from '../../assets/img/share-government.svg';
 import homeStyles from '../style';
 import FooterComponent from '../footer';
 
@@ -38,13 +35,13 @@ const OnboardScreen = () => {
   const getImageSlide = (work) => {
     switch (work) {
       case 'school':
-        return (<ShareSchool width={282} height={210} style={{ alignSelf: 'center' }} />);
+        return (<Image style={{ width: 282, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-school.png')} />);
         break;
       case 'government':
-        return (<ShareGovernment width={231} height={210} style={{ alignSelf: 'center' }} />);
+        return (<Image style={{ width: 231, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-government.png')} />);
         break;
       default:
-        return (<ShareWork width={280} height={210} style={{ alignSelf: 'center' }} />);
+        return (<Image style={{ width: 280, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-work.png')} />);
         break;
     }
   };
