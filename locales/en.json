@@ -1,0 +1,253 @@
+{
+    "copyright": "Copyright (c) {{ year }}",
+    "all_rights_reserved": "All rights reserved",
+    "welcome_title": "Your ride sharing app",
+    "welcome_description": {
+        "work": "Publish your works of all types (book, magazine & newspaper or geographical map) to make them accessible to the public, and interact with subscribers to your works.",
+        "school": "Register your institution (school, academic or other), interact with teachers or students, and share your programs and events.",
+        "government": "Register your government institution (ministry, public company, or other) to be able to share your events and interact with the public."
+    },
+    "slogan": "The knowledge guide!",
+    "about_boongo": "About the Boongo app",
+    "about_reborn": "About the Reborn company",
+    "privacy_title": "Privacy policy",
+    "terms_title": "Terms of use",
+    "terms_accept1": "By creating your account, you accept our ",
+    "terms_accept1_": "By subscribing, you accept our ",
+    "terms_accept2": " and our policy for ",
+    "change_lang": "Change language",
+    "back_home": "Back to home",
+    "load_more": "Load more",
+    "see_more": "See more",
+    "see_less": "See less",
+    "dark_theme": "Dark mode",
+    "page": "Page",
+    "notepad": {
+        "title": "Save summaries",
+        "title_edit": "Edit the summary",
+        "page_number": "Page number",
+        "enter_note": "Enter your note"
+    },
+    "new": {
+        "book": "Publish a book",
+        "school": "Register school",
+        "government": "Register government institution"
+    },
+    "video_ended": "The video is finished!",
+    "success": {
+        "whatsapp": "Whatsapp is open."
+    },
+    "error": "Error:",
+    "error_message": {
+        "login_before_operation": "You must first identify yourself to carry out this operation.",
+        "pending_after_payment": "When you make your payment, your subscription will be validated within minutes.",
+        "no_server_response": "No response received from the server.",
+        "cannot_be_empty": "This cannot be empty."
+    },
+    "empty_list": {
+        "title": "The list is empty",
+        "description_popular": "Here, the works most consulted by members will be displayed.",
+        "description_books": "Here, the books will be displayed which can be consulted by members.",
+        "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
+        "description_medias": "Here, the medias will be displayed which can be consulted by members.",
+        "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
+    },
+    "back_list": "Back to the list",
+    "work_details": {
+        "title": "Details about the work",
+        "type": "Type: ",
+        "categories": "Categories: ",
+        "category": "Category: ",
+        "author": "Author: ",
+        "subscription_info": "Subscribe to be able to consult, or become partner to publish your own works."
+    },
+    "most_popular": "The most popular",
+    "have_account": "Already have an account?",
+    "no_account": "Don’t have an account?",
+    "select_date": "Select the date",
+    "search": "Search",
+    "search_result": "Results with « {{ query }} »",
+    "search_description": "Search on Boongo",
+    "reading": "Reading",
+    "summary": "Summary",
+    "show": "Show",
+    "hide": "Hide",
+    "all_m": "All",
+    "all_f": "All",
+    "see_all": "See all",
+    "see_details": "See details",
+    "expand": "Expand",
+    "cut": "Cut",
+    "confirm": "Confirm",
+    "save": "Save",
+    "send": "Send",
+    "cancel": "Cancel",
+    "update": "Update",
+    "change": "Change",
+    "register": "Register",
+    "i_register": "Create account",
+    "login": "Log in",
+    "i_login": "Sign in",
+    "logout": "Log out",
+    "personal_infos": "Personal infos",
+    "change_password": "Change password",
+    "subscription":  {
+        "title": "Choose a subscription",
+        "type": "Subscription type",
+        "price": "Price",
+        "link": "Subscribe"
+    },
+    "addToCart": "Add to cart",
+    "withdrawFromCart": "Withdraw from cart",
+    "pay": "Pay now",
+
+    "navigation": {
+        "home": {
+            "title": "Home",
+            "news": "News",
+            "books": "Works"
+        },
+        "account": {
+            "title": "Account",
+            "profile": "Profile",
+            "my_works": "My works",
+            "subscribers": "Subscribers",
+            "subscriptions": "Subscriptions"
+        },
+        "school": {
+            "title": "School",
+            "new": "Enregistrer my school",
+            "course_schedule": "Schedule",
+            "event": "Events",
+            "authors": {
+                "title": "Authors",
+                "books": "Books"
+            },
+            "data": {
+                "name": "School name",
+                "description": "Describe your school",
+                "id_number": "ID number",
+                "address": "Address",
+                "phone": "Phone number",
+                "email": "Email",
+                "p_o_box": "P.O. Box",
+                "legal_status": "Legal status",
+                "year_of_creation": "Year of creation",
+                "website_url": "Website URL",
+                "choose_type": "Choose type"
+            }
+        },
+        "government": {
+            "title": "Government institutions",
+            "new": "Register an institution",
+            "event": "Events",
+            "data": {
+                "name": "Institution name",
+                "description": "Describe the institution",
+                "address": "Address",
+                "phone": "Phone number",
+                "email": "Email",
+                "p_o_box": "P.O. Box",
+                "website_url": "Website URL",
+                "choose_type": "Choose type"
+            }
+        },
+        "settings": {
+            "title" : "Settings",
+            "update_account": {
+                "title" : "Update account",
+                "description" : "Information about your account. You can download an archive of your personal data."
+            },
+            "privacy_and_safety" : {
+                "title" : "Privacy and safety",
+                "description" : "Manage your access and your visibility (of your information) with other members.",
+                "blocked_accounts" : {
+                    "title" : "Blocked accounts",
+                    "description" : "View all members you have blocked."
+                },
+                "2fa_login" : {
+                    "title" : "2-step login",
+                    "by_mail" : "By mail",
+                    "by_phone" : "By SMS"
+                }
+            },
+            "close_account" : {
+                "title" : "Account closure",
+                "description" : "Your account will be recoverable for 30 days. Be sure to save your personal information before closing your account.",
+                "save_perso_data" : "Save my personal data",
+                "link" : "Close account"
+            }
+        },
+        "media": "Medias",
+        "notification": "Notifications",
+        "about": "About",
+        "terms": "Terms",
+        "privacy": "Privacy",
+        "contact": "Contact us",
+        "book": "Books",
+        "magazine": "Magazines & journals",
+        "mapping": "Mapping",
+        "cart": "My cart"
+    },
+
+    "auth": {
+        "firstname": "First name",
+        "lastname": "Last name",
+        "surname": "Surname",
+        "gender": {
+            "label": "Gender",
+            "male": "Male",
+            "female": "Female"
+        },
+        "birthdate": "Date of birth",
+        "city": "City",
+        "country": {
+            "title": "Choose a country",
+            "label": "Country"
+        },
+        "address_1": "Address 1",
+        "address_2": "Address 2 (Optional)",
+        "p_o_box": "P.O. Box",
+        "email": "E-mail",
+        "phone": "Phone number",
+        "username": "Username",
+        "login_username": "E-mail, phone or username",
+        "password": {
+            "label": "Password",
+            "former": "Former password",
+            "new": "New password",
+            "error": "The password is incorrect",
+            "forgotten": "Forgotten password",
+            "reset": "Reset password",
+            "reset_message": "You can send your phone number so that we can change your password which we will send to you by SMS and/or WhatsApp."
+        },
+        "confirm_password": {
+            "label": "Confirm password",
+            "new": "Confirm new password",
+            "error": "The confirmation didn't match"
+        },
+        "avatar": {
+            "label": "Change your avatar",
+            "upload": "Upload a photo",
+            "camera": "Use the camera"
+        },
+        "status": {
+            "disabled": {
+                "title": "Account disabled",
+                "description": "You have deactivated your account. Please reactivate it to perform specific operations.",
+                "link1": "Disable my account",
+                "link2": "Reactivate my account"
+            },
+            "blocked": {
+                "title": "Account blocked",
+                "description": "Your account is currently blocked because you do not comply with our terms of use. Please contact us by clicking the button below.",
+                "link1": "Claim my unlocking"
+            }
+        },
+        "my_works": {
+            "description": "Become one of our partners to be able to publish your works which will be visible to all. And this will give you the advantage of acquiring money according to public consultations.",
+            "terms_link": "Please click below to see our terms.",
+            "start_button": "Become a partner"
+        }
+    }
+}
