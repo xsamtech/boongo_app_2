@@ -4,8 +4,8 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, ToastAndroid } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { Button, Divider } from 'react-native-paper';
 import Spinner from 'react-native-loading-spinner-overlay';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -25,7 +25,7 @@ const RegisterScreen = () => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Authentication context ===============
-  const { isLoading, register } = useContext(AuthContext);
+  const { isLoading, register, registerError } = useContext(AuthContext);
   // =============== Get data ===============
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
@@ -49,7 +49,7 @@ const RegisterScreen = () => {
       });
   }, []);
 
-  // COUNTRY dropdown
+  // COUNTRIES DATA dropdown
   const [countriesData, setCountriesData] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -165,7 +165,14 @@ const RegisterScreen = () => {
         </View>
 
         {/* Submit / Cancel */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { register(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null) }}>
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} 
+          onPress={() => {
+            register(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
+
+            if (!registerError) {
+              navigation.navigate('CheckOTP', { emailAddress: email, phoneNumber: phone });
+            }
+          }}>
           <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('start')}</Text>
         </Button>
         <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]} onPress={() => navigation.navigate('Login')}>

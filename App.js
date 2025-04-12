@@ -223,19 +223,19 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <AuthProvider>
-        {userInfo.id ? (
-          <DrawerNav />
-        ) : (
-          <LoginStackNav />
-        )}
-      </AuthProvider>
+      {userInfo.id ? (
+        <DrawerNav />
+      ) : (
+        <LoginStackNav />
+      )}
     </NavigationContainer>
   );
 }
 
 export default () => (
   <ThemeProvider>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </ThemeProvider>
 );

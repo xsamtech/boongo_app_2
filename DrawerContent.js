@@ -4,13 +4,13 @@
  */
 import React, { useContext } from 'react';
 import { View, Text, Image } from 'react-native';
-import { Divider, Title } from 'react-native-paper';
+import { Title } from 'react-native-paper';
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COLORS, PADDING, TEXT_SIZE } from './tools/constants';
+import { PADDING } from './tools/constants';
 import homeStyles from './screens/style';
 import { AuthContext } from './contexts/AuthContext';
 import useColors from './hooks/useColors';
