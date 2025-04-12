@@ -84,6 +84,7 @@
     "cancel": "Cancel",
     "update": "Update",
     "change": "Change",
+    "start": "Start",
     "register": "Register",
     "i_register": "Create account",
     "login": "Log in",
@@ -209,8 +210,13 @@
         "address_2": "Address 2 (Optional)",
         "p_o_box": "P.O. Box",
         "email": "E-mail",
+        "phone_code": "Code",
         "phone": "Phone number",
-        "username": "Username",
+        "username": {
+            "label": "Username",
+            "placeholder": "Create a username",
+            "message": "Very important for discussions"
+        },
         "login_username": "E-mail, phone or username",
         "password": {
             "label": "Password",
@@ -243,6 +249,14 @@
                 "description": "Your account is currently blocked because you do not comply with our terms of use. Please contact us by clicking the button below.",
                 "link1": "Claim my unlocking"
             }
+        },
+        "otp_code": {
+            "title": "Checking your {{ reference }}",
+            "placeholder": "Write the code...",
+            "message_email": "Please enter the code you received in your registered email.",
+            "message_phone": "Please enter the code you received by SMS on the phone number you registered.",
+            "send": "Check",
+            "warning": "The code will become invalid after 15 minutes"
         },
         "my_works": {
             "description": "Become one of our partners to be able to publish your works which will be visible to all. And this will give you the advantage of acquiring money according to public consultations.",

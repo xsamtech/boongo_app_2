@@ -59,18 +59,18 @@ const DrawerContent = (props) => {
     // =============== Language ===============
     const { t } = useTranslation();
     // =============== Get data ===============
-    const { logout } = useContext(AuthContext);
+    const { userInfo, logout } = useContext(AuthContext);
 
     return (
         <View style={{ flex: 1, paddingHorizontal: -12, marginHorizontal: -12 }}>
             <DrawerContentScrollView {...props}>
                 <View style={homeStyles.drawerCurrentUser}>
                     <View style={{ marginTop: 5 }}>
-                        <Image style={{ width: 60, height: 60, borderRadius: 30 }} source={require('./assets/img/avatar.png')} />
+                        <Image style={{ width: 60, height: 60, borderRadius: 30 }} source={{ uri: userInfo.profile_photo_path }} />
                     </View>
                     <View style={{ marginLeft: PADDING.p01, flexDirection: 'column' }}>
-                        <Title style={homeStyles.drawerTitle}>Zachée Kabongo</Title>
-                        <Text style={{ color: COLORS.yellow }}>{t('passenger')}</Text>
+                        <Title style={homeStyles.drawerTitle}>{userInfo.firstname + ' ' + userInfo.lastname}</Title>
+                        <Text style={{ color: COLORS.yellow }}>@{userInfo.username}</Text>
                     </View>
                 </View>
                 <View style={homeStyles.drawerSection}>
@@ -78,7 +78,7 @@ const DrawerContent = (props) => {
                     <View style={homeStyles.drawerFooter}>
                         <DrawerItem
                             icon={() => <FaIcon name='power-off' color={COLORS.black} size={18} />}
-                            label="Se déconnecter" labelStyle={{ marginLeft: PADDING.p00, color: COLORS.black }}
+                            label={t('logout')} labelStyle={{ marginLeft: PADDING.p00, color: COLORS.black }}
                             style={{ marginLeft: PADDING.p01 }}
                             onPress={logout} />
                     </View>

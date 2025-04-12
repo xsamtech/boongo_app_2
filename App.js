@@ -18,17 +18,18 @@ import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
 import Logo from './assets/img/logo.svg';
 import useColors from './hooks/useColors';
-import AboutScreen from './screens/About';
-import TermsScreen from './screens/About/terms';
-import PrivacyScreen from './screens/About/privacy';
-import ContactScreen from './screens/About/contact';
+import SplashScreen from './screens/splash_screen';
 import OnboardScreen from './screens/Auth';
 import LoginScreen from './screens/Auth/login';
 import RegisterScreen from './screens/Auth/register';
 import PasswordResetScreen from './screens/Auth/password-reset';
+import CheckOTPScreen from './screens/Auth/check-otp';
+import AboutScreen from './screens/About';
+import TermsScreen from './screens/About/terms';
+import PrivacyScreen from './screens/About/privacy';
+import ContactScreen from './screens/About/contact';
 import HomeScreen from './screens/Home';
 import LanguageScreen from './screens/language';
-import SplashScreen from './screens/splash_screen';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -152,6 +153,7 @@ const LoginStackNav = () => {
       <Stack.Screen name='Login' component={LoginScreen} />
       <Stack.Screen name='Register' component={RegisterScreen} />
       <Stack.Screen name='PasswordReset' component={PasswordResetScreen} />
+      <Stack.Screen name='CheckOTP' component={CheckOTPScreen} />
       <Stack.Screen name='About' component={AboutBottomTab} />
     </Stack.Navigator>
   );
@@ -221,19 +223,19 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      {userInfo.id ? (
-        <DrawerNav />
-      ) : (
-        <LoginStackNav />
-      )}
+      <AuthProvider>
+        {userInfo.id ? (
+          <DrawerNav />
+        ) : (
+          <LoginStackNav />
+        )}
+      </AuthProvider>
     </NavigationContainer>
   );
 }
 
 export default () => (
   <ThemeProvider>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <App />
   </ThemeProvider>
 );

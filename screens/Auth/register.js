@@ -3,15 +3,14 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, Linking } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, ToastAndroid } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { Dropdown } from 'react-native-element-dropdown';
 import { Button, Divider } from 'react-native-paper';
 import Spinner from 'react-native-loading-spinner-overlay';
-import { PADDING } from '../../tools/constants';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { API, PADDING } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
-import ThemeContext from '../../contexts/ThemeContext';
 import FooterComponent from '../footer';
 import TextBrand from '../../assets/img/text.svg';
 import useColors from '../../hooks/useColors';
@@ -27,48 +26,69 @@ const RegisterScreen = () => {
   const navigation = useNavigation();
   // =============== Authentication context ===============
   const { isLoading, register } = useContext(AuthContext);
-  // =============== Handle theme ===============
-  const { theme } = useContext(ThemeContext);
   // =============== Get data ===============
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
   const [email, setEmail] = useState(null);
+  const [phoneCode, setPhoneCode] = useState(null);
   const [phone, setPhone] = useState(null);
   const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [confirm_password, setConfirmPassword] = useState(null);
-  // COUNTRY dropdown
-  const [isFocus, setIsFocus] = useState(false);
-  const [country, setCountry] = useState('');
-  const [countries, setCountries] = useState([]);
+  // Get role "Membre"
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
-    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all' })
-      .then(function (response) {
-        const count = Object.keys(response.data).length;
-        let countryArray = [];
+    axios({ method: 'GET', url: `${API.url}/role/search/Membre` })
+      .then(function (res) {
+        let roleData = res.data.data;
 
-        for (let i = 0; i < count; i++) {
-          const countryData = response.data[i];
-
-          countryArray.push({
-            value: countryData.name.common,
-            label: countryData.name.common,
-            phoneCode: countryData.idd.root ? `${countryData.idd.root}${(countryData.idd.suffixes[0] ? `${countryData.idd.suffixes[0]}` : '')}` : ''
-          });
-        }
-
-        setCountries(countryArray);
+        setRole(roleData);
+        console.log(`${JSON.stringify(roleData)}`);
       })
       .catch(function (error) {
         console.log(error);
       });
   }, []);
 
+  // COUNTRY dropdown
+  const [countriesData, setCountriesData] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all' })
+      .then((res) => {
+        // On garde une trace des codes téléphoniques uniques
+        const phoneCodes = new Set();
+
+        const countryArray = res.data.map((country) => {
+          const phoneCodeData = country.idd && country.idd.root ? `${country.idd.root}${country.idd.suffixes ? `${country.idd.suffixes[0]}` : ''}` : '';
+
+          // Vérifier si le code téléphonique existe déjà dans le Set
+          if (phoneCodes.has(phoneCodeData)) {
+            return null; // Si le code existe déjà, ignorer cet élément
+          }
+
+          // Ajouter le code téléphonique dans le Set pour éviter les doublons
+          phoneCodes.add(phoneCodeData);
+
+          return {
+            value: phoneCodeData, // Le code téléphonique est unique
+            label: `${country.cca2} (${phoneCodeData})`, // Affichage "CD (+243)"
+          };
+        }).filter(item => item !== null); // Filtrer les éléments nulls
+
+        // Trie des pays par nom (A-Z)
+        countryArray.sort((a, b) => a.label.localeCompare(b.label));
+
+        setCountriesData(countryArray);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+
   const handleCountryChange = (item) => {
-    setCountry(item.value);
-    setIsFocus(false);
-    setPhone(item.phoneCode); // Updates the phone field with the phone code
+    setPhoneCode(item.value);
   };
 
   return (
@@ -98,71 +118,55 @@ const RegisterScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={text => setLastname(text)} />
 
+        {/* Username */}
+        <TextInput
+          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, marginBottom: 3 }]}
+          value={username}
+          placeholder={t('auth.username.placeholder')}
+          placeholderTextColor={COLORS.dark_secondary}
+          onChangeText={text => setUsername(text)} />
+        <Text style={{ fontSize: 12, color: COLORS.dark_secondary, letterSpacing: 0.5, textAlign: 'right', marginBottom: PADDING.p02 }}>{t('auth.username.message')}</Text>
+
         {/* E-mail */}
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={email}
           placeholder={t('auth.email')}
           placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setEmail(text)} />
+          onChangeText={text => setEmail(text.toLowerCase())}
+          autoCapitalize='none' />
 
-        {/* Country  */}
-        <Text style={{ color: COLORS.dark_secondary, paddingVertical: PADDING.p00, paddingHorizontal: PADDING.p01 }}>{t('auth.country.label')}</Text>
-        <Dropdown
-          style={[homeStyles.authInput, { color: COLORS.black, height: 50, borderColor: COLORS.light_secondary }]}
-          data={countries}
-          search
-          labelField='label'
-          valueField='value'
-          placeholder={!isFocus ? t('auth.country.title') : '...'}
-          placeholderStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}
-          selectedTextStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}
-          searchPlaceholder={t('search')}
-          maxHeight={300}
-          value={country}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={handleCountryChange} />
+        <View style={{ flexDirection: 'row' }}>
+          {/* Phone code  */}
+          <DropDownPicker
+            open={open}
+            value={phoneCode}
+            items={countriesData}
+            setOpen={setOpen}
+            setValue={setPhoneCode}
+            dropDownContainerStyle={{ backgroundColor: COLORS.white }}
+            textStyle={{ color: COLORS.black }}
+            placeholderStyle={{ color: COLORS.black }}
+            placeholder={t('auth.phone_code')}
+            arrowIconStyle={{ tintColor: COLORS.black }}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
+            containerStyle={{ width: '43%', height: 50 }}
+            listMode='SCROLLVIEW'
+            onChangeItem={handleCountryChange} />
 
-        {/* Phone number */}
-        <TextInput
-          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          keyboardType='phone-pad'
-          value={phone}
-          placeholder={t('auth.phone')}
-          placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setPhone(text)} />
-
-        {/* Username */}
-        <TextInput
-          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={username}
-          placeholder={t('auth.username')}
-          placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setUsername(text)} />
-
-        {/* Password */}
-        <TextInput
-          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={password}
-          placeholder={t('auth.password.label')}
-          placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setPassword(text)} secureTextEntry />
-
-        {/* Confirm password */}
-        <TextInput
-          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={confirm_password}
-          placeholder={t('auth.confirm_password.label')}
-          placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setConfirmPassword(text)} secureTextEntry />
+          {/* Phone number */}
+          <TextInput
+            style={[homeStyles.authInput, { color: COLORS.black, width: '57%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
+            keyboardType='phone-pad'
+            value={phone}
+            placeholder={t('auth.phone')}
+            placeholderTextColor={COLORS.dark_secondary}
+            onChangeText={text => setPhone(text)} />
+        </View>
 
         {/* Submit / Cancel */}
-        {/* <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => {
-          register(firstname, lastname, null, null, null, null, null, null, null, null, email, phone, username, password, confirm_password, 4);
-          navigation.navigate('Login'); */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { navigation.navigate('Login') }}>
-          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('register')}</Text>
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { register(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null) }}>
+          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('start')}</Text>
         </Button>
         <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]} onPress={() => navigation.navigate('Login')}>
           <Text style={[homeStyles.authButtonText, { color: COLORS.black }]}>{t('cancel')}</Text>

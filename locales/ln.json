@@ -84,6 +84,7 @@
     "cancel": "Longola",
     "update": "Bongola",
     "change": "Bongola",
+    "start": "Banda",
     "register": "Mikomisa",
     "i_register": "Nasala compte",
     "login": "Nakoti",
@@ -209,8 +210,13 @@
         "address_2": "Adresse 2 (Facultative)",
         "p_o_box": "Boite Postale",
         "email": "E-mail",
+        "phone_code": "Code",
         "phone": "N° de téléphone",
-        "username": "Pseudo",
+        "username": {
+            "label": "Pseudo",
+            "placeholder": "Create a username",
+            "message": "Ezali na ntina mingi mpo na masolo"
+        },
         "login_username": "E-mail, n° de téléphone ou pseudo",
         "password": {
             "label": "Mot de passe",
@@ -243,6 +249,14 @@
                 "description": "Compte na yo ekangami sikoyo mpo ozali kotosa mibeko na biso ya kosalela te. Bo contacter biso na ko cliquer bouton oyo ezali awa na se.",
                 "link1": "Reclamer déverrouillage na ngai"
             }
+        },
+        "otp_code": {
+            "title": "Tala {{ référence }} na yo.",
+            "placeholder": "Koma code ...",
+            "message_email": "Koma code oyo etindameli yo na boîte email oyo okomisaki.",
+            "message_phone": "Koma lisusu code oyo ozwi na SMS na numéro ya téléfone oyo okomisaki.",
+            "send": "Tala",
+            "warning": "Code ekosala lisusu te sima ya 15 minutes"
         },
         "my_works": {
             "description": "koma moko ya ba partenaires na biso po ozala na makoki ya kobimisa misala na yo oyo ekozala komonana na bato banso. Mpe yango ekopesa yo avantage ya kozua mbongo selon ba consultations publiques.",

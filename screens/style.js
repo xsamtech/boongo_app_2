@@ -345,7 +345,7 @@ const homeStyles = StyleSheet.create({
         width: '100%',
         backgroundColor: 'rgba(255, 255, 255, 0)',
         paddingHorizontal: 0,
-        paddingVertical: PADDING.p01,
+        paddingVertical: PADDING.p02,
         borderRadius: PADDING.p10,
         borderWidth: 1
     },

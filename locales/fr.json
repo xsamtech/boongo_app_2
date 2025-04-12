@@ -84,6 +84,7 @@
     "cancel": "Annuler",
     "update": "Mettre à jour",
     "change": "Modifier",
+    "start": "Commencer",
     "register": "Inscription",
     "i_register": "Créer un compte",
     "login": "Connexion",
@@ -209,8 +210,13 @@
         "address_2": "Adresse 2 (Facultative)",
         "p_o_box": "Boite Postale",
         "email": "E-mail",
+        "phone_code": "Code",
         "phone": "N° de téléphone",
-        "username": "Pseudo",
+        "username": {
+            "label": "Pseudo",
+            "placeholder": "Créer un pseudo",
+            "message": "Très important pour les discussions"
+        },
         "login_username": "E-mail, n° de téléphone ou pseudo",
         "password": {
             "label": "Mot de passe",
@@ -243,6 +249,14 @@
                 "description": "Votre compte est bloqué pour l'instant parce que vous ne respectez pas nos conditions d’utilisation. Veuillez nous contacter en cliquant sur le bouton ci-dessous.",
                 "link1": "Réclamer mon déblocage"
             }
+        },
+        "otp_code": {
+            "title": "Vérification de votre {{ reference }}",
+            "placeholder": "Écrire le code ...",
+            "message_email": "Veuillez saisir le code que vous avez reçu dans la boîte email que vous avez enregistrée.",
+            "message_phone": "Veuillez saisir encore le code que vous avez reçu par SMS sur le n° de téléphone que vous avez enregistrée.",
+            "send": "Vérifier",
+            "warning": "Le code deviendra invalide après 15 minutes"
         },
         "my_works": {
             "description": "Devenez un de nos partenaires pour pouvoir publier vos ouvrages qui seront visibles par tous. Et cela vous donnera l'avantage d'acquérir de l'argent selon les consultations du public.",
