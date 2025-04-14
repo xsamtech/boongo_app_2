@@ -1,7 +1,7 @@
 {
     "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "Tous droits réservés",
-    "welcome_title": "Votre appli de covoiturage",
+    "welcome_title": "Bienvenue {{ user }}",
     "welcome_description": {
         "work": "Publiez vos ouvrages de tout type (livre, revue & journal ou carte géographique) pour les rendre accessibles au public, et échangez avec les abonnés à vos ouvrages.",
         "school": "Enregistrez votre établissement (scolaire, académique ou autre), échangez avec des enseignants ou des élèves/étudiants, et partagez vos programmes et événements.",
@@ -87,6 +87,7 @@
     "start": "Commencer",
     "register": "Inscription",
     "i_register": "Créer un compte",
+    "continue_register": "Poursuivre l’inscription",
     "login": "Connexion",
     "i_login": "S’identifier",
     "logout": "Déconnexion",

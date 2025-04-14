@@ -25,7 +25,7 @@ const RegisterScreen = () => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Authentication context ===============
-  const { isLoading, register, registerError } = useContext(AuthContext);
+  const { isLoading, startRegister, registerError } = useContext(AuthContext);
   // =============== Get data ===============
   const [firstname, setFirstname] = useState(null);
   const [lastname, setLastname] = useState(null);
@@ -85,7 +85,6 @@ const RegisterScreen = () => {
         console.log(error);
       });
   }, []);
-
 
   const handleCountryChange = (item) => {
     setPhoneCode(item.value);
@@ -167,7 +166,7 @@ const RegisterScreen = () => {
         {/* Submit / Cancel */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} 
           onPress={() => {
-            register(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
+            startRegister(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
 
             if (!registerError) {
               navigation.navigate('CheckOTP', { emailAddress: email, phoneNumber: phone });

@@ -1,7 +1,7 @@
 {
     "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "All rights reserved",
-    "welcome_title": "Your ride sharing app",
+    "welcome_title": "Welcome {{ user }}",
     "welcome_description": {
         "work": "Publish your works of all types (book, magazine & newspaper or geographical map) to make them accessible to the public, and interact with subscribers to your works.",
         "school": "Register your institution (school, academic or other), interact with teachers or students, and share your programs and events.",
@@ -87,6 +87,7 @@
     "start": "Start",
     "register": "Register",
     "i_register": "Create account",
+    "continue_register": "Continue register",
     "login": "Log in",
     "i_login": "Sign in",
     "logout": "Log out",

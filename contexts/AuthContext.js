@@ -10,11 +10,11 @@ import { API } from '../tools/constants';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children, }) => {
+export const AuthProvider = ({ children }) => {
     // =============== Get data ===============
     const [userInfo, setUserInfo] = useState({});
     const [otpCode, setOtpCode] = useState(null);
-    const [registerError, setRegisterError] = useState(null);
+    const [registerInfo, setRegisterInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
     const [pushToken, setPushToken] = useState(null);
@@ -38,66 +38,62 @@ export const AuthProvider = ({ children, }) => {
 
     const register = (firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
         setIsLoading(true);
-        setRegisterError(null);
+        setRegisterInfo(null);
 
         axios.post(`${API.url}/user`, {
             firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id
         }).then(res => {
             let message = res.data.message;
-            let passwordResetData = res.data.data.password_reset;
 
-            setOtpCode(passwordResetData.token);
-
-            AsyncStorage.setItem('otp_code', passwordResetData.token);
-
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
             setIsLoading(false);
-            setRegisterError(null);
+            setRegisterInfo(null);
 
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
                 ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
                 console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-                setRegisterError(`${error.response.data.message || error.response.data}`);
+                setRegisterInfo(`${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
                 ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
-                setRegisterError(t('error') + ' ' + t('error_message.no_server_response'));
+                setRegisterInfo(t('error') + ' ' + t('error_message.no_server_response'));
 
             } else {
                 // An error occurred while configuring the query
                 ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-                setRegisterError(`${error}`);
+                setRegisterInfo(`${error}`);
             }
 
             setIsLoading(false);
         });
     };
 
-    const checkOTP = (email, phone, otp_code) => {
+    const checkOTP = (email, phone, token) => {
         setIsLoading(true);
 
-        axios.post(`${API.url}/password_reset`, {
-            email, phone, otp_code
+        axios.post(`${API.url}/password_reset/check_token`, {
+            email, phone, token
         }).then(res => {
             let message = res.data.message;
             let userData = res.data.data.user;
-            let passwordResetData = res.data.data.password_reset;
 
             if (userData.phone !== null && userData.phone_verified_at === null) {
-                setOtpCode(passwordResetData.token);
+                setOtpCode(userData);
 
                 AsyncStorage.setItem('otp_code', passwordResetData.token);
-    
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+                console.log(`${message}`);
+
             } else {
                 setOtpCode(null);
-                setUserInfo(userData);
+                setRegisterInfo(userData);
 
-                AsyncStorage.removeItem('userInfo');
-                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                AsyncStorage.removeItem('otp_code');
                 ToastAndroid.show(`${message}`, ToastAndroid.LONG);
                 console.log(`${message}`);
             }
@@ -486,7 +482,7 @@ export const AuthProvider = ({ children, }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, otpCode, registerError, splashLoading, pushToken, login, logout, register, checkOTP, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription }}>
+            value={{ isLoading, userInfo, otpCode, registerInfo, splashLoading, pushToken, login, logout, register, checkOTP, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription }}>
             {children}
         </AuthContext.Provider>
     );
