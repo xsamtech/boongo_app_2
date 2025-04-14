@@ -13,8 +13,9 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     // =============== Get data ===============
     const [userInfo, setUserInfo] = useState({});
-    const [otpCode, setOtpCode] = useState(null);
-    const [registerInfo, setRegisterInfo] = useState(null);
+    const [startRegisterInfo, setStartRegisterInfo] = useState({});
+    const [endRegisterInfo, setEndRegisterInfo] = useState({});
+    const [registerError, setRegisterError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
     const [pushToken, setPushToken] = useState(null);
@@ -36,37 +37,41 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = (firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
+    const startRegister = (firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
         setIsLoading(true);
-        setRegisterInfo(null);
+        setRegisterError(null);
 
         axios.post(`${API.url}/user`, {
             firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id
         }).then(res => {
             let message = res.data.message;
+            let userData = res.data.data.user;
 
+            setStartRegisterInfo(userData);
+
+            AsyncStorage.setItem('startRegisterInfo', JSON.stringify(userData));
             ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
             setIsLoading(false);
-            setRegisterInfo(null);
+            setRegisterError(null);
 
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
                 ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
                 console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-                setRegisterInfo(`${error.response.data.message || error.response.data}`);
+                setRegisterError(`${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
                 ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
-                setRegisterInfo(t('error') + ' ' + t('error_message.no_server_response'));
+                setRegisterError(t('error') + ' ' + t('error_message.no_server_response'));
 
             } else {
                 // An error occurred while configuring the query
                 ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-                setRegisterInfo(`${error}`);
+                setRegisterError(`${error}`);
             }
 
             setIsLoading(false);
@@ -82,21 +87,16 @@ export const AuthProvider = ({ children }) => {
             let message = res.data.message;
             let userData = res.data.data.user;
 
-            if (userData.phone !== null && userData.phone_verified_at === null) {
-                setOtpCode(userData);
+            if (userData.phone_verified_at) {
+                setStartRegisterInfo({});
+                setEndRegisterInfo(userData);
 
-                AsyncStorage.setItem('otp_code', passwordResetData.token);
-                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-                console.log(`${message}`);
-
-            } else {
-                setOtpCode(null);
-                setRegisterInfo(userData);
-
-                AsyncStorage.removeItem('otp_code');
-                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-                console.log(`${message}`);
+                AsyncStorage.removeItem('startRegisterInfo');
+                AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
             }
+
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+            console.log(`${message}`);
 
             setIsLoading(false);
 
@@ -119,11 +119,51 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const update = (id, firstname, lastname, surname, gender, birthdate, city, country, address_1, address_2, p_o_box, email, phone, username) => {
+    const endRegister = (id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
         setIsLoading(true);
 
         axios.put(`${API.url}/user/${id}`, {
-            id, firstname, lastname, surname, gender, birthdate, city, country, address_1, address_2, p_o_box, email, phone, username
+            id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id
+        }, {
+            headers: { 'Authorization': `Bearer ${endRegisterInfo.api_token}` }
+        }).then(res => {
+            let message = res.data.message;
+
+            setEndRegisterInfo({});
+
+            AsyncStorage.removeItem('endRegisterInfo');
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+            console.log(`${message}`);
+
+            setIsLoading(false);
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                setRegisterError(`${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+                setRegisterError(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+                setRegisterError(`${error}`);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
+    const update = (id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
+        setIsLoading(true);
+
+        axios.put(`${API.url}/user/${id}`, {
+            id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id
         }, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
@@ -482,7 +522,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, otpCode, registerInfo, splashLoading, pushToken, login, logout, register, checkOTP, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription }}>
             {children}
         </AuthContext.Provider>
     );

@@ -20,10 +20,11 @@ import Logo from './assets/img/logo.svg';
 import useColors from './hooks/useColors';
 import SplashScreen from './screens/splash_screen';
 import OnboardScreen from './screens/Auth';
-import LoginScreen from './screens/Auth/login';
 import RegisterScreen from './screens/Auth/register';
-import PasswordResetScreen from './screens/Auth/password-reset';
 import CheckOTPScreen from './screens/Auth/check-otp';
+import ContinueRegisterScreen from './screens/Auth/continue-register';
+import LoginScreen from './screens/Auth/login';
+import PasswordResetScreen from './screens/Auth/password-reset';
 import AboutScreen from './screens/About';
 import TermsScreen from './screens/About/terms';
 import PrivacyScreen from './screens/About/privacy';
@@ -152,6 +153,7 @@ const LoginStackNav = () => {
       <Stack.Screen name='Onboard' component={OnboardScreen} />
       <Stack.Screen name='Login' component={LoginScreen} />
       <Stack.Screen name='Register' component={RegisterScreen} />
+      <Stack.Screen name='ContinueRegister' component={ContinueRegisterScreen} />
       <Stack.Screen name='PasswordReset' component={PasswordResetScreen} />
       <Stack.Screen name='CheckOTP' component={CheckOTPScreen} />
       <Stack.Screen name='About' component={AboutBottomTab} />
