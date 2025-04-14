@@ -16,7 +16,7 @@ import TextBrand from '../../assets/img/text.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
 
-const CheckOTPScreen = ({ route }) => {
+const CheckPhoneOTPScreen = ({ route }) => {
   // =============== Get parameters ===============
   const { emailAddress, phoneNumber } = route.params;
   // =============== Colors ===============
@@ -26,10 +26,17 @@ const CheckOTPScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Authentication context ===============
-  const { isLoading, startRegisterInfo, registerError, checkOTP } = useContext(AuthContext);
+  const { isLoading, checkOTP } = useContext(AuthContext);
   // =============== Get data ===============
-  const [userCode, setUserCode] = useState(null);
-  const reference = startRegisterInfo.email_verified_at === null ? t('auth.email') : t('auth.phone');
+  const [code, setCode] = useState('');
+
+  const handleCheckPhoneCode = async () => {
+    const result = await checkOTP(emailAddress, phoneNumber, code);
+
+    if (result === 'done') {
+      navigation.navigate('ContinueRegister');
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -40,44 +47,27 @@ const CheckOTPScreen = ({ route }) => {
         <View style={homeStyles.authlogo}>
           <TextBrand width={190} height={46} />
         </View>
-        <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('auth.otp_code.title', { reference })}</Text>
+        <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('auth.otp_code.title', { reference: t('auth.phone') })}</Text>
 
-        {/* Message */}
-        {startRegisterInfo.email_verified_at === null ?
-          <>
-            <Icon name='envelope' color={COLORS.black} size={50} style={{ alignSelf: 'center' }} />
-            <Text style={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p05 }}>{t('auth.otp_code.message_email')}</Text>
-          </>
-          :
-          <>
-            <Icon name='phone' color={COLORS.black} size={50} style={{ alignSelf: 'center' }} />
-            <Text style={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p05 }}>{t('auth.otp_code.message_phone')}</Text>
-          </>}
+        <Icon name='phone' color={COLORS.black} size={50} style={{ alignSelf: 'center' }} />
+        <Text style={{ color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p05 }}>{t('auth.otp_code.message_phone')}</Text>
 
-        {/* Code OTP */}
+        {/* Code to check */}
         <TextInput
           style={[homeStyles.authInput, { fontSize: TEXT_SIZE.title, color: COLORS.black, textAlign: 'center', borderColor: COLORS.light_secondary }]}
           keyboardType='numeric'
-          value={userCode}
+          value={code}
           placeholder={t('auth.otp_code.placeholder')}
           placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setUserCode(text)} />
+          onChangeText={text => setCode(text)} />
 
-        {/* Submit / Cancel */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.danger }]}
-          onPress={() => {
-            checkOTP(emailAddress, phoneNumber, userCode);
-
-            if (!startRegisterInfo.id && !registerError) {
-              navigation.navigate('ContinueRegister');
-            }
-          }}>
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleCheckPhoneCode}>
           <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('auth.otp_code.send')}</Text>
         </Button>
 
         {/* Message */}
         <View style={homeStyles.messageContainer}>
-          <Text style={[homeStyles.messageText, {fontSize: TEXT_SIZE.paragraph, textAlign: 'center', paddingHorizontal: PADDING.p12}]}>{t('auth.otp_code.warning')}</Text>
+          <Text style={[homeStyles.messageText, { fontSize: TEXT_SIZE.paragraph, textAlign: 'center', paddingHorizontal: PADDING.p12 }]}>{t('auth.otp_code.warning')}</Text>
         </View>
 
         {/* Copyright */}
@@ -88,4 +78,4 @@ const CheckOTPScreen = ({ route }) => {
   );
 };
 
-export default CheckOTPScreen;
+export default CheckPhoneOTPScreen;

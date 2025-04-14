@@ -21,7 +21,8 @@ import useColors from './hooks/useColors';
 import SplashScreen from './screens/splash_screen';
 import OnboardScreen from './screens/Auth';
 import RegisterScreen from './screens/Auth/register';
-import CheckOTPScreen from './screens/Auth/check-otp';
+import CheckEmailOTPScreen from './screens/Auth/check-email-otp';
+import CheckPhoneOTPScreen from './screens/Auth/check-phone-otp';
 import ContinueRegisterScreen from './screens/Auth/continue-register';
 import LoginScreen from './screens/Auth/login';
 import PasswordResetScreen from './screens/Auth/password-reset';
@@ -155,7 +156,8 @@ const LoginStackNav = () => {
       <Stack.Screen name='Register' component={RegisterScreen} />
       <Stack.Screen name='ContinueRegister' component={ContinueRegisterScreen} />
       <Stack.Screen name='PasswordReset' component={PasswordResetScreen} />
-      <Stack.Screen name='CheckOTP' component={CheckOTPScreen} />
+      <Stack.Screen name='CheckEmailOTP' component={CheckEmailOTPScreen} />
+      <Stack.Screen name='CheckPhoneOTP' component={CheckPhoneOTPScreen} />
       <Stack.Screen name='About' component={AboutBottomTab} />
     </Stack.Navigator>
   );

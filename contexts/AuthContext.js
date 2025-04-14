@@ -78,46 +78,71 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const checkOTP = (email, phone, token) => {
+    const checkOTP = async (email, phone, token) => {
         setIsLoading(true);
+        try {
+            const res = await axios.post(`${API.url}/password_reset/check_token`, {
+                email, phone, token
+            });
 
-        axios.post(`${API.url}/password_reset/check_token`, {
-            email, phone, token
-        }).then(res => {
-            let message = res.data.message;
-            let userData = res.data.data.user;
+            const message = res.data.message;
+            const userData = res.data.data.user;
 
-            if (userData.phone_verified_at) {
-                setStartRegisterInfo({});
-                setEndRegisterInfo(userData);
-
-                AsyncStorage.removeItem('startRegisterInfo');
-                AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
-            }
+            const emailVerified = !!userData.email_verified_at;
+            const phoneVerified = !!userData.phone_verified_at;
 
             ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
+            // Update local storage
+            if (emailVerified && phoneVerified) {
+                setStartRegisterInfo({});
+                setEndRegisterInfo(userData);
+
+                await AsyncStorage.removeItem('startRegisterInfo');
+                await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                setIsLoading(false);
+
+                return 'done';
+            }
+
+            // Otherwise, just update "startRegisterInfo"
+            setStartRegisterInfo(userData);
+
+            await AsyncStorage.setItem('startRegisterInfo', JSON.stringify(userData));
+
             setIsLoading(false);
 
-        }).catch(error => {
+            if (emailVerified && !phoneVerified) {
+                return 'phone_validated';
+
+            } else {
+                return 'email_validated';
+            }
+
+        } catch (error) {
             if (error.response) {
                 // The request was made and the server responded with a status code
                 ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
                 console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                setRegisterError(`${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
                 ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+                setRegisterError(t('error') + ' ' + t('error_message.no_server_response'));
 
             } else {
                 // An error occurred while configuring the query
                 ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+                setRegisterError(`${error}`);
             }
 
             setIsLoading(false);
-        });
+        }
     };
+
 
     const endRegister = (id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
         setIsLoading(true);
