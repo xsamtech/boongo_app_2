@@ -31,7 +31,7 @@ const CheckEmailOTPScreen = ({ route }) => {
   const [code, setCode] = useState('');
 
   const handleCheckEmailCode = async () => {
-    const result = await checkOTP(emailAddress, phoneNumber, code);
+    const result = await checkOTP(emailAddress, null, code);
 
     if (result === 'email_validated') {
       navigation.navigate('CheckPhoneOTP', { emailAddress, phoneNumber });
