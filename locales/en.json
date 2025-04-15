@@ -17,6 +17,7 @@
     "terms_accept2": " and our policy for ",
     "change_lang": "Change language",
     "back_home": "Back to home",
+    "loading": "Loading...",
     "load_more": "Load more",
     "see_more": "See more",
     "see_less": "See less",
@@ -87,7 +88,7 @@
     "start": "Start",
     "register": "Register",
     "i_register": "Create account",
-    "continue_register": "Continue register",
+    "continue_register": "Complete your registration",
     "login": "Log in",
     "i_login": "Sign in",
     "logout": "Log out",
@@ -211,7 +212,11 @@
         "address_2": "Address 2 (Optional)",
         "p_o_box": "P.O. Box",
         "email": "E-mail",
-        "phone_code": "Code",
+        "phone_code": {
+            "title": "Telephone code of your country",
+            "label": "Ph. code",
+            "search": "Search your country..."
+        },
         "phone": "Phone number",
         "username": {
             "label": "Username",

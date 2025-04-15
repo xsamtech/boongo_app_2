@@ -138,19 +138,34 @@ const RegisterScreen = () => {
         <View style={{ flexDirection: 'row' }}>
           {/* Phone code  */}
           <DropDownPicker
+            modalTitle={t('auth.phone_code.title')}
+            disabled={countriesData.length === 0}
+            loading={countriesData.length === 0}
+            modalProps={{
+              presentationStyle: 'fullScreen', // optional
+              animationType: 'slide',
+            }}
+            modalContentContainerStyle={{ 
+              backgroundColor: COLORS.white,
+              borderTopWidth: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: COLORS.light_secondary,
+            }}
+            closeIconStyle={{
+              tintColor: COLORS.black
+            }}
+            textStyle={{ color: COLORS.black }}
+            placeholderStyle={{ color: COLORS.black }}
+            placeholder={t('auth.phone_code.label')}
+            arrowIconStyle={{ tintColor: COLORS.black }}
+            containerStyle={{ width: '43%', height: 50 }}
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
+            listMode='MODAL'
             open={open}
             value={phoneCode}
             items={countriesData}
             setOpen={setOpen}
             setValue={setPhoneCode}
-            dropDownContainerStyle={{ backgroundColor: COLORS.white }}
-            textStyle={{ color: COLORS.black }}
-            placeholderStyle={{ color: COLORS.black }}
-            placeholder={t('auth.phone_code')}
-            arrowIconStyle={{ tintColor: COLORS.black }}
-            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
-            containerStyle={{ width: '43%', height: 50 }}
-            listMode='SCROLLVIEW'
             onChangeItem={handleCountryChange} />
 
           {/* Phone number */}

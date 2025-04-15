@@ -17,6 +17,7 @@
     "terms_accept2": "mpe politiki na biso ya",
     "change_lang": "Bongola monoko",
     "back_home": "Zonga na lokasa ya ebandeli",
+    "loading": "Ez’otonda...",
     "load_more": "Tondisa mingi",
     "see_more": "Tala misusu",
     "see_less": "Tala moke",
@@ -87,7 +88,7 @@
     "start": "Banda",
     "register": "Mikomisa",
     "i_register": "Nasala compte",
-    "continue_register": "Koba na ko mikomisa",
+    "continue_register": "Silisa ko mikomisa",
     "login": "Nakoti",
     "i_login": "Namimonisa",
     "logout": "Na bima",
@@ -211,7 +212,11 @@
         "address_2": "Adresse 2 (Facultative)",
         "p_o_box": "Boite Postale",
         "email": "E-mail",
-        "phone_code": "Code",
+        "phone_code": {
+            "title": "Code ya téléphone ya mboka na yo",
+            "label": "Code tél.",
+            "search": "Luka mboka na yo ..."
+        },
         "phone": "N° de téléphone",
         "username": {
             "label": "Pseudo",

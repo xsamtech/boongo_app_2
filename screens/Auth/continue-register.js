@@ -4,7 +4,6 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View, TextInput, ScrollView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Button, Divider } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -24,22 +23,20 @@ const ContinueRegisterScreen = () => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Authentication context ===============
-  const { isLoading, continueRegister, registerInfo } = useContext(AuthContext);
+  const { isLoading, endRegister, endRegisterInfo } = useContext(AuthContext);
   // =============== User data ===============
-  const firstname = registerInfo.firstname;
-  const [surname, setSurname] = useState(userInfo.surname);
-  const [city, setCity] = useState(userInfo.city);
-  const [address_1, setAddress1] = useState(userInfo.address_1);
-  const [address_2, setAddress2] = useState(userInfo.address_2);
-  const [p_o_box, setPOBox] = useState(userInfo.p_o_box);
+  const firstname = endRegisterInfo.firstname;
+  const [surname, setSurname] = useState(null);
+  const [city, setCity] = useState(null);
+  const [address_1, setAddress1] = useState(null);
+  const [address_2, setAddress2] = useState(null);
+  const [p_o_box, setPOBox] = useState(null);
   const [password, setPassword] = useState(null);
   const [confirm_password, setConfirmPassword] = useState(null);
   // COUNTRY dropdown
   const [isFocus, setIsFocus] = useState(false);
-  const [country, setCountry] = useState(userInfo.country);
+  const [country, setCountry] = useState(null);
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
@@ -77,13 +74,13 @@ const ContinueRegisterScreen = () => {
 
   // GENDER dropdown
   const [genderOpen, setGenderOpen] = useState(false);
-  const [gender, setGender] = useState(userInfo.gender);
+  const [gender, setGender] = useState(null);
   const [genderItems, setGenderItems] = useState([
     { label: t('auth.gender.male'), value: 'M' },
     { label: t('auth.gender.female'), value: 'F' }
   ]);
   // BIRTH DATE date-picker
-  const [birthdate, setBirthdate] = useState(userInfo.birthdate);
+  const [birthdate, setBirthdate] = useState(null);
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
@@ -262,7 +259,7 @@ const ContinueRegisterScreen = () => {
           onChangeText={text => setConfirmPassword(text)} secureTextEntry />
 
         {/* Submit */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { continueRegister(registerInfo.id, firstname, lastname, surname, gender, birthdate, city, country, address_1, address_2, p_o_box, email, phone, username); }}>
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { endRegister(endRegisterInfo.id, firstname, null, surname, gender, birthdate, city, address_1, address_2, p_o_box, null, null, null, password, confirm_password, country.id, null, null); }}>
           <Text style={homeStyles.authButtonText}>{t('register')}</Text>
         </Button>
 
