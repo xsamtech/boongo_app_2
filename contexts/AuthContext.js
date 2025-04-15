@@ -149,10 +149,13 @@ export const AuthProvider = ({ children }) => {
             headers: { 'Authorization': `Bearer ${endRegisterInfo.api_token}` }
         }).then(res => {
             const message = res.data.message;
+            const userData = res.data.data;
 
             setEndRegisterInfo({});
+            setUserInfo(userData);
 
             AsyncStorage.removeItem('endRegisterInfo');
+            AsyncStorage.setItem('userInfo', JSON.stringify(userData));
             ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
