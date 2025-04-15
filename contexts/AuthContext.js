@@ -89,22 +89,57 @@ export const AuthProvider = ({ children }) => {
             const message = res.data.message;
             const userData = res.data.data.user;
 
-            const emailVerified = !!userData.email_verified_at;
-            const phoneVerified = !!userData.phone_verified_at;
+            if (email && phone) {
+                const emailVerified = !!userData.email_verified_at;
+                const phoneVerified = !!userData.phone_verified_at;
+
+                if (emailVerified && phoneVerified) {
+                    setStartRegisterInfo({});
+                    setEndRegisterInfo(userData);
+
+                    await AsyncStorage.removeItem('startRegisterInfo');
+                    await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                    setIsLoading(false);
+
+                    return 'done';
+                }
+
+            } else {
+                if (email) {
+                    const emailVerified = !!userData.email_verified_at;
+
+                    if (emailVerified) {
+                        setStartRegisterInfo({});
+                        setEndRegisterInfo(userData);
+
+                        await AsyncStorage.removeItem('startRegisterInfo');
+                        await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                        setIsLoading(false);
+
+                        return 'done';
+                    }
+                }
+
+                if (phone) {
+                    const phoneVerified = !!userData.phone_verified_at;
+
+                    if (phoneVerified) {
+                        setStartRegisterInfo({});
+                        setEndRegisterInfo(userData);
+
+                        await AsyncStorage.removeItem('startRegisterInfo');
+                        await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                        setIsLoading(false);
+
+                        return 'done';
+                    }
+                }
+            }
 
             ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-
-            if (emailVerified && phoneVerified) {
-                setStartRegisterInfo({});
-                setEndRegisterInfo(userData);
-
-                await AsyncStorage.removeItem('startRegisterInfo');
-                await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
-
-                setIsLoading(false);
-
-                return 'done';
-            }
 
             setStartRegisterInfo(userData);
 

@@ -12,6 +12,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { API, PADDING } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
+import ThemeContext from '../../contexts/ThemeContext';
 import FooterComponent from '../footer';
 import TextBrand from '../../assets/img/text.svg';
 import useColors from '../../hooks/useColors';
@@ -23,8 +24,9 @@ const ContinueRegisterScreen = () => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Authentication context ===============
+  // =============== Get contexts ===============
   const { isLoading, endRegister, endRegisterInfo } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   // =============== User data ===============
   const firstname = endRegisterInfo.firstname;
   const [surname, setSurname] = useState(null);

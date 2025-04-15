@@ -37,12 +37,11 @@ const PasswordResetScreen = () => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Authentication context ===============
-  const { isLoading, login } = useContext(AuthContext);
-  // =============== Handle theme ===============
-  const { theme } = useContext(ThemeContext);
   // =============== Navigation ===============
   const navigation = useNavigation();
+  // =============== Get contexts ===============
+  const { isLoading, login } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   // =============== Get data ===============
   const [phone, setPhone] = useState('');
   // COUNTRY dropdown

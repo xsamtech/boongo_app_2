@@ -24,7 +24,7 @@ const RegisterScreen = () => {
   const { t } = useTranslation();
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Authentication context ===============
+  // =============== Get contexts ===============
   const { isLoading, startRegister, registerError } = useContext(AuthContext);
   // =============== Get data ===============
   const [firstname, setFirstname] = useState(null);

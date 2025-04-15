@@ -20,10 +20,10 @@ const LoginScreen = ({ route }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Authentication context ===============
-  const { isLoading, login } = useContext(AuthContext);
   // =============== Navigation ===============
   const navigation = useNavigation();
+  // =============== Get contexts ===============
+  const { isLoading, login } = useContext(AuthContext);
   // =============== Get data ===============
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);

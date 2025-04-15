@@ -18,20 +18,20 @@ import homeStyles from '../style';
 
 const CheckPhoneOTPScreen = ({ route }) => {
   // =============== Get parameters ===============
-  const { phoneNumber } = route.params;
+  const { emailAddress, phoneNumber } = route.params;
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Authentication context ===============
+  // =============== Get contexts ===============
   const { isLoading, checkOTP } = useContext(AuthContext);
   // =============== Get data ===============
   const [code, setCode] = useState('');
 
   const handleCheckPhoneCode = async () => {
-    const result = await checkOTP(null, phoneNumber, code);
+    const result = await checkOTP(emailAddress, phoneNumber, code);
 
     if (result === 'done') {
       navigation.navigate('ContinueRegister');
