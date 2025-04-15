@@ -34,7 +34,7 @@ const CheckEmailOTPScreen = ({ route }) => {
     const result = await checkOTP(emailAddress, null, code);
 
     if (result === 'email_validated') {
-      navigation.navigate('CheckPhoneOTP', { emailAddress, phoneNumber });
+      navigation.navigate('CheckPhoneOTP', { phoneNumber: phoneNumber });
     }
   };
 

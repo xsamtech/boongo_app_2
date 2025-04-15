@@ -18,7 +18,7 @@ import homeStyles from '../style';
 
 const CheckPhoneOTPScreen = ({ route }) => {
   // =============== Get parameters ===============
-  const { emailAddress, phoneNumber } = route.params;
+  const { phoneNumber } = route.params;
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
