@@ -169,7 +169,7 @@ const RegisterScreen = () => {
             startRegister(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
 
             if (!registerError) {
-              navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: phone });
+              navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: `${phoneCode}${phone}` });
             }
           }}>
           <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('start')}</Text>
