@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
             const message = res.data.message;
             const userData = res.data.data.user;
 
-            if (email && phone) {
+            if (email !== null && phone !== 0) {
                 const emailVerified = !!userData.email_verified_at;
                 const phoneVerified = !!userData.phone_verified_at;
 
@@ -105,8 +105,20 @@ export const AuthProvider = ({ children }) => {
                     return 'done';
                 }
 
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                setStartRegisterInfo(userData);
+
+                await AsyncStorage.setItem('startRegisterInfo', JSON.stringify(userData));
+
+                setIsLoading(false);
+
+                if (emailVerified) return 'email_validated';
+
+                return 'email_not_validated';
+
             } else {
-                if (email) {
+                if (email !== null) {
                     const emailVerified = !!userData.email_verified_at;
 
                     if (emailVerified) {
@@ -122,7 +134,7 @@ export const AuthProvider = ({ children }) => {
                     }
                 }
 
-                if (phone) {
+                if (phone !== 0) {
                     const phoneVerified = !!userData.phone_verified_at;
 
                     if (phoneVerified) {
@@ -137,19 +149,11 @@ export const AuthProvider = ({ children }) => {
                         return 'done';
                     }
                 }
+
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                setIsLoading(false);
             }
-
-            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-
-            setStartRegisterInfo(userData);
-
-            await AsyncStorage.setItem('startRegisterInfo', JSON.stringify(userData));
-
-            setIsLoading(false);
-
-            if (emailVerified) return 'email_validated';
-
-            return 'email_not_validated';
 
         } catch (error) {
             if (error.response) {

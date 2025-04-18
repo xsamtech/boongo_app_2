@@ -137,7 +137,7 @@ const ContinueRegisterScreen = () => {
           <TextBrand width={190} height={46} />
         </View>
         <Text style={[homeStyles.authTitle, { color: COLORS.black , marginBottom: PADDING.p01}]}>{t('welcome_title', { firstname })}</Text>
-        <Text style={[homeStyles.authText, { color: COLORS.black, marginBottom: PADDING.p12 }]}>{t('continue_register')}</Text>
+        <Text style={[homeStyles.authText, { color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p12 }]}>{t('continue_register')}</Text>
 
         {/* Surname */}
         <TextInput

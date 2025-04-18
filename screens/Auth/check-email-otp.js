@@ -35,6 +35,9 @@ const CheckEmailOTPScreen = ({ route }) => {
 
     if (result === 'email_validated') {
       navigation.navigate('CheckPhoneOTP', { emailAddress: emailAddress, phoneNumber: phoneNumber });
+
+    } else {
+      navigation.navigate('ContinueRegister');
     }
   };
 
