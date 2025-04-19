@@ -142,7 +142,7 @@
             }
         },
         "government": {
-            "title": "Government institutions",
+            "title": "Institutions",
             "new": "Register an institution",
             "event": "Events",
             "data": {

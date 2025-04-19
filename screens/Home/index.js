@@ -23,7 +23,7 @@ const HomeScreen = () => {
   const { t } = useTranslation();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.white }}>
       <ScrollView style={{ padding: PADDING.p05 }} contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
         {/* Open drawer */}
         <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>

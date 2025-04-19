@@ -8,6 +8,7 @@ import { Button } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import FooterComponent from '../footer';
@@ -27,6 +28,7 @@ const LoginScreen = ({ route }) => {
   // =============== Get data ===============
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (route.params) {
     // =============== Get parameters ===============
@@ -52,12 +54,17 @@ const LoginScreen = ({ route }) => {
             onChangeText={text => setUsername(text)} />
 
           {/* Password */}
-          <TextInput
-            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-            value={password}
-            placeholder={t('auth.password.label')}
-            placeholderTextColor={COLORS.dark_secondary}
-            onChangeText={text => setPassword(text)} secureTextEntry />
+          <View style={{ position: 'relative' }}>
+            <TextInput
+              style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+              value={password}
+              placeholder={t('auth.password.label')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={text => setPassword(text)} secureTextEntry={!showPassword} />
+            <TouchableOpacity style={{ position: 'absolute', top: 7, right: 7 }} onPress={() => setShowPassword(prev => !prev)}>
+              <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} color={COLORS.dark_secondary} size={30} />
+            </TouchableOpacity>
+          </View>
 
           {/* Forgotten password */}
           <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>
@@ -110,12 +117,17 @@ const LoginScreen = ({ route }) => {
             onChangeText={text => setUsername(text)} />
 
           {/* Password */}
-          <TextInput
-            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-            value={password}
-            placeholder={t('auth.password.label')}
-            placeholderTextColor={COLORS.dark_secondary}
-            onChangeText={text => setPassword(text)} secureTextEntry />
+          <View style={{ position: 'relative' }}>
+            <TextInput
+              style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+              value={password}
+              placeholder={t('auth.password.label')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={text => setPassword(text)} secureTextEntry={!showPassword} />
+            <TouchableOpacity style={{ position: 'absolute', top: 7, right: 7 }} onPress={() => setShowPassword(prev => !prev)}>
+              <Icon name={showPassword ? 'eye-off-outline' : 'eye-outline'} color={COLORS.dark_secondary} size={30} />
+            </TouchableOpacity>
+          </View>
 
           {/* Forgotten password */}
           <TouchableOpacity onPress={() => navigation.navigate('PasswordReset')}>

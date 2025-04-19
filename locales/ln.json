@@ -142,7 +142,7 @@
             }
         },
         "government": {
-            "title": "Ba institutions ya gouvernement",
+            "title": "Ba institutions",
             "new": "Komisa institution",
             "event": "Milulu",
             "data": {

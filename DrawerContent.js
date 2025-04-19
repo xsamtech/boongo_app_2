@@ -10,31 +10,42 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { PADDING } from './tools/constants';
-import homeStyles from './screens/style';
+import { PADDING, TEXT_SIZE } from './tools/constants';
 import { AuthContext } from './contexts/AuthContext';
+import FooterComponent from './screens/footer';
+import homeStyles from './screens/style';
 import useColors from './hooks/useColors';
 
 const DrawerList = [
-    { icon: 'home-outline', label: 'Accueil', navigateTo: 'Home' },
-    { icon: 'book', label: 'Mon compte', navigateTo: 'Book' },
-    { icon: 'newspaper', label: 'Etablissements', navigateTo: 'Journal' },
-    { icon: 'map-marker-outline', label: 'Institutions', navigateTo: 'Mapping' },
-    { icon: 'video-outline', label: 'Paramètres', navigateTo: 'Media' },
-    { icon: 'help-circle-outline', label: 'A propos', navigateTo: 'About' }
+    { icon: 'home-outline', label: 'navigation.home.title', navigateTo: 'Home', toScreen: null },
+    { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Book', toScreen: null },
+    { icon: 'bank-outline', label: 'navigation.school.title', navigateTo: 'Journal', toScreen: null },
+    { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Mapping', toScreen: null },
+    { icon: 'image-multiple-outline', label: 'navigation.media', navigateTo: 'Mapping', toScreen: null },
+    { icon: 'cog-outline', label: 'navigation.settings.title', navigateTo: 'Media', toScreen: null },
+    { icon: 'help-circle-outline', label: 'navigation.about', navigateTo: 'About', toScreen: 'Contact' }
 ];
 
-const DrawerLayout = ({ icon, label, navigateTo }) => {
+const DrawerLayout = ({ icon, label, navigateTo, toScreen }) => {
+    // =============== Colors ===============
+    const COLORS = useColors();
+    // =============== Navigation ===============
     const navigation = useNavigation();
-    // const { t } = useTranslation();
+    // =============== Language ===============
+    const { t } = useTranslation();
 
     return (
         <DrawerItem
-            icon={({ color, size }) => <Icon name={icon} color={color} size={size} />}
-            // label={t(label)}
-            label={label}
+            label={t(label)}
+            icon={({ color, size }) => <Icon name={icon} color={COLORS.black} size={size} />}
+            labelStyle={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.black }}
             onPress={() => {
-                navigation.navigate(navigateTo);
+                if (toScreen != null) {
+                    navigation.navigate(navigateTo, { screen: toScreen });
+
+                } else {
+                    navigation.navigate(navigateTo);
+                }
             }}
         />
     );
@@ -54,33 +65,32 @@ const DrawerItems = props => {
 const DrawerContent = (props) => {
     // =============== Colors ===============
     const COLORS = useColors();
-    // =============== Navigation ===============
-    const navigation = useNavigation();
     // =============== Language ===============
     const { t } = useTranslation();
     // =============== Get data ===============
     const { userInfo, logout } = useContext(AuthContext);
 
     return (
-        <View style={{ flex: 1, paddingHorizontal: -12, marginHorizontal: -12 }}>
+        <View style={{ flex: 1, backgroundColor: COLORS.white, borderTopRightRadius: 15, borderBottomRightRadius: 15 }}>
             <DrawerContentScrollView {...props}>
                 <View style={homeStyles.drawerCurrentUser}>
                     <View style={{ marginTop: 5 }}>
-                        <Image style={{ width: 60, height: 60, borderRadius: 30 }} source={{ uri: userInfo.profile_photo_path }} />
+                        <Image style={{ width: 60, height: 60, borderRadius: 30 }} source={{ uri: userInfo.avatar_url }} />
                     </View>
                     <View style={{ marginLeft: PADDING.p01, flexDirection: 'column' }}>
-                        <Title style={homeStyles.drawerTitle}>{userInfo.firstname + ' ' + userInfo.lastname}</Title>
-                        <Text style={{ color: COLORS.yellow }}>@{userInfo.username}</Text>
+                        <Title style={[homeStyles.drawerTitle, { color: COLORS.black }]}>{userInfo.firstname + ' ' + userInfo.lastname}</Title>
+                        <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.warning }}>@{userInfo.username}</Text>
                     </View>
                 </View>
                 <View style={homeStyles.drawerSection}>
                     <DrawerItems />
                     <View style={homeStyles.drawerFooter}>
                         <DrawerItem
-                            icon={() => <FaIcon name='power-off' color={COLORS.black} size={18} />}
-                            label={t('logout')} labelStyle={{ marginLeft: PADDING.p00, color: COLORS.black }}
-                            style={{ marginLeft: PADDING.p01 }}
+                            icon={() => <FaIcon name='power-off' color='white' size={18} />}
+                            label={t('logout')} labelStyle={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}
+                            style={{ backgroundColor: COLORS.primary, marginBottom: PADDING.p05 }}
                             onPress={logout} />
+                        <FooterComponent />
                     </View>
                 </View>
             </DrawerContentScrollView>

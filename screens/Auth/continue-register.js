@@ -72,6 +72,8 @@ const ContinueRegisterScreen = () => {
   const handleCountryChange = (item) => {
     setCountry(item.value);
     setIsFocus(false);
+
+    console.log(item.value);
   };
 
   // GENDER dropdown
@@ -136,7 +138,7 @@ const ContinueRegisterScreen = () => {
         <View style={homeStyles.authlogo}>
           <TextBrand width={190} height={46} />
         </View>
-        <Text style={[homeStyles.authTitle, { color: COLORS.black , marginBottom: PADDING.p01}]}>{t('welcome_title', { firstname })}</Text>
+        <Text style={[homeStyles.authTitle, { color: COLORS.black, marginBottom: PADDING.p01 }]}>{t('welcome_title', { firstname })}</Text>
         <Text style={[homeStyles.authText, { color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p12 }]}>{t('continue_register')}</Text>
 
         {/* Surname */}
@@ -262,7 +264,7 @@ const ContinueRegisterScreen = () => {
 
         {/* Submit */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { endRegister(endRegisterInfo.id, firstname, null, surname, gender, birthdate, city, address_1, address_2, p_o_box, null, null, null, password, confirm_password, country.id, null, null); }}>
-          <Text style={homeStyles.authButtonText}>{t('register')}</Text>
+          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('register')}</Text>
         </Button>
 
         {/* Copyright */}

@@ -386,18 +386,15 @@ const homeStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: PADDING.p00,
-        marginBottom: PADDING.p01,
-        marginLeft: PADDING.p07
+        marginBottom: PADDING.p05,
+        marginLeft: PADDING.p01
     },
 
     drawerFooter: {
         position: 'absolute',
         left: 0,
-        bottom: 0,
-        width: '100%',
-        height: 140,
-        backgroundColor: '#e3e3e3',
-        paddingVertical: PADDING.p00
+        bottom: PADDING.p12,
+        width: '100%'
     },
 
     drawerButton: {

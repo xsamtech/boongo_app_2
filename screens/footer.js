@@ -44,8 +44,8 @@ const FooterComponent = ({color}) => {
         </>}
 
       {/* Copyright */}
-      <Text style={{ textAlign: 'center', color: color, marginBottom: PADDING.p00 }}>{t('copyright', { year })} <Text style={{ fontWeight: '700' }}>Reborn</Text></Text>
-      <Text style={{ textAlign: 'center', color: color }}>Designed by<Text style={{ color: COLORS.primary }} onPress={() => Linking.openURL('https://xsamtech.com')}> Xsam Technologies</Text></Text>
+      <Text style={{ textAlign: 'center', color: COLORS.dark_secondary, marginBottom: PADDING.p00 }}>{t('copyright', { year })} <Text style={{ fontWeight: '700' }}>Reborn</Text></Text>
+      <Text style={{ textAlign: 'center', color: COLORS.dark_secondary }}>Designed by<Text style={{ color: COLORS.primary }} onPress={() => Linking.openURL('https://xsamtech.com')}> Xsam Technologies</Text></Text>
     </View>
   );
 };

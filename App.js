@@ -134,14 +134,6 @@ const AboutBottomTab = () => {
 const LoginStackNav = () => {
   // =============== Colors ===============
   const COLORS = useColors();
-  // =============== Lock screen orientation ===============
-  useEffect(() => {
-    Orientation.lockToPortrait();
-
-    return () => {
-      Orientation.unlockAllOrientations();
-    };
-  }, []);
 
   return (
     <Stack.Navigator
@@ -213,6 +205,16 @@ const App = () => {
   // =============== Get data ===============
   const { userInfo, splashLoading } = useContext(AuthContext);
 
+  // =============== Lock screen orientation ===============
+  useEffect(() => {
+    Orientation.lockToPortrait();
+
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  }, []);
+
+  // =============== Lock screen captures ===============
   useEffect(() => {
     const applySecurity = async () => {
       await forbid();
