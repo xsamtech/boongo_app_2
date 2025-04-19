@@ -1,7 +1,7 @@
 {
     "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "All rights reserved",
-    "welcome_title": "Welcome {{ user }}",
+    "welcome_title": "Welcome {{ firstname }}",
     "welcome_description": {
         "work": "Publish your works of all types (book, magazine & newspaper or geographical map) to make them accessible to the public, and interact with subscribers to your works.",
         "school": "Register your institution (school, academic or other), interact with teachers or students, and share your programs and events.",
@@ -43,6 +43,7 @@
         "login_before_operation": "You must first identify yourself to carry out this operation.",
         "pending_after_payment": "When you make your payment, your subscription will be validated within minutes.",
         "no_server_response": "No response received from the server.",
+        "missing_parameters": "There are missing parameters.",
         "cannot_be_empty": "This cannot be empty."
     },
     "empty_list": {

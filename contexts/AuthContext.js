@@ -82,77 +82,102 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(true);
 
         try {
-            const res = await axios.post(`${API.url}/password_reset/check_token`, {
-                email, phone, token
-            });
+            let res;
+            let userData;
+            let message;
+            let emailVerified = false;
+            let phoneVerified = false;
 
-            const message = res.data.message;
-            const userData = res.data.data.user;
+            if (email) {
+                res = await axios.post(`${API.url}/password_reset/check_token/email`, { email, token });
 
-            if (email !== null && phone !== 0) {
-                const emailVerified = !!userData.email_verified_at;
-                const phoneVerified = !!userData.phone_verified_at;
+            } else if (phone) {
+                res = await axios.post(`${API.url}/password_reset/check_token/phone`, { phone, token });
 
-                if (emailVerified && phoneVerified) {
-                    setStartRegisterInfo({});
-                    setEndRegisterInfo(userData);
+            } else {
+                setIsLoading(false);
 
+                ToastAndroid.show(t('error_message.missing_parameters'), ToastAndroid.LONG);
+
+                return 'missing_parameters';
+            }
+
+            message = res.data.message;
+            userData = res.data.data.user;
+
+            emailVerified = !!userData.email_verified_at;
+            phoneVerified = !!userData.phone_verified_at;
+
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+            setIsLoading(false);
+
+            // === Email first ===
+            if (email) {
+                // === User has phone ===
+                if (userData.phone) {
+                    // Phone is verified
+                    if (phoneVerified) {
+                        // Everything is good, we save "endRegisterInfo"
+                        await AsyncStorage.removeItem('startRegisterInfo');
+                        await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                        setStartRegisterInfo({});
+                        setEndRegisterInfo(userData);
+
+                        return 'done';
+
+                    // Phone NOT yet verified
+                    } else {
+                        // We do NOT save "endRegisterInfo"
+                        return 'phone_not_validated';
+                    }
+
+                // === User hasn't phone ===
+                } else {
+                    // We can save "endRegisterInfo" directly
                     await AsyncStorage.removeItem('startRegisterInfo');
                     await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
 
-                    setIsLoading(false);
+                    setStartRegisterInfo({});
+                    setEndRegisterInfo(userData);
 
                     return 'done';
                 }
+            }
 
-                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-
-                setStartRegisterInfo(userData);
-
-                await AsyncStorage.setItem('startRegisterInfo', JSON.stringify(userData));
-
-                setIsLoading(false);
-
-                if (emailVerified) return 'email_validated';
-
-                return 'email_not_validated';
-
-            } else {
-                if (email !== null) {
-                    const emailVerified = !!userData.email_verified_at;
-
+            // === Phone first ===
+            if (phone) {
+                // === User has email ===
+                if (userData.email) {
+                    // Email is verified
                     if (emailVerified) {
-                        setStartRegisterInfo({});
-                        setEndRegisterInfo(userData);
-
+                        // Everything is good, we save "endRegisterInfo"
                         await AsyncStorage.removeItem('startRegisterInfo');
                         await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
 
-                        setIsLoading(false);
-
-                        return 'done';
-                    }
-                }
-
-                if (phone !== 0) {
-                    const phoneVerified = !!userData.phone_verified_at;
-
-                    if (phoneVerified) {
                         setStartRegisterInfo({});
                         setEndRegisterInfo(userData);
 
-                        await AsyncStorage.removeItem('startRegisterInfo');
-                        await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
-
-                        setIsLoading(false);
-
                         return 'done';
+
+                    // Phone NOT yet verified
+                    } else {
+                        // We do NOT save "endRegisterInfo"
+                        return 'email_not_validated';
                     }
+
+                // === User hasn't email ===
+                } else {
+                    // We can save "endRegisterInfo" directly
+                    await AsyncStorage.removeItem('startRegisterInfo');
+                    await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                    setStartRegisterInfo({});
+                    setEndRegisterInfo(userData);
+
+                    return 'done';
                 }
-
-                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-
-                setIsLoading(false);
             }
 
         } catch (error) {

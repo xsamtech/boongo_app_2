@@ -1,7 +1,7 @@
 {
     "copyright": "Copyright (c) {{ year }}",
     "all_rights_reserved": "Tous droits réservés",
-    "welcome_title": "Bienvenue {{ user }}",
+    "welcome_title": "Bienvenue {{ firstname }}",
     "welcome_description": {
         "work": "Publiez vos ouvrages de tout type (livre, revue & journal ou carte géographique) pour les rendre accessibles au public, et échangez avec les abonnés à vos ouvrages.",
         "school": "Enregistrez votre établissement (scolaire, académique ou autre), échangez avec des enseignants ou des élèves/étudiants, et partagez vos programmes et événements.",
@@ -43,6 +43,7 @@
         "login_before_operation": "Vous devez avant tout vous identifier pour effectuer cette opération.",
         "pending_after_payment": "Lorsque vous effectuerez votre paiement, votre abonnement sera validé dans les minutes qui suivent.",
         "no_server_response": "Aucune réponse reçue du serveur.",
+        "missing_parameters": "Il y a des paramètres qui manquent.",
         "cannot_be_empty": "Ceci ne peut pas être vide."
     },
     "empty_list": {
