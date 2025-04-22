@@ -24,7 +24,7 @@ const News = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
-      <Text style={homeStyles.heading}>={t('navigation.home.news')}</Text>
+      <Text style={homeStyles.heading}>{t('navigation.home.news')}</Text>
     </View>
   );
 };
@@ -40,7 +40,7 @@ const Books = () => {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white }}>
-      <Text style={homeStyles.heading}>={t('navigation.home.books')}</Text>
+      <Text style={homeStyles.heading}>{t('navigation.home.books')}</Text>
     </View>
   );
 };
