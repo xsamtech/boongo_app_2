@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, Image, StatusBar } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { Divider } from 'react-native-paper';
@@ -47,53 +47,56 @@ const OnboardScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
-      {/* Onboard top */}
-      <View style={[homeStyles.onboardTop, { backgroundColor: COLORS.white }]}>
-        {/* Brand */}
-        <View style={{ marginBottom: 30 }}>
-          <LogoText width={190} height={105} style={{ alignSelf: 'center' }} />
-          <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
+    <>
+      <StatusBar barStyle={COLORS.bar_style} backgroundColor={COLORS.white} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
+        {/* Onboard top */}
+        <View style={[homeStyles.onboardTop, { backgroundColor: COLORS.white }]}>
+          {/* Brand */}
+          <View style={{ marginBottom: 30 }}>
+            <LogoText width={190} height={105} style={{ alignSelf: 'center' }} />
+            <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
+          </View>
+
+          {/* Slides */}
+          <Carousel style={homeStyles.onboardSlide} autoplay={true} loop={true} showsControls={false} showsDots={true} autoplayInterval={10000}>
+            {slides.map(item =>
+              <View key={item.id} style={homeStyles.onboardSlideItem}>
+                {getImageSlide(item.entity)}
+                <Text style={[homeStyles.onboardSlideText, { color: COLORS.black }]}>{t('welcome_description.' + item.entity)}</Text>
+              </View>
+            )}
+          </Carousel>
         </View>
 
-        {/* Slides */}
-        <Carousel style={homeStyles.onboardSlide} autoplay={true} loop={true} showsControls={false} showsDots={true} autoplayInterval={10000}>
-          {slides.map(item =>
-            <View key={item.id} style={homeStyles.onboardSlideItem}>
-              {getImageSlide(item.entity)}
-              <Text style={[homeStyles.onboardSlideText, { color: COLORS.black }]}>{t('welcome_description.' + item.entity)}</Text>
-            </View>
-          )}
-        </Carousel>
-      </View>
+        {/* Onboard bottom */}
+        <View style={[homeStyles.onboardBottom, { backgroundColor: COLORS.light }]}>
+          <View style={{ width: '100%' }}>
+            {/* Log in link */}
+            <TouchableOpacity style={[homeStyles.onboardButton, { backgroundColor: COLORS.black, marginBottom: PADDING.p01 }]} onPress={() => navigation.navigate('Login')}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name='lock-outline' color={COLORS.white} size={TEXT_SIZE.title} style={{ marginRight: PADDING.p01 }} />
+                <Text style={[homeStyles.onboardButtonText, { color: COLORS.white }]}>{t('i_login')}</Text>
+              </View>
+              <Icon name='chevron-right' color={COLORS.white} size={TEXT_SIZE.header} />
+            </TouchableOpacity>
 
-      {/* Onboard bottom */}
-      <View style={[homeStyles.onboardBottom, { backgroundColor: COLORS.light }]}>
-        <View style={{ width: '100%' }}>
-          {/* Log in link */}
-          <TouchableOpacity style={[homeStyles.onboardButton, { backgroundColor: COLORS.black, marginBottom: PADDING.p01 }]} onPress={() => navigation.navigate('Login')}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name='lock-outline' color={COLORS.white} size={TEXT_SIZE.title} style={{ marginRight: PADDING.p01 }} />
-              <Text style={[homeStyles.onboardButtonText, { color: COLORS.white }]}>{t('i_login')}</Text>
-            </View>
-            <Icon name='chevron-right' color={COLORS.white} size={TEXT_SIZE.header} />
-          </TouchableOpacity>
+            {/* Register link */}
+            <TouchableOpacity style={[homeStyles.onboardButton, { backgroundColor: 'rgba(250, 250, 250, 0)', borderWidth: 1, borderColor: COLORS.black }]} onPress={() => navigation.navigate('Register')}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name='account-plus-outline' color={COLORS.black} size={TEXT_SIZE.title} style={{ marginRight: PADDING.p01 }} />
+                <Text style={[homeStyles.onboardButtonText, { color: COLORS.black }]}>{t('i_register')}</Text>
+              </View>
+              <Icon name='chevron-right' color={COLORS.black} size={TEXT_SIZE.header} />
+            </TouchableOpacity>
 
-          {/* Register link */}
-          <TouchableOpacity style={[homeStyles.onboardButton, { backgroundColor: 'rgba(250, 250, 250, 0)', borderWidth: 1, borderColor: COLORS.black }]} onPress={() => navigation.navigate('Register')}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name='account-plus-outline' color={COLORS.black} size={TEXT_SIZE.title} style={{ marginRight: PADDING.p01 }} />
-              <Text style={[homeStyles.onboardButtonText, { color: COLORS.black }]}>{t('i_register')}</Text>
-            </View>
-            <Icon name='chevron-right' color={COLORS.black} size={TEXT_SIZE.header} />
-          </TouchableOpacity>
-
-          {/* Footer */}
-          <Divider style={{ backgroundColor: 'rgba(250, 250, 250, 0)', marginVertical: PADDING.p01 }} />
-          <FooterComponent color={COLORS.dark} />
+            {/* Footer */}
+            <Divider style={{ backgroundColor: 'rgba(250, 250, 250, 0)', marginVertical: PADDING.p01 }} />
+            <FooterComponent color={COLORS.dark} />
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 

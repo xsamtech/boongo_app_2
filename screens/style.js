@@ -266,21 +266,14 @@ const homeStyles = StyleSheet.create({
 
     // Custom header
     headerBanner: {
-        flexShrink: 1,
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        paddingVertical: 11.5,
+        height: 50,
+        paddingTop: 5,
+        paddingBottom: 2,
         paddingLeft: 7,
         paddingRight: 10,
-        // Shadow for iOS
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        // Shadow for Android
-        elevation: 5,
-        zIndex: 999
     },
 
     headerAvatar: {
