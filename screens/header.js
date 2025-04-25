@@ -21,13 +21,14 @@ const HeaderComponent = ({ title }) => {
     <>
       {/* Status bar */}
       <StatusBar barStyle={COLORS.bar_style} backgroundColor={COLORS.white} />
+
       {/* Content */}
       <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-            <Icon name='menu' size={30} color={COLORS.black} />
+            <Icon name='menu' size={28} color={COLORS.black} />
           </TouchableOpacity>
-          <Logo width={120} height={30} style={{ marginTop: 3, marginLeft: PADDING.p00 }} />
+          <Logo width={120} height={30} style={{ marginLeft: PADDING.p00 }} />
           {title ?
           <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
           : ''}

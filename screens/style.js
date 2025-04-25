@@ -251,6 +251,16 @@ const homeStyles = StyleSheet.create({
         marginTop: PADDING.p05
     },
 
+    link: {
+        fontSize: 16,
+    },
+
+    linkIcon: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: PADDING.p01
+    },
+
     // Floating button
     floatingButton: {
         alignItems: 'center',
@@ -264,12 +274,20 @@ const homeStyles = StyleSheet.create({
         borderRadius: 60 / 2
     },
 
+    // Custom tab bar
+    tabBar: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        zIndex: 10,
+        width: '100%'
+    },
+
     // Custom header
     headerBanner: {
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
-        height: 50,
         paddingTop: 5,
         paddingBottom: 2,
         paddingLeft: 7,
@@ -478,12 +496,11 @@ const homeStyles = StyleSheet.create({
     workTitle: {
         fontSize: 19,
         fontWeight: '700',
-        color: '#3a7ced',
-        marginTop: 10,
     },
 
     workContent: {
         fontSize: 14,
+        marginVertical: PADDING.p00
     },
 
     workBottom: {
@@ -561,6 +578,10 @@ const homeStyles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 10,
         whiteSpace: 'nowrap',
+    },
+
+    scrollableList: {
+        paddingTop: PADDING.p01,
     },
 
     scrollableListItem: {
