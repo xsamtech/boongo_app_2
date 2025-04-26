@@ -140,15 +140,15 @@ const News = ({ handleScroll, showBackToTop }) => {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.light_secondary }}>
       {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.success, bottom: 80 }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: COLORS.white }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 80 }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
       {/* News */}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height - 70, marginLeft: 0, paddingHorizontal: 2, paddingBottom: 30 }]}>
-          <FlatList
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          <Animated.FlatList
             ref={flatListRef}
             data={newsData}
             extraData={newsData}
@@ -157,7 +157,7 @@ const News = ({ handleScroll, showBackToTop }) => {
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            style={homeStyles.scrollableList}
+            contentContainerStyle={homeStyles.scrollableList} // ← Important: Compensates for the height of the Header + TabBar
             windowSize={10}
             ListEmptyComponent={() => {
               return (
@@ -181,8 +181,8 @@ const News = ({ handleScroll, showBackToTop }) => {
                 </View>
               );
             }}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
-             />
+          // refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+          />
         </View>
       </SafeAreaView>
     </View>
@@ -190,7 +190,7 @@ const News = ({ handleScroll, showBackToTop }) => {
 };
 
 // Books frame
-const Books = ({ handleScroll }) => {
+const Books = ({ handleScroll, showBackToTop }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Navigation ===============
@@ -199,7 +199,6 @@ const Books = ({ handleScroll }) => {
   const { t } = useTranslation();
   // =============== Get data ===============
   // const [isLoading, setIsLoading] = useState(true);
-  const [showBackToTop, setShowBackToTop] = useState(false);
   const flatListRef = useRef(null);
   const booksData = [
     {
@@ -289,15 +288,15 @@ const Books = ({ handleScroll }) => {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.light_secondary }}>
       {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.success, bottom: 80 }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: COLORS.white }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 80 }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
       {/* Books */}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height - 70, marginLeft: 0, paddingHorizontal: 2, paddingBottom: 30 }]}>
-          <FlatList
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          <Animated.FlatList
             ref={flatListRef}
             data={booksData}
             extraData={booksData}
@@ -306,7 +305,7 @@ const Books = ({ handleScroll }) => {
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            style={homeStyles.scrollableList}
+            contentContainerStyle={homeStyles.scrollableList} // ← Important: Compensates for the height of the Header + TabBar
             windowSize={10}
             ListEmptyComponent={() => {
               return (
@@ -330,8 +329,8 @@ const Books = ({ handleScroll }) => {
                 </View>
               );
             }}
-            // refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />} 
-            />
+          // refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />} 
+          />
         </View>
       </SafeAreaView>
     </View>
@@ -341,15 +340,12 @@ const Books = ({ handleScroll }) => {
 const HomeScreen = () => {
   // =============== Colors ===============
   const COLORS = useColors();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== State for managing active tab index ===============
-  const [index, setIndex] = useState(0);
+  // =============== Get data ===============
+  const [index, setIndex] = useState(0); // State for managing active tab index
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [scrollY, setScrollY] = useState(new Animated.Value(0)); // Animation to make the Header move
-  const [headerVisible, setHeaderVisible] = useState(true); // Logic to show or hide the header
+  const scrollY = useRef(new Animated.Value(0)).current
 
   const headerTranslateY = scrollY.interpolate({
     inputRange: [0, 50],
@@ -358,19 +354,17 @@ const HomeScreen = () => {
   });
 
   // Handle scrolling and show/hide the header
-  const handleScroll = (event) => {
-    const { contentOffset } = event.nativeEvent;
-    const currentOffset = contentOffset.y;
-    const isAtTop = contentOffset.y === 0;
-
-    if (currentOffset > 50) {
-      setHeaderVisible(false); // Masquer le header
-    } else {
-      setHeaderVisible(true); // Afficher le header
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: true,
+      listener: (event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const isAtTop = offsetY === 0;
+        setShowBackToTop(!isAtTop);
+      },
     }
-
-    setShowBackToTop(!isAtTop);
-  };
+  );
 
   const [routes] = useState([
     { key: 'news', title: t('navigation.home.news') },
@@ -382,7 +376,7 @@ const HomeScreen = () => {
       case 'news':
         return <News handleScroll={handleScroll} showBackToTop={showBackToTop} />;
       case 'books':
-        return <Books handleScroll={handleScroll} />;
+        return <Books handleScroll={handleScroll} showBackToTop={showBackToTop} />;
       default:
         return null;
     }
@@ -390,22 +384,22 @@ const HomeScreen = () => {
 
   // Custom TabBar
   const renderTabBar = (props) => (
-    <>
+    <View style={{ position: 'absolute', top: 0, zIndex: 1000, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
       <Animated.View
-        style={[
-          { backgroundColor: COLORS.white, paddingTop: 20 },
-          { transform: [{ translateY: headerTranslateY }] }, // Applies header animation
-        ]}
+        style={{
+          transform: [{ translateY: headerTranslateY }], // Applies header animation
+        }}
       >
         <HeaderComponent />
       </Animated.View>
       <TabBar
         {...props}
-        style={{ backgroundColor: COLORS.white, color: COLORS.black, elevation: 0 }}
+        style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
         indicatorStyle={{ backgroundColor: COLORS.black }}
-        labelStyle={{ color: COLORS.black }}
+        activeColor={COLORS.black}
+        inactiveColor={COLORS.dark_secondary}
       />
-    </>
+    </View>
   );
 
   return (

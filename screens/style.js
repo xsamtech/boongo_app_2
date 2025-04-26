@@ -270,8 +270,8 @@ const homeStyles = StyleSheet.create({
         zIndex: 999,
         width: 60,
         height: 60,
-        paddingTop: 9,
-        borderRadius: 60 / 2
+        paddingTop: 7,
+        borderRadius: 60 / 2,
     },
 
     // Custom tab bar
@@ -581,7 +581,7 @@ const homeStyles = StyleSheet.create({
     },
 
     scrollableList: {
-        paddingTop: PADDING.p01,
+        paddingTop: 96,
     },
 
     scrollableListItem: {
