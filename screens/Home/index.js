@@ -346,7 +346,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 50 }]} onPress={scrollToTop}>
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 30 }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
