@@ -48,6 +48,7 @@
     },
     "empty_list": {
         "title": "La liste est vide",
+        "description_news": "Ici, sera affichée l’actualité sur les organisations (établissement ou institution) de la plateforme.",
         "description_popular": "Ici, seront affichés les œuvres les plus consultées par les membres.",
         "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
         "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",

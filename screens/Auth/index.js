@@ -48,7 +48,7 @@ const OnboardScreen = () => {
 
   return (
     <>
-      <StatusBar barStyle={COLORS.bar_style} backgroundColor={COLORS.white} />
+      <StatusBar barStyle='light-content' backgroundColor={COLORS.danger} />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
         {/* Onboard top */}
         <View style={[homeStyles.onboardTop, { backgroundColor: COLORS.white }]}>

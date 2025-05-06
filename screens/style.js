@@ -67,7 +67,6 @@ const homeStyles = StyleSheet.create({
 
     messageText: {
         fontWeight: '400',
-        color: 'black'
     },
 
     // Maps
@@ -102,7 +101,6 @@ const homeStyles = StyleSheet.create({
     },
 
     mapButtonText: {
-        color: 'white',
         fontWeight: 'bold',
     },
 
@@ -151,18 +149,18 @@ const homeStyles = StyleSheet.create({
     // Card
     cardEmpty: {
         width: '100%',
-        padding: PADDING.p01,
+        padding: 2,
     },
 
     cardEmptyTitle: {
-        marginBottom: 10,
-        fontSize: 19,
-        fontWeight: '700',
-        color: '#3a7ced'
+        fontSize: 23,
+        fontWeight: '500',
     },
 
     cardEmptyText: {
-        fontSize: 14,
+        fontSize: 16,
+        textAlign: 'center',
+        fontWeight: '300',
     },
 
     cardEmptySettings: {
@@ -265,7 +263,7 @@ const homeStyles = StyleSheet.create({
     floatingButton: {
         alignItems: 'center',
         position: 'absolute',
-        right: PADDING.p01,
+        right: PADDING.p03,
         bottom: 40,
         zIndex: 999,
         width: 60,
@@ -484,7 +482,8 @@ const homeStyles = StyleSheet.create({
         width: Dimensions.get('window').width / 2.5,
         height: (Dimensions.get('window').width / 2.5) * 1.5,
         marginRight: 10,
-        borderWidth: 3,
+        marginVertical: 7,
+        borderWidth: 1,
         borderRadius: 20
     },
 
@@ -495,11 +494,12 @@ const homeStyles = StyleSheet.create({
 
     workTitle: {
         fontSize: 19,
-        fontWeight: '700',
+        fontWeight: '500',
     },
 
     workContent: {
         fontSize: 14,
+        fontWeight: '300',
         marginVertical: PADDING.p00
     },
 
@@ -535,7 +535,6 @@ const homeStyles = StyleSheet.create({
 
     workDescBadge: {
         fontSize: 16,
-        color: 'black',
         backgroundColor: '#d3d3d3',
         marginBottom: 10,
         marginRight: 7,
@@ -581,7 +580,7 @@ const homeStyles = StyleSheet.create({
     },
 
     scrollableList: {
-        paddingTop: 96,
+        paddingTop: 105,
     },
 
     scrollableListItem: {
@@ -635,25 +634,24 @@ const homeStyles = StyleSheet.create({
 
     // Category filter badge
     categoryBadge: {
+        alignSelf: 'center',
         marginRight: 7,
-        paddingTop: 3,
-        paddingBottom: 4,
-        paddingHorizontal: 10,
-        borderRadius: 10
+        paddingVertical: 6,
+        paddingHorizontal: PADDING.p01,
+        borderRadius: PADDING.p07,
     },
 
     categoryBadgeText: {
         fontSize: 14,
-        fontWeight: '800',
+        fontWeight: '500',
     },
 
     categoryBadgeSelected: {
         alignSelf: 'center',
-        backgroundColor: '#e3e3e3',
-        marginHorizontal: PADDING.p05,
-        paddingVertical: PADDING.p00 + 1,
-        paddingHorizontal: PADDING.p03,
-        borderRadius: PADDING.p07
+        marginRight: 7,
+        paddingVertical: 6,
+        paddingHorizontal: PADDING.p01,
+        borderRadius: PADDING.p07, // OK si cohérent
     },
 
     categoryBadgeTextSelected: {

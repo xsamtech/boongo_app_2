@@ -20,10 +20,11 @@ const HeaderComponent = ({ title }) => {
   return (
     <>
       {/* Status bar */}
-      <StatusBar barStyle={COLORS.bar_style} backgroundColor={COLORS.white} />
+      <StatusBar barStyle='light-content' backgroundColor={COLORS.danger} />
 
       {/* Content */}
       <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
+        {/* Brand */}
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
             <Icon name='menu' size={28} color={COLORS.black} />
@@ -32,6 +33,10 @@ const HeaderComponent = ({ title }) => {
           {title ?
           <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
           : ''}
+        </View>
+
+        {/* Brand */}
+        <View style={{ flexDirection: 'row' }}>
         </View>
       </View>
     </>
