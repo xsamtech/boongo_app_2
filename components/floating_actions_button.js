@@ -1,24 +1,32 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+/**
+ * @author Xanders
+ * @see https://team.xsamtech.com/xanderssamoth
+ */
 import React from 'react';
-import Animated, {
-    Easing,
-    Extrapolation,
-    interpolate,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-    withDelay,
-    withSpring,
-    withTiming,
-} from 'react-native-reanimated';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import Animated, { Easing, Extrapolation, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { IMAGE_SIZE } from '../tools/constants';
+import useColors from '../hooks/useColors';
 
 const FloatingActionsButton = () => {
+    // =============== Colors ===============
+    const COLORS = useColors();
+    // =============== Navigation ===============
+    const navigation = useNavigation();
+    // =============== Language ===============
+    const { t } = useTranslation();
+    // =============== Get data ===============
     const firstValue = useSharedValue(30);
     const secondValue = useSharedValue(30);
     const thirdValue = useSharedValue(30);
+    const fourthValue = useSharedValue(30);
     const firstWidth = useSharedValue(60);
     const secondWidth = useSharedValue(60);
     const thirdWidth = useSharedValue(60);
+    const fourthWidth = useSharedValue(60);
     const isOpen = useSharedValue(false);
     const opacity = useSharedValue(0);
     const progress = useDerivedValue(() =>
@@ -30,31 +38,43 @@ const FloatingActionsButton = () => {
             easing: Easing.bezier(0.68, -0.6, 0.32, 1.6),
             duration: 500,
         };
+
         if (isOpen.value) {
             firstWidth.value = withTiming(60, { duration: 100 }, finish => {
                 if (finish) {
                     firstValue.value = withTiming(30, config);
                 }
             });
+
             secondWidth.value = withTiming(60, { duration: 100 }, finish => {
                 if (finish) {
                     secondValue.value = withDelay(50, withTiming(30, config));
                 }
             });
+
             thirdWidth.value = withTiming(60, { duration: 100 }, finish => {
                 if (finish) {
                     thirdValue.value = withDelay(100, withTiming(30, config));
                 }
             });
+
+            fourthWidth.value = withTiming(60, { duration: 100 }, finish => {
+                if (finish) {
+                    fourthValue.value = withDelay(130, withTiming(30, config));
+                }
+            });
+
             opacity.value = withTiming(0, { duration: 100 });
 
         } else {
-            firstValue.value = withDelay(200, withSpring(130));
-            secondValue.value = withDelay(100, withSpring(210));
-            thirdValue.value = withSpring(290);
-            firstWidth.value = withDelay(1200, withSpring(200));
-            secondWidth.value = withDelay(1100, withSpring(200));
-            thirdWidth.value = withDelay(1000, withSpring(200));
+            firstValue.value = withDelay(300, withSpring(130));
+            secondValue.value = withDelay(200, withSpring(210));
+            thirdValue.value =  withDelay(100, withSpring(290));
+            fourthValue.value = withSpring(370);
+            firstWidth.value = withDelay(1300, withSpring(200));
+            secondWidth.value = withDelay(1200, withSpring(200));
+            thirdWidth.value = withDelay(1100, withSpring(200));
+            fourthWidth.value = withDelay(1000, withSpring(200));
             opacity.value = withDelay(1200, withSpring(1));
         }
 
@@ -82,6 +102,12 @@ const FloatingActionsButton = () => {
     const thirdWidthStyle = useAnimatedStyle(() => {
         return {
             width: thirdWidth.value,
+        };
+    });
+
+    const fourthWidthStyle = useAnimatedStyle(() => {
+        return {
+            width: fourthWidth.value,
         };
     });
 
@@ -127,6 +153,20 @@ const FloatingActionsButton = () => {
         };
     });
 
+    const fourthIcon = useAnimatedStyle(() => {
+        const scale = interpolate(
+            fourthValue.value,
+            [30, 370],
+            [0, 1],
+            Extrapolation.CLAMP,
+        );
+
+        return {
+            bottom: fourthValue.value,
+            transform: [{ scale: scale }],
+        };
+    });
+
     const plusIcon = useAnimatedStyle(() => {
         return {
             transform: [{ rotate: `${progress.value * 45}deg` }],
@@ -135,52 +175,42 @@ const FloatingActionsButton = () => {
 
     return (
         <View style={styles.container}>
-            <Animated.View
-                style={[styles.contentContainer, thirdIcon, thirdWidthStyle]}>
+            {/* New message */}
+            <Animated.View style={[styles.contentContainer, fourthIcon, fourthWidthStyle, { backgroundColor: COLORS.primary }]}>
                 <View style={styles.iconContainer}>
-                    <Image
-                        source={require('../assets/PenIcon.png')}
-                        style={styles.icon}
-                    />
+                    <Icon name='chat-plus' size={IMAGE_SIZE.s06} color='white' />
                 </View>
-                <Animated.Text style={[styles.text, opacityText]}>
-                    Edit File
-                </Animated.Text>
+                <Animated.Text style={[styles.text, opacityText]}>{t('chat.new')}</Animated.Text>
             </Animated.View>
-            <Animated.View
-                style={[styles.contentContainer, secondIcon, secondWidthStyle]}>
+
+            {/* Add a work */}
+            <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>
                 <View style={styles.iconContainer}>
-                    <Image
-                        source={require('../assets/FileIcon.png')}
-                        style={styles.icon}
-                    />
+                    <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
                 </View>
-                <Animated.Text style={[styles.text, opacityText]}>
-                    New File
-                </Animated.Text>
+                <Animated.Text style={[styles.text, opacityText]}>{t('work.publish_new')}</Animated.Text>
             </Animated.View>
-            <Animated.View
-                style={[styles.contentContainer, firstIcon, firstWidthStyle]}>
+
+            {/* Add a school */}
+            <Animated.View style={[styles.contentContainer, secondIcon, secondWidthStyle, { backgroundColor: COLORS.warning }]}>
                 <View style={styles.iconContainer}>
-                    <Image
-                        source={require('../assets/FolderIcon.png')}
-                        style={styles.icon}
-                    />
+                    <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
                 </View>
-                <Animated.Text style={[styles.text, opacityText]}>
-                    New Folder
-                </Animated.Text>
+                <Animated.Text style={[styles.text, opacityText]}>{t('navigation.school.new')}</Animated.Text>
             </Animated.View>
-            <Pressable
-                style={styles.contentContainer}
-                onPress={() => {
-                    handlePress();
-                }}>
+
+            {/* Add a government */}
+            <Animated.View style={[styles.contentContainer, firstIcon, firstWidthStyle, { backgroundColor: COLORS.danger }]}>
+                <View style={styles.iconContainer}>
+                    <Icon name='city-variant' size={IMAGE_SIZE.s06} color='white' />
+                </View>
+                <Animated.Text style={[styles.text, opacityText]}>{t('navigation.government.new')}</Animated.Text>
+            </Animated.View>
+
+            {/* Trigger button */}
+            <Pressable style={[styles.contentContainer, { backgroundColor: COLORS.primary }]} onPress={() => { handlePress(); }}>
                 <Animated.View style={[styles.iconContainer, plusIcon]}>
-                    <Image
-                        source={require('../assets/PlusIcon.png')}
-                        style={styles.icon}
-                    />
+                    <Icon name='plus' size={IMAGE_SIZE.s06} color='white' />
                 </Animated.View>
             </Pressable>
         </View>
@@ -194,7 +224,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     contentContainer: {
-        backgroundColor: '#0F56B3',
         position: 'absolute',
         bottom: 30,
         right: 30,

@@ -29,10 +29,12 @@
         "page_number": "Page number",
         "enter_note": "Enter your note"
     },
-    "new": {
-        "book": "Publish a book",
-        "school": "Register school",
-        "government": "Register government institution"
+    "chat": {
+        "new": "Start a chat",
+        "circle": {
+            "create": "Create a circle",
+            "description": "Chat circles allow you to talk with multiple members at the same time."
+        }
     },
     "video_ended": "The video is finished!",
     "success": {
@@ -56,8 +58,9 @@
         "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
     },
     "back_list": "Back to the list",
-    "work_details": {
+    "work": {
         "title": "Details about the work",
+        "publish_new": "Publish a work",
         "type": "Type: ",
         "categories": "Categories: ",
         "category": "Category: ",
@@ -121,7 +124,7 @@
         },
         "school": {
             "title": "School",
-            "new": "Enregistrer my school",
+            "new": "Add my school",
             "course_schedule": "Schedule",
             "event": "Events",
             "authors": {
@@ -144,7 +147,7 @@
         },
         "government": {
             "title": "Institutions",
-            "new": "Register an institution",
+            "new": "Add an institution",
             "event": "Events",
             "data": {
                 "name": "Institution name",

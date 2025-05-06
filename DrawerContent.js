@@ -18,11 +18,11 @@ import useColors from './hooks/useColors';
 
 const DrawerList = [
     { icon: 'home-outline', label: 'navigation.home.title', navigateTo: 'Home', toScreen: null },
-    { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Book', toScreen: null },
-    { icon: 'bank-outline', label: 'navigation.school.title', navigateTo: 'Journal', toScreen: null },
-    { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Mapping', toScreen: null },
-    { icon: 'image-multiple-outline', label: 'navigation.media', navigateTo: 'Mapping', toScreen: null },
-    { icon: 'cog-outline', label: 'navigation.settings.title', navigateTo: 'Media', toScreen: null },
+    { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Account', toScreen: null },
+    { icon: 'bank-outline', label: 'navigation.school.title', navigateTo: 'School', toScreen: null },
+    { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Government', toScreen: null },
+    { icon: 'image-multiple-outline', label: 'navigation.media', navigateTo: 'Media', toScreen: null },
+    { icon: 'cog-outline', label: 'navigation.settings.title', navigateTo: 'Settings', toScreen: null },
     { icon: 'help-circle-outline', label: 'navigation.about', navigateTo: 'About', toScreen: 'Contact' }
 ];
 

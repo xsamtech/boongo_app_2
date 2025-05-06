@@ -29,10 +29,12 @@
         "page_number": "Numéro page",
         "enter_note": "Entrer votre note"
     },
-    "new": {
-        "book": "Publier un ouvrage",
-        "school": "Enregistrer un établissement",
-        "government": "Enregistrer institution gouvernementale"
+    "chat": {
+        "new": "Démarrer une discussion",
+        "circle": {
+            "create": "Créer un cercle",
+            "description": "Les cercles de discussion vous permettent de parler avec plusieurs membres en même temps."
+        }
     },
     "video_ended": "La vidéo est terminée !",
     "success": {
@@ -56,8 +58,9 @@
         "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres."
     },
     "back_list": "Retour à la liste",
-    "work_details": {
+    "work": {
         "title": "Détails sur l’œuvre",
+        "publish_new": "Publier une œuvre",
         "type": "Type : ",
         "categories": "Catégories : ",
         "category": "Catégorie : ",
@@ -121,7 +124,7 @@
         },
         "school": {
             "title": "Établissements",
-            "new": "Enregistrer mon établissement",
+            "new": "Ajouter établissement",
             "course_schedule": "Programme",
             "event": "Événements",
             "authors": {
@@ -144,7 +147,7 @@
         },
         "government": {
             "title": "Institutions",
-            "new": "Enregistrer une institution",
+            "new": "Ajouter institution",
             "event": "Événements",
             "data": {
                 "name": "Nom de l’institution",

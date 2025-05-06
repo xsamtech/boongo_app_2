@@ -29,10 +29,12 @@
         "page_number": "Motángo ya lokasa",
         "enter_note": "Kotisa note na yo"
     },
-    "new": {
-        "book": "Bimisa buku",
-        "school": "Komisa eteyelo",
-        "government": "Komisa institution ya gouvernement"
+    "chat": {
+        "new": "Banda lisolo",
+        "circle": {
+            "create": "Kela lisanga",
+            "description": "Ba lisanga ya masolo esungaka yo o solola na ba membres ebele na mbala moko."
+        }
     },
     "video_ended": "Video esili!",
     "success": {
@@ -56,8 +58,9 @@
         "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte."
     },
     "back_list": "Zonga na liste",
-    "work_details": {
-        "title": "Makambo ya mikemike na ntina ya oeuvre",
+    "work": {
+        "title": "Makambo etali œuvre",
+        "publish_new": "Tinda œuvre",
         "type": "Lolenge : ",
         "categories": "Catégories : ",
         "category": "Catégorie : ",
@@ -121,7 +124,7 @@
         },
         "school": {
             "title": "Eteyelo",
-            "new": "Komisa eteyelo",
+            "new": "Nakomisa eteyelo",
             "course_schedule": "Programme",
             "event": "Milulu",
             "authors": {
@@ -144,7 +147,7 @@
         },
         "government": {
             "title": "Ba institutions",
-            "new": "Komisa institution",
+            "new": "Nakomisa institution",
             "event": "Milulu",
             "data": {
                 "name": "Kombo ya institution",
