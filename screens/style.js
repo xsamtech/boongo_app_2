@@ -263,13 +263,14 @@ const homeStyles = StyleSheet.create({
     floatingButton: {
         alignItems: 'center',
         position: 'absolute',
-        right: PADDING.p03,
-        bottom: 40,
-        zIndex: 999,
+        bottom: 110,
+        right: 20,
+        zIndex: 998,
         width: 60,
         height: 60,
-        paddingTop: 7,
-        borderRadius: 60 / 2,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 50,
     },
 
     // Custom tab bar
@@ -569,6 +570,29 @@ const homeStyles = StyleSheet.create({
     workCmdIcon: {
         fontSize: 16,
         marginRight: 10
+    },
+
+    // News
+    newsImage: {
+        width: Dimensions.get('window').width / 3.2,
+        height: Dimensions.get('window').width / 3.2,
+        marginLeft: 10,
+        marginVertical: 7,
+        borderWidth: 1,
+        borderRadius: 20
+    },
+
+    newsContent: {
+        fontSize: 17,
+        fontWeight: '400',
+        letterSpacing: 0.3,
+        marginVertical: PADDING.p00
+    },
+
+    newsDate: {
+        fontSize: 13,
+        fontWeight: '400',
+        marginVertical: PADDING.p00
     },
 
     // Horizontal scrolling badges

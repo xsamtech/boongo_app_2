@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Animated, { Easing, Extrapolation, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
@@ -67,14 +67,14 @@ const FloatingActionsButton = () => {
             opacity.value = withTiming(0, { duration: 100 });
 
         } else {
-            firstValue.value = withDelay(300, withSpring(130));
-            secondValue.value = withDelay(200, withSpring(210));
-            thirdValue.value =  withDelay(100, withSpring(290));
-            fourthValue.value = withSpring(370);
-            firstWidth.value = withDelay(1300, withSpring(200));
-            secondWidth.value = withDelay(1200, withSpring(200));
-            thirdWidth.value = withDelay(1100, withSpring(200));
-            fourthWidth.value = withDelay(1000, withSpring(200));
+            firstValue.value = withDelay(300, withSpring(80));
+            secondValue.value = withDelay(200, withSpring(160));
+            thirdValue.value =  withDelay(100, withSpring(240));
+            fourthValue.value = withSpring(320);
+            firstWidth.value = withDelay(1300, withSpring(250));
+            secondWidth.value = withDelay(1200, withSpring(250));
+            thirdWidth.value = withDelay(1100, withSpring(250));
+            fourthWidth.value = withDelay(1000, withSpring(250));
             opacity.value = withDelay(1200, withSpring(1));
         }
 
@@ -114,7 +114,7 @@ const FloatingActionsButton = () => {
     const firstIcon = useAnimatedStyle(() => {
         const scale = interpolate(
             firstValue.value,
-            [30, 130],
+            [30, 80],
             [0, 1],
             Extrapolation.CLAMP,
         );
@@ -128,7 +128,7 @@ const FloatingActionsButton = () => {
     const secondIcon = useAnimatedStyle(() => {
         const scale = interpolate(
             secondValue.value,
-            [30, 210],
+            [30, 160],
             [0, 1],
             Extrapolation.CLAMP,
         );
@@ -142,7 +142,7 @@ const FloatingActionsButton = () => {
     const thirdIcon = useAnimatedStyle(() => {
         const scale = interpolate(
             thirdValue.value,
-            [30, 290],
+            [30, 240],
             [0, 1],
             Extrapolation.CLAMP,
         );
@@ -156,7 +156,7 @@ const FloatingActionsButton = () => {
     const fourthIcon = useAnimatedStyle(() => {
         const scale = interpolate(
             fourthValue.value,
-            [30, 370],
+            [30, 320],
             [0, 1],
             Extrapolation.CLAMP,
         );
@@ -177,34 +177,42 @@ const FloatingActionsButton = () => {
         <View style={styles.container}>
             {/* New message */}
             <Animated.View style={[styles.contentContainer, fourthIcon, fourthWidthStyle, { backgroundColor: COLORS.primary }]}>
-                <View style={styles.iconContainer}>
-                    <Icon name='chat-plus' size={IMAGE_SIZE.s06} color='white' />
-                </View>
-                <Animated.Text style={[styles.text, opacityText]}>{t('chat.new')}</Animated.Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('NewChat'); }}>
+                    <View style={styles.iconContainer}>
+                        <Icon name='chat-plus' size={IMAGE_SIZE.s06} color='white' />
+                    </View>
+                    <Animated.Text style={[styles.text, opacityText]}>{t('chat.new')}</Animated.Text>
+                </TouchableOpacity>
             </Animated.View>
 
             {/* Add a work */}
             <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>
-                <View style={styles.iconContainer}>
-                    <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
-                </View>
-                <Animated.Text style={[styles.text, opacityText]}>{t('work.publish_new')}</Animated.Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); }}>
+                    <View style={styles.iconContainer}>
+                        <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
+                    </View>
+                    <Animated.Text style={[styles.text, opacityText]}>{t('work.publish_new')}</Animated.Text>
+                </TouchableOpacity>
             </Animated.View>
 
             {/* Add a school */}
             <Animated.View style={[styles.contentContainer, secondIcon, secondWidthStyle, { backgroundColor: COLORS.warning }]}>
-                <View style={styles.iconContainer}>
-                    <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
-                </View>
-                <Animated.Text style={[styles.text, opacityText]}>{t('navigation.school.new')}</Animated.Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); }}>
+                    <View style={styles.iconContainer}>
+                        <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
+                    </View>
+                    <Animated.Text style={[styles.text, opacityText]}>{t('navigation.school.new')}</Animated.Text>
+                </TouchableOpacity>
             </Animated.View>
 
             {/* Add a government */}
             <Animated.View style={[styles.contentContainer, firstIcon, firstWidthStyle, { backgroundColor: COLORS.danger }]}>
-                <View style={styles.iconContainer}>
-                    <Icon name='city-variant' size={IMAGE_SIZE.s06} color='white' />
-                </View>
-                <Animated.Text style={[styles.text, opacityText]}>{t('navigation.government.new')}</Animated.Text>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddGovernment'); }}>
+                    <View style={styles.iconContainer}>
+                        <Icon name='city-variant' size={IMAGE_SIZE.s06} color='white' />
+                    </View>
+                    <Animated.Text style={[styles.text, opacityText]}>{t('navigation.government.new')}</Animated.Text>
+                </TouchableOpacity>
             </Animated.View>
 
             {/* Trigger button */}
@@ -221,12 +229,21 @@ export default FloatingActionsButton;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        zIndex: 997,
+        width: 60,
+        height: 60,
     },
     contentContainer: {
         position: 'absolute',
-        bottom: 30,
-        right: 30,
+        bottom: 0,
+        right: 0,
+        zIndex: 997,
+        width: 60,
+        height: 60,
         borderRadius: 50,
         flexDirection: 'row',
         alignItems: 'center',
@@ -244,6 +261,6 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 18,
+        fontSize: 15,
     },
 });

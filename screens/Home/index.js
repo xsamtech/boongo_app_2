@@ -16,6 +16,7 @@ import NewsItemComponent from '../../components/news_item';
 import WorkItemComponent from '../../components/work_item';
 import { AuthContext } from '../../contexts/AuthContext';
 import axios from 'axios';
+import FloatingActionsButton from '../../components/floating_actions_button';
 
 // News frame
 const News = ({ handleScroll, showBackToTop, listRef }) => {
@@ -36,11 +37,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 84,
       "is_public": true,
-      "created_at": "2025-04-23 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-23 08:33:31",
+      "updated_at_ago": "Il y a 37 minutes",
+      "photo_url": "https://afrique.tv5monde.com/sites/afrique/files/styles/info_750x427/public/2025-04-24/field_media_image-1443914-M23%2520SOLDATS.jpg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Université de Kinshasa",
+        "org_acronym": "UNIKIN",
+        "type": {
+          "alias": "school_organization",
+          "icon": "fa-solid fa-graduation-cap"
+        },
+      }
     },
     {
       "id": 15,
@@ -50,11 +60,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 106,
       "is_public": true,
-      "created_at": "2025-04-24 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-24 08:33:31",
+      "updated_at_ago": "Il y a 1 heure",
+      "photo_url": "https://actualite.cd/sites/default/files/styles/800_400/public/2025-05/Bumba%20assembl%C3%A9e%20prov.jpg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Direction Générale des Impôts",
+        "org_acronym": "DGI",
+        "type": {
+          "alias": "government_organization",
+          "icon": "fa-solid fa-building-flag"
+        },
+      }
     },
     {
       "id": 4,
@@ -64,11 +83,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 106,
       "is_public": true,
-      "created_at": "2025-04-25 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-25 08:33:31",
+      "updated_at_ago": "Il y a 12 heures",
+      "photo_url": "https://www.bpi.fr/content/uploads/sites/2/2020/08/casier-espace-presse-1200x800-1-1024x683.jpg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "École Masamba",
+        "org_acronym": "ECOMAS",
+        "type": {
+          "alias": "school_organization",
+          "icon": "fa-solid fa-graduation-cap"
+        },
+      }
     },
     {
       "id": 83,
@@ -78,11 +106,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 101,
       "is_public": false,
-      "created_at": "2025-04-26 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-26 08:33:31",
+      "updated_at_ago": "Il y a 2 jours",
+      "photo_url": "https://cdn.essentiels.bnf.fr/media/images/cache/crop/rc/0s7TO018/uploads/media/image/20220208170734000000_130hd_jpg.jpeg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Ministère des Affaires Etrangères",
+        "org_acronym": "MinAfEt",
+        "type": {
+          "alias": "government_organization",
+          "icon": "fa-solid fa-building-flag"
+        },
+      }
     },
     {
       "id": 45,
@@ -92,11 +129,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 3,
       "is_public": false,
-      "created_at": "2025-04-27 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-27 08:33:31",
+      "updated_at_ago": "Il y a 1 semaine",
+      "photo_url": "https://s.francaisfacile.rfi.fr/media/display/e480a5a4-b955-11ef-9fd7-005056bf30b7/w:980/p:16x9/rfi_a1_societe_fp_2024_une_annee_dactu_VISUEL.jpg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Institut Supérieur des Techniques Appliquées",
+        "org_acronym": "ISTA",
+        "type": {
+          "alias": "school_organization",
+          "icon": "fa-solid fa-graduation-cap"
+        },
+      }
     },
     {
       "id": 67,
@@ -106,11 +152,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 31,
       "is_public": true,
-      "created_at": "2025-04-28 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-28 08:33:31",
+      "updated_at_ago": "Il y a 2 mois",
+      "photo_url": "https://actualite.cd/sites/default/files/styles/800_600/public/2025-04/pluiee.jpeg",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Radio Télévision Nationale Congolaise",
+        "org_acronym": "RTNC",
+        "type": {
+          "alias": "government_organization",
+          "icon": "fa-solid fa-building-flag"
+        },
+      }
     },
     {
       "id": 59,
@@ -120,11 +175,20 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
       "video_source": "",
       "media_length": 116,
       "is_public": true,
-      "created_at": "2025-04-29 08:33:31",
-      "photo_url": "",
+      "updated_at": "2025-04-29 08:33:31",
+      "updated_at_ago": "Il y a 1 an",
+      "photo_url": "https://img.20mn.fr/K0Xse6S4R4G-6cvkyjV6uyk/1444x920_volodymyr-zelensky-des-soldats-israeliens-et-l-hommage-a-dominique-bernard",
       "document_url": "",
       "audio_url": "",
-      "video_url": ""
+      "video_url": "",
+      "organization": {
+        "org_name": "Université Protestante du Congo",
+        "org_acronym": "UPC",
+        "type": {
+          "alias": "school_organization",
+          "icon": "fa-solid fa-graduation-cap"
+        },
+      }
     }
   ];
 
@@ -143,8 +207,8 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 30 }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -466,17 +530,19 @@ const HomeScreen = () => {
 
   // Custom "TabBar"
   const renderTabBar = (props) => (
-    <Animated.View style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
-      <HeaderComponent />
-      <TabBar
-        {...props}
-        style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
-        indicatorStyle={{ backgroundColor: COLORS.black }}
-        activeColor={COLORS.black}
-        inactiveColor={COLORS.dark_secondary}
-      />
-    </Animated.View>
-
+    <>
+      <Animated.View style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
+        <HeaderComponent />
+        <TabBar
+          {...props}
+          style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
+          indicatorStyle={{ backgroundColor: COLORS.black }}
+          activeColor={COLORS.black}
+          inactiveColor={COLORS.dark_secondary}
+        />
+      </Animated.View>
+      <FloatingActionsButton />
+    </>
   );
 
   return (
