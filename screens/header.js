@@ -35,8 +35,14 @@ const HeaderComponent = ({ title }) => {
           : ''}
         </View>
 
-        {/* Brand */}
+        {/* Right links */}
         <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => navigation.navigate('')}>
+            <Icon name='magnify' size={28} color={COLORS.black} />
+          </TouchableOpacity>
+          <TouchableOpacity style={{ marginLeft: PADDING.p01 }} onPress={() => navigation.navigate('')}>
+            <Icon name='book-outline' size={28} color={COLORS.black} />
+          </TouchableOpacity>
         </View>
       </View>
     </>
