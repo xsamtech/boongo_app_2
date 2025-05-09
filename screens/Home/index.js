@@ -7,16 +7,16 @@ import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshCont
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import axios from 'axios';
 import { API, IMAGE_SIZE, PADDING } from '../../tools/constants';
+import { AuthContext } from '../../contexts/AuthContext';
 import HeaderComponent from '../header';
-import homeStyles from '../style';
-import useColors from '../../hooks/useColors';
 import EmptyListComponent from '../../components/empty_list';
 import NewsItemComponent from '../../components/news_item';
 import WorkItemComponent from '../../components/work_item';
-import { AuthContext } from '../../contexts/AuthContext';
-import axios from 'axios';
 import FloatingActionsButton from '../../components/floating_actions_button';
+import homeStyles from '../style';
+import useColors from '../../hooks/useColors';
 
 // News frame
 const News = ({ handleScroll, showBackToTop, listRef }) => {
