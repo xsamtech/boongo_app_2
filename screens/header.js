@@ -37,11 +37,11 @@ const HeaderComponent = ({ title }) => {
 
         {/* Right links */}
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => navigation.navigate('')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Search')}>
             <Icon name='magnify' size={28} color={COLORS.black} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ marginLeft: PADDING.p01 }} onPress={() => navigation.navigate('')}>
-            <Icon name='book-outline' size={28} color={COLORS.black} />
+          <TouchableOpacity style={{ marginLeft: PADDING.p03 }} onPress={() => navigation.navigate('Dictionary')}>
+            <Icon name='book-open-blank-variant' size={28} color={COLORS.black} />
           </TouchableOpacity>
         </View>
       </View>

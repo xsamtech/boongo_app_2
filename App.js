@@ -32,6 +32,29 @@ import PrivacyScreen from './screens/About/privacy';
 import ContactScreen from './screens/About/contact';
 import HomeScreen from './screens/Home';
 import LanguageScreen from './screens/language';
+import AccountScreen from './screens/Account';
+import SettingsScreen from './screens/Account/settings';
+import NotificationsScreen from './screens/Account/notifications';
+import SearchScreen from './screens/search';
+import ChatScreen from './screens/Chat';
+import NewChatScreen from './screens/Chat/new_chat';
+import BlockedContactsScreen from './screens/Chat/blocked_contacts';
+import SchoolScreen from './screens/Organization/School';
+import AddSchoolScreen from './screens/Organization/School/add_school';
+import WorkDataScreen from './screens/Organization/work_data';
+import AddWorkScreen from './screens/Organization/add_work';
+import BookScreen from './screens/Organization/book';
+import JournalScreen from './screens/Organization/journal';
+import MappingScreen from './screens/Organization/mapping';
+import MediaScreen from './screens/Organization/media';
+import PDFViewerScreen from './screens/Organization/pdf_viewer';
+import VideoPlayerScreen from './screens/Organization/video_player';
+import OrganizationDataScreen from './screens/Organization/organization_data';
+import GovernmentScreen from './screens/Organization/Government';
+import AddGovernmentScreen from './screens/Organization/Government/add_government';
+import AudioPlayerScreen from './screens/Organization/audio_player';
+import SubscriptionScreen from './screens/subscriptions';
+import DictionaryScreen from './screens/dictionary';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -189,6 +212,31 @@ const HomeStackNav = () => {
           }
         }} />
       <Stack.Screen name='About' component={AboutBottomTab} />
+      <Stack.Screen name='Dictionary' component={DictionaryScreen} />
+      <Stack.Screen name='Settings' component={SettingsScreen} />
+      <Stack.Screen name='Account' component={AccountScreen} />
+      <Stack.Screen name='Notifications' component={NotificationsScreen} />
+      <Stack.Screen name='Search' component={SearchScreen} />
+      <Stack.Screen name='NewChat' component={NewChatScreen} />
+      <Stack.Screen name='Chat' component={ChatScreen} />
+      <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} />
+      <Stack.Screen name='OrganizationData' component={OrganizationDataScreen} />
+      <Stack.Screen name='School' component={SchoolScreen} />
+      <Stack.Screen name='AddSchool' component={AddSchoolScreen} />
+      <Stack.Screen name='Government' component={GovernmentScreen} />
+      <Stack.Screen name='AddGovernment' component={AddGovernmentScreen} />
+      <Stack.Screen name='AddWork' component={AddWorkScreen} />
+      <Stack.Screen name='Book' component={BookScreen} />
+      <Stack.Screen name='Journal' component={JournalScreen} />
+      <Stack.Screen name='Mapping' component={MappingScreen} />
+      <Stack.Screen name='Media' component={MediaScreen} />
+      <Stack.Screen name='WorkData' component={WorkDataScreen} />
+      <Stack.Screen name='PDFViewer' component={PDFViewerScreen} />
+      <Stack.Screen name='AudioPlayer' component={AudioPlayerScreen} />
+      <Stack.Screen name='VideoPlayer' component={VideoPlayerScreen} />
+      <Stack.Screen name='Subscription' component={SubscriptionScreen} />
+      {/* <Stack.Screen name='MobileSubscribe' component={MobileSubscribeScreen} />
+      <Stack.Screen name='BankCardSubscribe' component={BankCardSubscribeScreen} /> */}
     </Stack.Navigator>
   );
 };
@@ -215,13 +263,13 @@ const App = () => {
   }, []);
 
   // =============== Lock screen captures ===============
-  // useEffect(() => {
-  //   const applySecurity = async () => {
-  //     await forbid();
-  //   };
+  useEffect(() => {
+    const applySecurity = async () => {
+      await forbid();
+    };
 
-  //   applySecurity();
-  // }, []);
+    applySecurity();
+  }, []);
 
   if (splashLoading) {
     return <SplashScreen />;
