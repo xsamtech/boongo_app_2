@@ -2,10 +2,11 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
+import { SearchContext, SearchProvider } from './contexts/SearchContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { TouchableOpacity } from 'react-native';
+import { Dimensions, TextInput, TouchableOpacity, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -55,6 +56,7 @@ import AddGovernmentScreen from './screens/Organization/Government/add_governmen
 import AudioPlayerScreen from './screens/Organization/audio_player';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
+import homeStyles from './screens/style';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -185,6 +187,18 @@ const HomeStackNav = () => {
   const navigation = useNavigation();
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Get data ===============
+  const [isSearchActive, setIsSearchActive] = useState(false); // Status to know if the search is active
+  const { searchQuery, setSearchQuery } = useContext(SearchContext);
+
+  const handleSearchPress = () => {
+    setIsSearchActive(true);  // Activate search mode
+  };
+
+  const handleCloseSearch = () => {
+    setIsSearchActive(false);  // Close the search field
+    setSearchQuery('');        // Reset the search text
+  };
 
   return (
     <Stack.Navigator
@@ -212,7 +226,57 @@ const HomeStackNav = () => {
           }
         }} />
       <Stack.Screen name='About' component={AboutBottomTab} />
-      <Stack.Screen name='Dictionary' component={DictionaryScreen} />
+      <Stack.Screen name='Dictionary' component={DictionaryScreen}
+        options={{
+          headerShown: true,
+          headerTitle: isSearchActive ? '' : t('navigation.dictionary'),
+          headerTintColor: 'white',
+          headerStyle: {
+            backgroundColor: COLORS.danger
+          },
+          headerTitleStyle: {
+            color: 'white'
+          },
+          headerLeft: () => {
+            return (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Home', { screen: 'HomeStack' })}>
+                  <Icon name='arrow-left' color='white' style={{ fontSize: 24 }} />
+                </TouchableOpacity>
+                {isSearchActive ? (
+                  <>
+                    <TextInput
+                      value={searchQuery}
+                      onChangeText={setSearchQuery}
+                      style={[homeStyles.searchInputText, { fontSize: 18, width: Dimensions.get('window').width - 120, height: 37, color: 'white', marginVertical: 0, paddingVertical: 5, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, borderColor: 'white' }]}
+                      placeholder={t('search')}
+                      placeholderTextColor={COLORS.secondary}
+                    />
+                  </>
+                ) : (
+                  <Icon name='book-open-blank-variant' color='white' style={{ fontSize: 28, marginHorizontal: PADDING.p01 }} />
+                )}
+              </View>
+            );
+          },
+          headerRight: () => {
+            return (
+              <>
+                {isSearchActive ?
+                  (
+                    <TouchableOpacity onPress={handleCloseSearch}>
+                      <Icon name='close' color='white' style={{ fontSize: 24 }} />
+                    </TouchableOpacity>
+                  ) :
+                  (
+                    <TouchableOpacity onPress={handleSearchPress}>
+                      <Icon name='magnify' color='white' style={{ fontSize: 24 }} />
+                    </TouchableOpacity>
+                  )}
+              </>
+            );
+          }
+        }} />
       <Stack.Screen name='Settings' component={SettingsScreen} />
       <Stack.Screen name='Account' component={AccountScreen} />
       <Stack.Screen name='Notifications' component={NotificationsScreen} />
@@ -289,7 +353,9 @@ const App = () => {
 export default () => (
   <ThemeProvider>
     <AuthProvider>
-      <App />
+      <SearchProvider>
+        <App />
+      </SearchProvider>
     </AuthProvider>
   </ThemeProvider>
 );

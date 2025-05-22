@@ -746,6 +746,61 @@ const homeStyles = StyleSheet.create({
         fontSize: 14
     },
 
+    // Dictionary
+    dicoContainer: {
+        paddingTop: 16,
+        paddingHorizontal: 16,
+        paddingBottom: 0
+    },
+
+    dicoMessage: {
+        fontSize: 16,
+        fontWeight: '300',
+        textAlign: 'center'
+    },
+
+    dicoHeader: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    dicoWord: {
+        fontSize: 28,
+        fontWeight: 'bold'
+    },
+
+    dicoPhonetic: {
+        fontSize: 18,
+        color: 'gray',
+        marginTop: 4
+    },
+
+    dicoMeaningSection: {
+        marginTop: 20
+    },
+
+    dicoPartOfSpeech: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 6
+    },
+
+    dicoDefinitionBlock: {
+        marginBottom: 10
+    },
+
+    dicoDefinition: {
+        fontSize: 16
+    },
+
+    dicoExample: {
+        fontSize: 14,
+        color: '#555',
+        fontStyle: 'italic',
+        marginLeft: 10
+    },
+
     // Notepad
     noteTitle: {
         marginVertical: PADDING.p00,

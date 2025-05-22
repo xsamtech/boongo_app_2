@@ -46,6 +46,7 @@
         "pending_after_payment": "Tango okofuta, abonnément na yo ekozala validé na ba ngonga elandi.",
         "no_server_response": "Eyano moko te ezwami uta na serveur.",
         "missing_parameters": "Ba paramètres misusu ez’ozanga.",
+        "word_not_found": "Oyo oluki emonani te",
         "cannot_be_empty": "Oyo ekoki kozala mpamba te."
     },
     "empty_list": {
@@ -73,6 +74,7 @@
     "select_date": "Pona mokolo",
     "search": "Luka",
     "search_result": "Ba résultats na « {{ query }} »",
+    "search_dictionary": "Tyá oyo olingi koluka nakati ya diksionɛrɛ",
     "search_description": "Luka na Boongo",
     "reading": "Kotanga",
     "summary": "Résumés",
@@ -195,6 +197,7 @@
         "book": "Buku",
         "magazine": "Mikanda",
         "mapping": "Ba kartes",
+        "dictionary": "Dictionnaire",
         "cart": "Kitunga na nga"
     },
 

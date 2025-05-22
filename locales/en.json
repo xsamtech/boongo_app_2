@@ -46,6 +46,7 @@
         "pending_after_payment": "When you make your payment, your subscription will be validated within minutes.",
         "no_server_response": "No response received from the server.",
         "missing_parameters": "There are missing parameters.",
+        "word_not_found": "Word not found",
         "cannot_be_empty": "This cannot be empty."
     },
     "empty_list": {
@@ -73,6 +74,7 @@
     "select_date": "Select the date",
     "search": "Search",
     "search_result": "Results with « {{ query }} »",
+    "search_dictionary": "Type a word to search in the dictionary",
     "search_description": "Search on Boongo",
     "reading": "Reading",
     "summary": "Summary",
@@ -195,6 +197,7 @@
         "book": "Books",
         "magazine": "Magazines & journals",
         "mapping": "Mapping",
+        "dictionary": "Dictionary",
         "cart": "My cart"
     },
 
