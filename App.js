@@ -5,6 +5,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import { SearchContext, SearchProvider } from './contexts/SearchContext';
+import { Provider as PaperProvider } from 'react-native-paper';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Dimensions, TextInput, TouchableOpacity, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -37,7 +38,6 @@ import AccountScreen from './screens/Account';
 import SettingsScreen from './screens/Account/settings';
 import NotificationsScreen from './screens/Account/notifications';
 import SearchScreen from './screens/search';
-import ChatScreen from './screens/Chat';
 import NewChatScreen from './screens/Chat/new_chat';
 import BlockedContactsScreen from './screens/Chat/blocked_contacts';
 import SchoolScreen from './screens/Organization/School';
@@ -57,6 +57,8 @@ import AudioPlayerScreen from './screens/Organization/audio_player';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
 import homeStyles from './screens/style';
+import ChatsScreen from './screens/Chat';
+import ChatEntityScreen from './screens/Chat/chat';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -281,8 +283,9 @@ const HomeStackNav = () => {
       <Stack.Screen name='Account' component={AccountScreen} />
       <Stack.Screen name='Notifications' component={NotificationsScreen} />
       <Stack.Screen name='Search' component={SearchScreen} />
+      <Stack.Screen name='Chats' component={ChatsScreen} />
       <Stack.Screen name='NewChat' component={NewChatScreen} />
-      <Stack.Screen name='Chat' component={ChatScreen} />
+      <Stack.Screen name='ChatEntity' component={ChatEntityScreen} />
       <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} />
       <Stack.Screen name='OrganizationData' component={OrganizationDataScreen} />
       <Stack.Screen name='School' component={SchoolScreen} />
@@ -327,13 +330,13 @@ const App = () => {
   }, []);
 
   // =============== Lock screen captures ===============
-  useEffect(() => {
-    const applySecurity = async () => {
-      await forbid();
-    };
+  // useEffect(() => {
+  //   const applySecurity = async () => {
+  //     await forbid();
+  //   };
 
-    applySecurity();
-  }, []);
+  //   applySecurity();
+  // }, []);
 
   if (splashLoading) {
     return <SplashScreen />;
@@ -354,7 +357,9 @@ export default () => (
   <ThemeProvider>
     <AuthProvider>
       <SearchProvider>
-        <App />
+        <PaperProvider>
+          <App />
+        </PaperProvider>
       </SearchProvider>
     </AuthProvider>
   </ThemeProvider>

@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Dimensions, Image, Pressable, SafeAreaView, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -30,6 +30,26 @@ const NewsItemComponent = ({ item }) => {
         const iconParts = icon.split(' ');  // Separates the prefix and the icon name
         return iconParts[iconParts.length - 1].replace(/^fa-/, '');  // Remove "fa-" if necessary
     };
+
+    if (item.id === 'ad') {
+        // If it is the "advertisement" object, we display the advertisement component
+        return (
+            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+                <View>
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { width: Dimensions.get('window').width / 2.5, height: 'auto', borderColor: COLORS.light_secondary }]} />
+                </View>
+                <View style={homeStyles.workDescTop}>
+                    <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                    {item.website_url &&
+                        <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('Subscription', { itemId: item.realId })}>
+                            <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
+                            <Icon name='chevron-right' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
+                        </TouchableOpacity>
+                    }
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <Pressable style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>

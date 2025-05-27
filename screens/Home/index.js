@@ -24,213 +24,128 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Get contexts ===============
+  const { userInfo } = useContext(AuthContext);
   // =============== Get data ===============
+  const [news, setNews] = useState([]);
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
-  // const newsData = [];
-  const newsData = [
-    {
-      "id": 61,
-      "work_title": "Lorem enim deserunt Lorem aliquip eu consectetur",
-      "work_content": "enim ut cupidatat incididunt laboris irure nostrud et eu sint nisi occaecat incididunt voluptate qui eiusmod ad minim veniam",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 84,
-      "is_public": true,
-      "updated_at": "2025-04-23 08:33:31",
-      "updated_at_ago": "Il y a 37 minutes",
-      "photo_url": "https://afrique.tv5monde.com/sites/afrique/files/styles/info_750x427/public/2025-04-24/field_media_image-1443914-M23%2520SOLDATS.jpg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Université de Kinshasa",
-        "org_acronym": "UNIKIN",
-        "type": {
-          "alias": "school_organization",
-          "icon": "fa-solid fa-graduation-cap"
-        },
-      }
-    },
-    {
-      "id": 15,
-      "work_title": "et consequat et labore minim id sit minim",
-      "work_content": "officia aliquip cupidatat anim incididunt veniam ipsum labore eu duis laboris qui",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 106,
-      "is_public": true,
-      "updated_at": "2025-04-24 08:33:31",
-      "updated_at_ago": "Il y a 1 heure",
-      "photo_url": "https://actualite.cd/sites/default/files/styles/800_400/public/2025-05/Bumba%20assembl%C3%A9e%20prov.jpg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Direction Générale des Impôts",
-        "org_acronym": "DGI",
-        "type": {
-          "alias": "government_organization",
-          "icon": "fa-solid fa-building-flag"
-        },
-      }
-    },
-    {
-      "id": 4,
-      "work_title": "qui nisi nisi veniam ipsum cillum est adipisicing ea anim",
-      "work_content": "labore in labore ullamco non culpa ipsum pariatur ut pariatur occaecat reprehenderit voluptate cillum est ullamco anim commodo eiusmod",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 106,
-      "is_public": true,
-      "updated_at": "2025-04-25 08:33:31",
-      "updated_at_ago": "Il y a 12 heures",
-      "photo_url": "https://www.bpi.fr/content/uploads/sites/2/2020/08/casier-espace-presse-1200x800-1-1024x683.jpg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "École Masamba",
-        "org_acronym": "ECOMAS",
-        "type": {
-          "alias": "school_organization",
-          "icon": "fa-solid fa-graduation-cap"
-        },
-      }
-    },
-    {
-      "id": 83,
-      "work_title": "culpa cupidatat ea occaecat irure aliqua voluptate consectetur consectetur",
-      "work_content": "enim in aute qui aute elit sit consectetur sint dolor tempor nostrud reprehenderit mollit sint occaecat consectetur",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 101,
-      "is_public": false,
-      "updated_at": "2025-04-26 08:33:31",
-      "updated_at_ago": "Il y a 2 jours",
-      "photo_url": "https://cdn.essentiels.bnf.fr/media/images/cache/crop/rc/0s7TO018/uploads/media/image/20220208170734000000_130hd_jpg.jpeg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Ministère des Affaires Etrangères",
-        "org_acronym": "MinAfEt",
-        "type": {
-          "alias": "government_organization",
-          "icon": "fa-solid fa-building-flag"
-        },
-      }
-    },
-    {
-      "id": 45,
-      "work_title": "tempor excepteur reprehenderit minim esse labore culpa deserunt labore",
-      "work_content": "consectetur exercitation reprehenderit culpa amet ex aliquip elit deserunt cillum et labore",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 3,
-      "is_public": false,
-      "updated_at": "2025-04-27 08:33:31",
-      "updated_at_ago": "Il y a 1 semaine",
-      "photo_url": "https://s.francaisfacile.rfi.fr/media/display/e480a5a4-b955-11ef-9fd7-005056bf30b7/w:980/p:16x9/rfi_a1_societe_fp_2024_une_annee_dactu_VISUEL.jpg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Institut Supérieur des Techniques Appliquées",
-        "org_acronym": "ISTA",
-        "type": {
-          "alias": "school_organization",
-          "icon": "fa-solid fa-graduation-cap"
-        },
-      }
-    },
-    {
-      "id": 67,
-      "work_title": "dolore occaecat",
-      "work_content": "et culpa nisi ut duis minim magna incididunt Lorem veniam amet dolore ullamco dolor elit ullamco elit magna ad minim",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 31,
-      "is_public": true,
-      "updated_at": "2025-04-28 08:33:31",
-      "updated_at_ago": "Il y a 2 mois",
-      "photo_url": "https://actualite.cd/sites/default/files/styles/800_600/public/2025-04/pluiee.jpeg",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Radio Télévision Nationale Congolaise",
-        "org_acronym": "RTNC",
-        "type": {
-          "alias": "government_organization",
-          "icon": "fa-solid fa-building-flag"
-        },
-      }
-    },
-    {
-      "id": 59,
-      "work_title": "cillum pariatur fugiat occaecat incididunt proident",
-      "work_content": "sit quis occaecat aute magna qui aliqua minim duis in tempor",
-      "work_url": "",
-      "video_source": "",
-      "media_length": 116,
-      "is_public": true,
-      "updated_at": "2025-04-29 08:33:31",
-      "updated_at_ago": "Il y a 1 an",
-      "photo_url": "https://img.20mn.fr/K0Xse6S4R4G-6cvkyjV6uyk/1444x920_volodymyr-zelensky-des-soldats-israeliens-et-l-hommage-a-dominique-bernard",
-      "document_url": "",
-      "audio_url": "",
-      "video_url": "",
-      "organization": {
-        "org_name": "Université Protestante du Congo",
-        "org_acronym": "UPC",
-        "type": {
-          "alias": "school_organization",
-          "icon": "fa-solid fa-graduation-cap"
-        },
-      }
-    }
-  ];
 
-  // =============== Refresh control ===============
-  const onRefresh = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
-  }, []);
-
-  // =============== Handle "scroll top" button ===============
   const scrollToTop = () => {
     flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
 
+  const fetchWorks = async (pageToFetch = 1) => {
+    if (isLoading || pageToFetch > lastPage) return;
+
+    setIsLoading(true);
+    const qs = require('qs');
+    const url = `${API.url}/work/filter_by_categories`;
+    const mParams = { type_id: 33, status_id: 17, page: pageToFetch };
+    const mHeaders = {
+      'X-localization': 'fr',
+      'Authorization': `Bearer ${userInfo.api_token}`
+    };
+
+    try {
+      const response = await axios.post(url, qs.stringify(mParams), { headers: mHeaders });
+
+      if (pageToFetch === 1) {
+        setNews(response.data.data);
+      } else {
+        setNews(prev => [...prev, ...response.data.data]);
+      }
+
+      setAd(response.data.ad);
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWorks(1); // Initial loading
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchWorks(page);
+    }
+  }, [page]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    await fetchWorks(1);
+    setRefreshing(false);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  const combinedData = [...news];
+
+  if (ad) {
+    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {/* Floating button */}
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
-
-      {/* News */}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
           <Animated.FlatList
             ref={flatListRef}
-            data={newsData}
-            extraData={newsData}
-            keyExtractor={item => item.id}
-            horizontal={false}
+            data={combinedData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => <NewsItemComponent item={item} />}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
-            contentContainerStyle={homeStyles.scrollableList} // ← Important: Compensates for the height of the Header + TabBar
+            contentContainerStyle={homeStyles.scrollableList}
             windowSize={10}
-            ListEmptyComponent={<EmptyListComponent iconName='script-text-outline' title={t('empty_list.title')} description={t('empty_list.description_news')} />}
-            renderItem={({ item }) => { return (<NewsItemComponent item={item} />); }}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} progressViewOffset={105} />}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                progressViewOffset={105}
+              />
+            }
             contentInset={{ top: 105 }}
             contentOffset={{ y: -105 }}
+            ListEmptyComponent={
+              <EmptyListComponent
+                iconName='script-text-outline'
+                title={t('empty_list.title')}
+                description={t('empty_list.description_news')}
+              />
+            }
+            ListFooterComponent={() =>
+              isLoading ? (
+                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
+              ) : null
+            }
           />
         </View>
       </SafeAreaView>
@@ -244,133 +159,117 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Get data ===============
+  // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
+  // =============== Get data ===============
   const [categories, setCategories] = useState([]);
   const [idCat, setIdCat] = useState(0);
   const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  // =============== Handle badge press ===============
+  // ================= Get categories =================
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    const headers = {
+      'X-localization': 'fr',
+      Authorization: `Bearer ${userInfo.api_token}`,
+    };
+
+    try {
+      const res = await axios.get(`${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`, { headers });
+      const data = res.data.data;
+      const itemAll = { id: 0, category_name: t('all_f'), category_name_fr: "Toutes", category_name_en: "All", category_name_ln: "Nioso", category_description: null, };
+
+      data.unshift(itemAll);
+      setCategories(data);
+      setIdCat(itemAll.id);
+
+    } catch (error) {
+      console.error('Erreur fetchCategories', error);
+    }
+  };
+
+  // ================= Fetch books when idCat or page changes =================
+  useEffect(() => {
+    fetchBooks();
+  }, [page, idCat]);
+
+  const fetchBooks = async () => {
+    if (isLoading || page > lastPage) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+    const url = `${API.url}/work/filter_by_categories?page=${page}`;
+    const params = {
+      'categories_ids[0]': idCat,
+      type_id: 29,
+      status_id: 17,
+    };
+
+    const headers = {
+      'X-localization': 'fr',
+      Authorization: `Bearer ${userInfo.api_token}`,
+    };
+
+    try {
+      const response = await axios.post(url, qs.stringify(params), { headers });
+      const data = response.data.data || [];
+
+      setBooks(prev => (page === 1 ? data : [...prev, ...data]));
+      setAd(response.data.ad || null);
+      setLastPage(response.data.lastPage || page);
+      setCount(response.data.count || 0);
+
+      console.log(response.data);
+
+    } catch (error) {
+      console.error('Erreur fetchBooks', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ================= Combined data =================
+  const combinedData = [...books];
+  if (ad) {
+    combinedData.push({ ...ad, id: 'ad', realId: ad.id });
+  }
+
+  // ================= Handlers =================
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    setBooks([]);
+    await fetchBooks();
+    setRefreshing(false);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
+
   const handleBadgePress = useCallback((id) => {
     setIdCat(id);
-    books.splice(0, books.length);
-
-    // Reload data
-    getBooks2(id);
-    console.log('handleReload => Works count: ' + books.length + ', Selected category: ' + idCat);
+    setPage(1);
+    setBooks([]);
+    setLastPage(1);
   }, []);
 
-  // =============== Using the Effect Hook ===============
-  // CATEGORIES
-  useEffect(() => {
-    getCategories();
-  }, []);
-
-  // BOOKS
-  useEffect(() => {
-    getBooks();
-  }, [idCat]);
-
-  // =============== Some work functions ===============
-  // CATEGORIES
-  // Get all categories
-  const getCategories = () => {
-    setIsLoading(true);
-
-    const config = { method: 'GET', url: `${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`, headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } };
-    const item_all = { "id": 0, "category_name": t('all_f'), "category_name_fr": "Toutes", "category_name_en": "All", "category_description": null };
-
-    axios(config)
-      .then(res => {
-        const categoriesData = res.data.data;
-
-        categoriesData.unshift(item_all);
-
-        setIdCat(item_all.id);
-        setCategories(categoriesData);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  // BOOKS
-  const getBooks = () => {
-    setIsLoading(true);
-
-    let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories`;
-    let mParams = { 'categories_ids[0]': idCat, 'type_id': 29, 'status_id': 17 }
-    const mHeaders = {
-      'X-localization': 'fr',
-      'Authorization': `Bearer ${userInfo.api_token}`
-    };
-
-    axios.post(url, qs.stringify(mParams), { headers: mHeaders }).then(res => {
-      const booksData = res.data.data;
-
-      setBooks(booksData);
-      setIsLoading(false);
-
-      console.log(new Date() + ' : getBooks => Works count: ' + booksData.length + ', Selected category: ' + idCat);
-
-    }).catch(error => {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        ToastAndroid.show(`${error.response.status} -> ${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
-        console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-      } else if (error.request) {
-        // The request was made but no response was received
-        ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
-
-      } else {
-        // An error occurred while configuring the query
-        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-      }
-    });
-  };
-
-  const getBooks2 = (id) => {
-    setIsLoading(true);
-
-    let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories`;
-    let mParams = { 'categories_ids[0]': id, 'type_id': 29, 'status_id': 17 }
-    const mHeaders = {
-      'X-localization': 'fr',
-      'Authorization': `Bearer ${userInfo.api_token}`
-    };
-
-    axios.post(url, qs.stringify(mParams), { headers: mHeaders }).then(res => {
-      const booksData = res.data.data;
-
-      setBooks(booksData);
-      setIsLoading(false);
-
-      console.log(new Date() + ' : getBooks2 => Works count: ' + booksData.length + ', Selected category: ' + id);
-
-    }).catch(error => {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        ToastAndroid.show(`${error.response.status} -> ${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
-        console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-      } else if (error.request) {
-        // The request was made but no response was received
-        ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
-
-      } else {
-        // An error occurred while configuring the query
-        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-      }
-    });
-  };
-
-  // =============== Category Item ===============
   const CategoryItem = ({ item }) => {
     const isSelected = idCat === item.id;
     const Container = isSelected ? TouchableHighlight : TouchableOpacity;
@@ -379,15 +278,19 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
       <Container
         key={item.id}
         onPress={() => handleBadgePress(item.id)}
-        style={isSelected
-          ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
-          : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]}
+        style={
+          isSelected
+            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
+            : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]
+        }
         underlayColor={COLORS.light_secondary}
       >
         <Text
-          style={isSelected
-            ? [homeStyles.categoryBadgeTextSelected, { color: COLORS.black }]
-            : [homeStyles.categoryBadgeText, { color: 'black' }]}
+          style={
+            isSelected
+              ? [homeStyles.categoryBadgeTextSelected, { color: COLORS.black }]
+              : [homeStyles.categoryBadgeText, { color: 'black' }]
+          }
         >
           {item.category_name}
         </Text>
@@ -395,54 +298,61 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
     );
   };
 
-  // =============== Refresh control ===============
-  const onRefresh = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
-  }, []);
-
-  // =============== Handle "scroll top" button ===============
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-  };
-
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 30 }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+        <TouchableOpacity
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 30 }]}
+          onPress={scrollToTop}
+        >
+          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+        <View
+          style={[
+            homeStyles.cardEmpty,
+            {
+              height: Dimensions.get('window').height,
+              marginLeft: 0,
+              paddingHorizontal: 2,
+            },
+          ]}
+        >
           {/* Categories */}
           <FlatList
             data={categories}
-            keyExtractor={item => item.id}
-            horizontal={true}
+            keyExtractor={item => item.id.toString()}
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={{ height: 40, marginTop: 105, flexGrow: 0 }}
-            contentContainerStyle={{ alignItems: 'center', paddingHorizontal: PADDING.p00 }}
-            renderItem={({ item }) => {
-              return (<CategoryItem item={item} />);
-            }} />
+            contentContainerStyle={{
+              alignItems: 'center',
+              paddingHorizontal: PADDING.p00,
+            }}
+            renderItem={({ item }) => <CategoryItem item={item} />}
+          />
 
-          {/* Books */}
+          {/* Books List */}
           <Animated.FlatList
             ref={flatListRef}
-            data={books}
-            extraData={books}
-            keyExtractor={item => item.id}
+            data={combinedData}
+            extraData={combinedData}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => <WorkItemComponent item={item} />}
             horizontal={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
             windowSize={10}
-            ListEmptyComponent={<EmptyListComponent iconName='book-open-page-variant-outline' title={t('empty_list.title')} description={t('empty_list.description_books')} />}
-            renderItem={({ item }) => { return (<WorkItemComponent item={item} />); }}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+            refreshControl={ <RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} /> }
+            contentInset={{ top: 105 }}
+            contentOffset={{ y: -105 }}
+            ListEmptyComponent={ <EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} /> }
+            ListFooterComponent={() => isLoading ? ( <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null }
           />
         </View>
       </SafeAreaView>

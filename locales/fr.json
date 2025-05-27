@@ -51,6 +51,10 @@
     },
     "empty_list": {
         "title": "La liste est vide",
+        "description_chat_user": "Ici seront affichées les membres avec qui vous pouvez échanger.",
+        "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d'autres membres.",
+        "description_chat_organization": "Ici seront affichées vos échanges dans les établissements et/ou institutions.",
+        "description_chat_event": "Ici seront affichées vos échanges dans les événements dans lesquels vous êtes invités.",
         "description_news": "Ici, sera affichée l’actualité sur les organisations (établissement ou institution) de la plateforme.",
         "description_popular": "Ici, seront affichés les œuvres les plus consultées par les membres.",
         "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
@@ -74,8 +78,13 @@
     "select_date": "Sélectionner la date",
     "search": "Rechercher",
     "search_result": "Résultats avec « {{ query }} »",
-    "search_dictionary": "Tapez un mot à rechercher dans le dictionnaire",
+    "search_dictionary": "Rechercher dans le dictionnaire",
     "search_description": "Rechercher sur Boongo",
+    "search_filter": "Rechercher et filtrer",
+    "search_filter_description": "Avec le bouton vert, vous pouvez filtrer vos résultats.",
+    "search_filter_type": "Sélectionner un type:",
+    "search_filter_categories": "Sélectionner des catégories:",
+    "search_filter_apply": "Appliquer les filtres :",
     "reading": "Lecture",
     "summary": "Résumés",
     "show": "Afficher",
@@ -116,6 +125,12 @@
             "title": "Accueil",
             "news": "Actualité",
             "books": "Ouvrages"
+        },
+        "chat": {
+            "members": "Membres",
+            "organizations": "Organisations",
+            "circles": "Cercles",
+            "events": "Événements"
         },
         "account": {
             "title": "Compte",

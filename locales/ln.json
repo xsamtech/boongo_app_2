@@ -51,6 +51,10 @@
     },
     "empty_list": {
         "title": "Liste ezali pamba",
+        "description_chat_user": "Awa okomona ba membres oyo okoki ko solola na bango.",
+        "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
+        "description_chat_organization": "Awa ekomona ba échanges na yo na ba eteyelo mpe/to ba institutions.",
+        "description_chat_event": "Awa ekolakisama ba échanges na yo na ba événements oyo babengi yo.",
         "description_news": "Awa, ba sango etali ba organisations (eteyelo to institution ya gouvernement) oyo ezali na plateforme ekolakisama.",
         "description_popular": "Awa, misala oyo ba membres ba consulté mingi ekolakisama.",
         "description_books": "Awa, misala mikolakisama miye mikoki kozala consulte na ba membres.",
@@ -74,8 +78,13 @@
     "select_date": "Pona mokolo",
     "search": "Luka",
     "search_result": "Ba résultats na « {{ query }} »",
-    "search_dictionary": "Tyá oyo olingi koluka nakati ya diksionɛrɛ",
+    "search_dictionary": "Luka nakati ya diksionɛrɛ",
     "search_description": "Luka na Boongo",
+    "search_filter": "Luka pe filtrer",
+    "search_filter_description": "Na bouton vert okoki ko filtrer ba résultats na yo.",
+    "search_filter_type": "Pona type:",
+    "search_filter_categories": "Pona ba catégories:",
+    "search_filter_apply": "Salelá ba filtres:",
     "reading": "Kotanga",
     "summary": "Résumés",
     "show": "Kolakisa",
@@ -116,6 +125,12 @@
             "title": "Ebandeli",
             "news": "Ba sango",
             "books": "Ba buku"
+        },
+        "chat": {
+            "members": "Membres",
+            "organizations": "Organisations",
+            "circles": "Cercles",
+            "events": "Événements"
         },
         "account": {
             "title": "Compte",

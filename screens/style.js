@@ -753,6 +753,14 @@ const homeStyles = StyleSheet.create({
         paddingBottom: 0
     },
 
+    dicoCenteredView: {
+        flexGrow: 1,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: PADDING.p07,
+    },
+
     dicoMessage: {
         fontSize: 16,
         fontWeight: '300',

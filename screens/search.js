@@ -2,16 +2,18 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { FlatList, Modal, RefreshControl, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { RadioButton, Checkbox, Button, Portal } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
-import { Dimensions, FlatList, Image, NativeModules, Platform, RefreshControl, SafeAreaView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import axios from 'axios';
-import Logo from '../assets/img/logo.svg';
+import { API, IMAGE_SIZE, PADDING } from '../tools/constants';
+import { AuthContext } from '../contexts/AuthContext';
+import WorkItemComponent from '../components/work_item';
+import EmptyListComponent from '../components/empty_list';
 import homeStyles from './style';
-import { API, IMAGE_SIZE } from '../tools/constants';
 import useColors from '../hooks/useColors';
 
 const SearchScreen = () => {
@@ -19,134 +21,192 @@ const SearchScreen = () => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-
-  // =============== Navigation ===============
-  const navigation = useNavigation();
-
-  // =============== Float button ===============
-  const [showBackToTop, setShowBackToTop] = useState(false);
+  // =============== Get contexts ===============
+  const { userInfo } = useContext(AuthContext);
+  // =============== Get data ===============
   const flatListRef = useRef(null);
-
-  // =============== Search data ===============
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const [datas, setDatas] = useState([]);
-  const [inputValue, setInputValue] = useState(null);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  // For modal handling
+  const [types, setTypes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
-  // =============== Get device language ===============
-  // const getDeviceLang = () => {
-  //   const appLanguage = Platform.OS === 'ios' ? NativeModules.SettingsManager.settings.AppleLocale || NativeModules.SettingsManager.settings.AppleLanguages[0] : NativeModules.I18nManager.localeIdentifier;
+  // Fetch types from API
+  useEffect(() => {
+    const fetchTypes = async () => {
+      try {
+        const response = await axios.get(`${API.url}/type/find_by_group/Type%20d'œuvre`);
+        setTypes(response.data.data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des types:', error);
+      }
+    };
 
-  //   return appLanguage.search(/-|_/g) !== -1 ? appLanguage.slice(0, 2) : appLanguage;
-  // };
+    fetchTypes();
+  }, []);
 
-  // =============== Handle "scroll top" button ===============
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`);
+        setCategories(response.data.data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des catégories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch data from API
+  const fetchData = async (searchTerm) => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+
+    const params = {
+      data: searchTerm,
+      type_id: selectedType,
+      categories_ids: selectedCategories,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API.url}/work/search`,
+        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 clé ici
+        {
+          headers: {
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+            'X-user-id': userInfo.id,
+            'Content-Type': 'application/x-www-form-urlencoded', // cohérent
+          },
+        }
+      );
+
+      setDatas(response.data.data);
+      console.log('Réponse API:', response.data);
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle scroll to top
   const handleScroll = (event) => {
     const { contentOffset } = event.nativeEvent;
-    const isAtTop = contentOffset.y === 0;
-
-    setShowBackToTop(!isAtTop);
+    setShowBackToTop(contentOffset.y > 200);
   };
 
   const scrollToTop = () => {
     flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
 
-  // =============== Refresh control ===============
-  const handleButtonPress = (text) => {
-    setIsLoading(true);
-    searchData(text);
-  };
-
-  // =============== Refresh control ===============
+  // Handle refreshing
   const onRefresh = useCallback(() => {
     setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
+    setTimeout(() => setIsLoading(false), 2000);
   }, []);
 
-  // =============== Search work function ===============
-  const searchData = (data) => {
-    setIsLoading(true);
-    setInputValue(data);
-
-    const config = { method: 'GET', url: `${API.url}/work/search/${data}`, headers: { 'X-localization': 'fr' } };
-
-    axios(config)
-      .then(res => {
-        datas.splice(0, datas.length);
-
-        const resultsData = res.data.data;
-
-        setDatas(resultsData);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        setDatas([]);
-        setIsLoading(false);
-      });
+  // Handle type selection
+  const handleTypeChange = (value) => {
+    setSelectedType(value);
   };
 
-  // =============== Work Item ===============
-  const WorkItem = ({ item }) => {
-    return (
-      <View style={homeStyles.searchResult}>
-        <View style={homeStyles.searchResultImage}>
-          <Image source={{ uri: item.image_url ? item.image_url : `${WEB.url}/assets/img/ad.png` }} style={{ width: '100%', height: '100%', borderRadius: 5 }} />
-        </View>
-        <View style={{ marginLeft: 10 }}>
-          <Text style={homeStyles.searchResultTitle}>
-            {((item.work_title).length > 25) ? (((item.work_title).substring(0, 25 - 3)) + '...') : item.work_title}
-          </Text>
-          <Text style={homeStyles.searchResultText}>
-            {((item.work_content).length > 33) ? (((item.work_content).substring(0, 33 - 3)) + '...') : item.work_content}
-          </Text>
-          <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
-            <Text style={[homeStyles.link]}>{t('see_details')} </Text>
-            <FontAwesome6 name='angle-right' size={IMAGE_SIZE.s01} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
+  // Handle category selection/deselection
+  const handleCategoryToggle = (id) => {
+    setSelectedCategories((prevSelected) =>
+      prevSelected.includes(id) ? prevSelected.filter((categoryId) => categoryId !== id) : [...prevSelected, id]
+    );
+  };
+
+  // Apply custom filters
+  const applyFilters = () => {
+    // Logic to apply filters (e.g., status update or API call)
+    console.log('Filtres appliqués:', { selectedType, selectedCategories });
+    setShowModal(false);
+  };
+
+  // Handle search event
+  const handleSearch = (text) => {
+    setInputValue(text);
+    fetchData(text);
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingBottom: 20 }}>
+    <SafeAreaView style={{ flex: 1, paddingBottom: 20, backgroundColor: COLORS.light_secondary }}>
       {/* Floating button */}
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.success, bottom: 80 }]} onPress={scrollToTop}>
-          <MaterialCommunityIcons name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: COLORS.white }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
       {/* Search container */}
       <View style={homeStyles.searchContainer}>
-        <Logo width={60} height={60} />
         <View style={homeStyles.searchInput}>
-          <TextInput placeholder={t('search')} onChangeText={text => searchData(text)} style={homeStyles.searchInputText} />
-          <TouchableOpacity style={homeStyles.searchInputSubmit} onPress={() => handleButtonPress(inputValue)}>
-            <FontAwesome6 name='magnifying-glass' size={IMAGE_SIZE.s04} style={{ color: COLORS.white }} />
+          <TextInput placeholder={t('search')} placeholderTextColor={COLORS.black} onChangeText={handleSearch} style={[homeStyles.searchInputText, { color: COLORS.black, borderColor: COLORS.dark_secondary }]} />
+          <TouchableOpacity style={[homeStyles.searchInputSubmit, { borderColor: COLORS.dark_secondary }]} onPress={() => fetchData(inputValue)}>
+            <FontAwesome6 name='magnifying-glass' size={IMAGE_SIZE.s04} color={COLORS.black} />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Search results list */}
       <FlatList
         ref={flatListRef}
         data={datas}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => { return (<WorkItemComponent item={item} />); }}
         onScroll={handleScroll}
-        ListEmptyComponent={() => {
-          return (
-            <View style={[homeStyles.cardEmpty, { width: Dimensions.get('window').width - 20, backgroundColor: 'rgba(255, 255, 255, 0)', elevation: 0 }]}>
-              <Text style={[homeStyles.cardEmptyText, { marginBottom: 30, textAlign: 'center', fontSize: 19, fontWeight: '300', letterSpacing: 0.3 }]}>{t('search_description')}</Text>
-            </View>
-          )
-        }}
-        renderItem={({ item }) => {
-          return (<WorkItem item={item} />);
-        }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />} />
+        ListEmptyComponent={<EmptyListComponent iconName='magnify' title={t('search_filter')} description={t('search_filter_description')} />}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+      />
+
+      <TouchableOpacity onPress={() => setShowModal(true)} style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]}>
+        <FontAwesome6 name="filter" size={20} color='white' />
+      </TouchableOpacity>
+
+      <Portal>
+        <Modal visible={showModal} onDismiss={() => setShowModal(false)}>
+          <ScrollView style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p07 }}>
+            {/* Type selection */}
+            <Text style={[homeStyles.headingText, { color: COLORS.black }]}>{t('search_filter_type')}</Text>
+            <RadioButton.Group onValueChange={handleTypeChange} value={selectedType}>
+              {types.map((type) => (
+                <View key={type.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <RadioButton value={type.id.toString()} />
+                  <Text style={{ color: COLORS.black }}>{type.type_name}</Text>
+                </View>
+              ))}
+            </RadioButton.Group>
+
+            {/* Categories selection */}
+            <Text style={[homeStyles.headingText, { color: COLORS.black, marginTop: PADDING.p01 }]}>{t('search_filter_categories')}</Text>
+            {categories.map((category) => (
+              <View key={category.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Checkbox
+                  status={selectedCategories.includes(category.id) ? 'checked' : 'unchecked'}
+                  onPress={() => handleCategoryToggle(category.id)}
+                />
+                <Text style={{ color: COLORS.black }}>{category.category_name}</Text>
+              </View>
+            ))}
+
+            {/* Bouton pour appliquer les filtres */}
+            <Button mode="contained" onPress={applyFilters} style={{ marginTop: PADDING.p01 }}>{t('search_filter_apply')}</Button>
+          </ScrollView>
+        </Modal>
+      </Portal>
     </SafeAreaView>
   );
-}
+};
 
 export default SearchScreen;

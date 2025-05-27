@@ -51,6 +51,10 @@
     },
     "empty_list": {
         "title": "The list is empty",
+        "description_chat_user": "Here you will see the members you can communicate with.",
+        "description_chat_circle": "Here will be displayed your chat circles with other members.",
+        "description_chat_organization": "Your exchanges in establishments and/or institutions will be displayed here.",
+        "description_chat_event": "Here will be displayed your exchanges in the events to which you are invited.",
         "description_news": "Here, news about the organizations (school or government) on the platform will be displayed.",
         "description_popular": "Here, the works most consulted by members will be displayed.",
         "description_books": "Here, the books will be displayed which can be consulted by members.",
@@ -74,8 +78,13 @@
     "select_date": "Select the date",
     "search": "Search",
     "search_result": "Results with « {{ query }} »",
-    "search_dictionary": "Type a word to search in the dictionary",
+    "search_dictionary": "Search in the dictionary",
     "search_description": "Search on Boongo",
+    "search_filter": "Search and filter",
+    "search_filter_description": "With the green button you can filter your results.",
+    "search_filter_type": "Select a type:",
+    "search_filter_categories": "Select categories:",
+    "search_filter_apply": "Apply filters:",
     "reading": "Reading",
     "summary": "Summary",
     "show": "Show",
@@ -116,6 +125,12 @@
             "title": "Home",
             "news": "News",
             "books": "Works"
+        },
+        "chat": {
+            "members": "Members",
+            "organizations": "Organizations",
+            "circles": "Circles",
+            "events": "Events"
         },
         "account": {
             "title": "Account",
