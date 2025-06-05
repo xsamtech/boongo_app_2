@@ -11,7 +11,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import axios from 'axios';
 import Carousel from 'pinar';
 import { API, WEB } from '../tools/constants';
-import TextBrand from '../assets/img/text.svg';
+import LogoText from '../assets/img/brand.svg';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
 
@@ -76,7 +76,7 @@ const VideoPlayerScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('window').width, paddingVertical: 7 }}>
-        <TextBrand width={140} height={55} style={{ alignSelf: 'center' }} />
+        <LogoText width={188} height={45} style={{ alignSelf: 'center' }} />
       </View>
 
       {/* Content */}

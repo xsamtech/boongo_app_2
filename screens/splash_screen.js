@@ -21,7 +21,7 @@ const SplashScreen = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 50 }}>
       <View style={{ marginBottom: 20, paddingHorizontal: 100 }}>
-        <LogoText width={280} height={154} />
+        <LogoText width={300} height={72} />
         <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
       </View>
 

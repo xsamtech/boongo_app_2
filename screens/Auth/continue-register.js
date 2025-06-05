@@ -14,7 +14,7 @@ import { API, PADDING } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import ThemeContext from '../../contexts/ThemeContext';
 import FooterComponent from '../footer';
-import TextBrand from '../../assets/img/text.svg';
+import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
 import axios from 'axios';
@@ -136,7 +136,7 @@ const ContinueRegisterScreen = () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
         {/* Brand / Title */}
         <View style={homeStyles.authlogo}>
-          <TextBrand width={190} height={46} />
+          <LogoText width={200} height={48} />
         </View>
         <Text style={[homeStyles.authTitle, { color: COLORS.black, marginBottom: PADDING.p01 }]}>{t('welcome_title', { firstname })}</Text>
         <Text style={[homeStyles.authText, { color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p12 }]}>{t('continue_register')}</Text>

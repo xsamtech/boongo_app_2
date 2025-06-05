@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import FooterComponent from '../footer';
-import TextBrand from '../../assets/img/text.svg';
+import LogoText from '../../assets/img/brand.svg';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
 
@@ -41,7 +41,7 @@ const LoginScreen = ({ route }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p10, paddingHorizontal: PADDING.p10 }}>
           {/* Brand / Title */}
           <View style={homeStyles.authlogo}>
-            <TextBrand width={154} height={50} />
+            <LogoText width={200} height={48} />
           </View>
           <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_login')}</Text>
 
@@ -104,7 +104,7 @@ const LoginScreen = ({ route }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
           {/* Brand / Title */}
           <View style={homeStyles.authlogo}>
-            <TextBrand width={190} height={46} />
+            <LogoText width={200} height={48} />
           </View>
           <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_login')}</Text>
 

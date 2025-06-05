@@ -54,7 +54,7 @@ const OnboardScreen = () => {
         <View style={[homeStyles.onboardTop, { backgroundColor: COLORS.white }]}>
           {/* Brand */}
           <View style={{ marginBottom: 30 }}>
-            <LogoText width={190} height={105} style={{ alignSelf: 'center' }} />
+            <LogoText width={250} height={60} style={{ alignSelf: 'center' }} />
             <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
           </View>
 

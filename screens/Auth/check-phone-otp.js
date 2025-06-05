@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import { PADDING, TEXT_SIZE } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import FooterComponent from '../footer';
-import TextBrand from '../../assets/img/text.svg';
+import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
 
@@ -48,7 +48,7 @@ const CheckPhoneOTPScreen = ({ route }) => {
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
         {/* Brand / Title */}
         <View style={homeStyles.authlogo}>
-          <TextBrand width={190} height={46} />
+          <LogoText width={200} height={48} />
         </View>
         <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('auth.otp_code.title', { reference: t('auth.phone') })}</Text>
 

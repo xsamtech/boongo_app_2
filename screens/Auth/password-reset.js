@@ -13,7 +13,7 @@ import { PADDING, PHONE } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import ThemeContext from '../../contexts/ThemeContext';
 import FooterComponent from '../footer';
-import TextBrand from '../../assets/img/text.svg';
+import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
 import axios from 'axios';
@@ -27,8 +27,8 @@ const sendWhatsAppMessage = async (message) => {
     await Linking.openURL(url);
 
   } catch (error) {
-      // An error occurred while configuring the query
-      ToastAndroid.show(`${error.message}`, ToastAndroid.LONG);
+    // An error occurred while configuring the query
+    ToastAndroid.show(`${error.message}`, ToastAndroid.LONG);
   }
 };
 
@@ -85,7 +85,7 @@ const PasswordResetScreen = () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
         {/* Brand / Title */}
         <View style={homeStyles.authlogo}>
-          <TextBrand width={190} height={46} />
+          <LogoText width={200} height={48} />
         </View>
         <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('auth.password.forgotten')}</Text>
 

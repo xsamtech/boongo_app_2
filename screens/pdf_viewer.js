@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Dimensions, Alert, Text, TextInput, FlatList, SafeAreaView, Modal } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScrollView } from 'react-native-gesture-handler';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -14,11 +14,11 @@ import Pdf from 'react-native-pdf';
 import Spinner from 'react-native-loading-spinner-overlay';
 import SQLite from 'react-native-sqlite-storage';
 import { IMAGE_SIZE } from '../tools/constants';
-import TextBrand from '../assets/img/text.svg';
+import LogoText from '../assets/img/brand.svg';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 const SummaryScreenContent = ({ route, navigation }) => {
   // =============== Colors ===============
@@ -211,7 +211,7 @@ const SummaryScreenContent = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('window').width, paddingVertical: 7 }}>
-        <TextBrand width={140} height={55} style={{ alignSelf: 'center' }} />
+        <LogoText width={188} height={45} style={{ alignSelf: 'center' }} />
       </View>
 
       {/* Content */}
@@ -276,7 +276,7 @@ const PDFViewerScreenContent = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('window').width, paddingVertical: 7 }}>
-        <TextBrand width={140} height={55} style={{ alignSelf: 'center' }} />
+        <LogoText width={188} height={45} style={{ alignSelf: 'center' }} />
       </View>
 
       {/* Content */}
