@@ -226,25 +226,25 @@ const ContinueRegisterScreen = () => {
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={address_1}
-          placeholder={t('auth.address_1')}
+          placeholder={t('auth.address')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={text => setAddress1(text)} />
 
         {/* Address 2  */}
-        <TextInput
+        {/* <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={address_2}
           placeholder={t('auth.address_2')}
           placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setAddress2(text)} />
+          onChangeText={text => setAddress2(text)} /> */}
 
         {/* P.O. box */}
-        <TextInput
+        {/* <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={p_o_box}
           placeholder={t('auth.p_o_box')}
           placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setPOBox(text)} />
+          onChangeText={text => setPOBox(text)} /> */}
 
         {/* Password */}
         <TextInput
@@ -263,7 +263,7 @@ const ContinueRegisterScreen = () => {
           onChangeText={text => setConfirmPassword(text)} secureTextEntry />
 
         {/* Submit */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { endRegister(endRegisterInfo.id, firstname, null, surname, gender, birthdate, city, address_1, address_2, p_o_box, null, null, null, password, confirm_password, country.id, null, null); }}>
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={() => { endRegister(endRegisterInfo.id, firstname, null, surname, gender, birthdate, city, address_1, null, null, null, null, null, password, confirm_password, country.id, null, null); }}>
           <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('register')}</Text>
         </Button>
 

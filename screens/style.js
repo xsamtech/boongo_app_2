@@ -243,7 +243,8 @@ const homeStyles = StyleSheet.create({
     },
 
     onboardSlideText: {
-        fontSize: 13,
+        fontSize: 16.5,
+        fontWeight: '300',
         letterSpacing: 0.3,
         textAlign: 'center',
         marginTop: PADDING.p05

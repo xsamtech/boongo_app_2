@@ -84,7 +84,7 @@
     "search_filter_description": "Avec le bouton vert, vous pouvez filtrer vos résultats.",
     "search_filter_type": "Sélectionner un type:",
     "search_filter_categories": "Sélectionner des catégories:",
-    "search_filter_apply": "Appliquer les filtres :",
+    "search_filter_apply": "Appliquer les filtres",
     "reading": "Lecture",
     "summary": "Résumés",
     "show": "Afficher",
@@ -231,6 +231,7 @@
             "title": "Choisir un pays",
             "label": "Pays"
         },
+        "address": "Adresse",
         "address_1": "Adresse 1",
         "address_2": "Adresse 2 (Facultative)",
         "p_o_box": "Boite Postale",

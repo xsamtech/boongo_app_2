@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, ToastAndroid } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { Button, Divider } from 'react-native-paper';
@@ -54,7 +54,7 @@ const RegisterScreen = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all' })
+    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all?fields=cca2,idd,flags,name' })
       .then((res) => {
         // On garde une trace des codes téléphoniques uniques
         const phoneCodes = new Set();
@@ -73,6 +73,7 @@ const RegisterScreen = () => {
           return {
             value: phoneCodeData, // Le code téléphonique est unique
             label: `${country.cca2} (${phoneCodeData})`, // Affichage "CD (+243)"
+            flag: country.flags.png
           };
         }).filter(item => item !== null); // Filtrer les éléments nulls
 
@@ -145,7 +146,7 @@ const RegisterScreen = () => {
               presentationStyle: 'fullScreen', // optional
               animationType: 'slide',
             }}
-            modalContentContainerStyle={{ 
+            modalContentContainerStyle={{
               backgroundColor: COLORS.white,
               borderTopWidth: 0,
               borderBottomWidth: 1,
@@ -158,7 +159,7 @@ const RegisterScreen = () => {
             placeholderStyle={{ color: COLORS.black }}
             placeholder={t('auth.phone_code.label')}
             arrowIconStyle={{ tintColor: COLORS.black }}
-            containerStyle={{ width: '43%', height: 50 }}
+            containerStyle={{ width: '50%', height: 50 }}
             style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
             listMode='MODAL'
             open={open}
@@ -166,11 +167,24 @@ const RegisterScreen = () => {
             items={countriesData}
             setOpen={setOpen}
             setValue={setPhoneCode}
-            onChangeItem={handleCountryChange} />
+            onChangeItem={handleCountryChange}
+            renderListItem={({ item }) => {
+              return (
+                <TouchableOpacity onPress={() => { handleCountryChange(item); setOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                  {item.flag ? (
+                    <Image source={{ uri: item.flag }} style={{ width: 20, height: 15, marginRight: 10 }} />
+                  ) : null}
+                  <Text style={{ color: COLORS.black }}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
 
           {/* Phone number */}
           <TextInput
-            style={[homeStyles.authInput, { color: COLORS.black, width: '57%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
+            style={[homeStyles.authInput, { color: COLORS.black, width: '50%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
             keyboardType='phone-pad'
             value={phone}
             placeholder={t('auth.phone')}
@@ -179,7 +193,7 @@ const RegisterScreen = () => {
         </View>
 
         {/* Submit / Cancel */}
-        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} 
+        <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}
           onPress={() => {
             startRegister(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
 

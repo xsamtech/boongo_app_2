@@ -55,11 +55,12 @@ export const PADDING = {
 };
 
 export const API = {
-    url: 'http://51.21.134.27/api'
+    // url: 'http://boongo.cd/api'
+    url: 'http://192.168.250.238/boongo/public/api'
 };
 
 export const WEB = {
-    url: 'http://51.21.134.27/'
+    url: 'https://boongo.cd/'
 };
 
 export const PHONE = {

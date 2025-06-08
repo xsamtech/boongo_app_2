@@ -201,7 +201,7 @@ const SearchScreen = () => {
             ))}
 
             {/* Bouton pour appliquer les filtres */}
-            <Button mode="contained" onPress={applyFilters} style={{ marginTop: PADDING.p01 }}>{t('search_filter_apply')}</Button>
+            <Button mode="contained" onPress={applyFilters} style={{ marginTop: PADDING.p01, marginBottom: PADDING.p10 }}>{t('search_filter_apply')}</Button>
           </ScrollView>
         </Modal>
       </Portal>

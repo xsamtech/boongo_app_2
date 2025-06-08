@@ -187,8 +187,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a work */}
             <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>
-                {/* <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); }}> */}
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
                     </View>
@@ -198,8 +197,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a school */}
             <Animated.View style={[styles.contentContainer, secondIcon, secondWidthStyle, { backgroundColor: COLORS.warning }]}>
-                {/* <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); }}> */}
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
                     </View>
@@ -209,8 +207,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a government */}
             <Animated.View style={[styles.contentContainer, firstIcon, firstWidthStyle, { backgroundColor: COLORS.danger }]}>
-                {/* <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddGovernment'); }}> */}
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddGovernment'); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='city-variant' size={IMAGE_SIZE.s06} color='white' />
                     </View>

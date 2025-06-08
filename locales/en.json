@@ -84,7 +84,7 @@
     "search_filter_description": "With the green button you can filter your results.",
     "search_filter_type": "Select a type:",
     "search_filter_categories": "Select categories:",
-    "search_filter_apply": "Apply filters:",
+    "search_filter_apply": "Apply filters",
     "reading": "Reading",
     "summary": "Summary",
     "show": "Show",
@@ -231,6 +231,7 @@
             "title": "Choose a country",
             "label": "Country"
         },
+        "address": "Address",
         "address_1": "Address 1",
         "address_2": "Address 2 (Optional)",
         "p_o_box": "P.O. Box",
