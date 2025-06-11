@@ -3,14 +3,14 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, Animated, Dimensions, SafeAreaView, ToastAndroid } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { View, Text, TouchableOpacity, RefreshControl, Animated, Dimensions, SafeAreaView, ToastAndroid, TextInput } from 'react-native';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
 import useColors from '../../hooks/useColors';
 import { useTranslation } from 'react-i18next';
 import HeaderComponent from '../header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import FloatingActionsButton from '../../components/floating_actions_button';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import { AuthContext } from '../../contexts/AuthContext';
 import axios from 'axios';
 import homeStyles from '../style';
@@ -29,6 +29,7 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get data ===============
   const [addressees, setAddressees] = useState([]);
+  const [inputValue, setInputValue] = useState('');
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -37,8 +38,50 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
+  // Fetch data from API
+  const fetchSearchData = async (searchTerm) => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+
+    const params = {
+      data: searchTerm,
+      'categories_ids[0]': 2,
+      'categories_ids[1]': 4,
+      'categories_ids[2]': 5,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API.url}/user/search`,
+        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
+        {
+          headers: {
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+            'X-user-id': userInfo.id,
+            'Content-Type': 'application/x-www-form-urlencoded', // consistent
+          },
+        }
+      );
+
+      setAddressees(response.data.data);
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const scrollToTop = () => {
     flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
+
+  // Handle search event
+  const handleSearch = (text) => {
+    setInputValue(text);
+    fetchSearchData(text);
   };
 
   const fetchAddressees = async (pageToFetch = 1) => {
@@ -46,16 +89,15 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
 
     setIsLoading(true);
 
-    const url = `${API.url}/user/find_by_role/Membre`;
+    const url = `${API.url}/user/find_by_role/Membre?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
-      'Authorization': `Bearer ${userInfo.api_token}`
+      'Authorization': `Bearer ${userInfo.api_token}`,
+      'X-user-id': `${userInfo.id}`
     };
 
     try {
       const response = await axios.get(url, { headers: mHeaders });
-
-      console.log(response);
 
       if (pageToFetch === 1) {
         setAddressees(response.data.data);
@@ -63,8 +105,6 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
       } else {
         setAddressees(prev => [...prev, ...response.data.data]);
       }
-
-      console.log(response);
 
       setAd(response.data.ad);
       setLastPage(response.data.lastPage);
@@ -80,16 +120,6 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
     }
   };
 
-  useEffect(() => {
-    fetchAddressees(1); // Initial loading
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchAddressees(page);
-    }
-  }, [page]);
-
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
@@ -99,7 +129,9 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
 
   const onEndReached = () => {
     if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
+      const nextPage = page + 1;
+
+      setPage(nextPage); // Update the page
     }
   };
 
@@ -109,145 +141,19 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
-        </TouchableOpacity>
-      )}
-      <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
-          <Animated.FlatList
-            ref={flatListRef}
-            data={combinedData}
-            keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
-            renderItem={({ item }) => (
-              <EntityItemComponent item={item} entity='user' entity_id={item.id} />
-            )}
-            showsVerticalScrollIndicator={false}
-            onScroll={handleScroll}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.1}
-            scrollEventThrottle={16}
-            contentContainerStyle={homeStyles.scrollableList}
-            windowSize={10}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                progressViewOffset={105}
-              />
-            }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
-            ListEmptyComponent={
-              <EmptyListComponent
-                iconName='wechat'
-                title={t('empty_list.title')}
-                description={t('empty_list.description_chat_user')}
-              />
-            }
-            ListFooterComponent={() =>
-              isLoading ? (
-                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
-              ) : null
-            }
-          />
-        </View>
-      </SafeAreaView>
-    </View>
-  );
-};
-
-const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
-  // =============== Colors ===============
-  const COLORS = useColors();
-  // =============== Language ===============
-  const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
-  // =============== Get contexts ===============
-  const { userInfo } = useContext(AuthContext);
-  // =============== Get data ===============
-  const [organizations, setOrganizations] = useState([]);
-  const [ad, setAd] = useState(null);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [count, setCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const flatListRef = listRef || useRef(null);
-
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-  };
-
-  const fetchOrganizations = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
-
-    setIsLoading(true);
-
-    const qs = require('qs');
-    // const url = `${API.url}/user/member_groups/organization/${userInfo.id}/15`;
-    const url = `${API.url}/organization`;
-    const mHeaders = {
-      'X-localization': 'fr',
-      'Authorization': `Bearer ${userInfo.api_token}`
-    };
-
-    try {
-      const response = await axios.get(url, { headers: mHeaders });
-
-      if (pageToFetch === 1) {
-        setOrganizations(response.data.data);
-
-      } else {
-        setOrganizations(prev => [...prev, ...response.data.data]);
-      }
-
-      setAd(response.data.ad);
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchOrganizations(1); // Initial loading
+    console.log(`Page ${page} chargée`);
+
+    fetchAddressees(1); // Initial loading
   }, []);
 
   useEffect(() => {
+    console.log(`Page ${page} chargée`);
+
     if (page > 1) {
-      fetchOrganizations(page);
+      fetchAddressees(page);
     }
   }, [page]);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setPage(1);
-    await fetchOrganizations(1);
-    setRefreshing(false);
-  };
-
-  const onEndReached = () => {
-    if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
-    }
-  };
-
-  const combinedData = [...organizations];
-
-  if (ad) {
-    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
@@ -258,34 +164,50 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
       )}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Search bar */}
+          <View style={[homeStyles.searchContainer, { marginTop: 48, backgroundColor: COLORS.white }]}>
+            <View style={homeStyles.searchInput}>
+              <TextInput placeholder={t('search')} placeholderTextColor={COLORS.black} onChangeText={handleSearch} style={[homeStyles.searchInputText, { color: COLORS.black, borderColor: COLORS.dark_secondary, marginHorizontal: 0 }]} />
+              <TouchableOpacity style={[homeStyles.searchInputSubmit, { borderColor: COLORS.dark_secondary }]} onPress={() => fetchSearchData(inputValue)}>
+                <FontAwesome6 name='magnifying-glass' size={IMAGE_SIZE.s04} color={COLORS.black} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Users List */}
           <Animated.FlatList
             ref={flatListRef}
             data={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
             renderItem={({ item }) => (
-              <EntityItemComponent item={item} entity='organization' entity_id={item.id} />
+              <EntityItemComponent
+                item={item}
+                entity='user'
+                entity_id={item.id}
+                entity_name={`${item.firstname} ${item.lastname}`}
+                entity_profile={item.avatar_url} />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
-            contentContainerStyle={homeStyles.scrollableList}
+            contentContainerStyle={{ paddingTop: 0 }}
             windowSize={10}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                progressViewOffset={105}
+                progressViewOffset={-30}
               />
             }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
             ListEmptyComponent={
               <EmptyListComponent
-                iconName='wechat'
+                iconName='account-outline'
                 title={t('empty_list.title')}
-                description={t('empty_list.description_chat_organization')}
+                description={t('empty_list.description_chat_user')}
               />
             }
             ListFooterComponent={() =>
@@ -402,29 +324,230 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
             data={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
             renderItem={({ item }) => (
-              <EntityItemComponent item={item} entity='circle' entity_id={item.id} />
+              <EntityItemComponent
+                item={item}
+                entity='circle'
+                entity_id={item.id}
+                entity_name={item.circle_name}
+                entity_profile={item.profile_url} />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
-            contentContainerStyle={homeStyles.scrollableList}
+            contentContainerStyle={{ paddingTop: 0 }}
             windowSize={10}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                progressViewOffset={105}
+                progressViewOffset={-30}
               />
             }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
             ListEmptyComponent={
               <EmptyListComponent
-                iconName='wechat'
+                iconName='account-group-outline'
                 title={t('empty_list.title')}
                 description={t('empty_list.description_chat_circle')}
+              />
+            }
+            ListFooterComponent={() =>
+              isLoading ? (
+                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
+              ) : null
+            }
+          />
+        </View>
+      </SafeAreaView>
+    </View>
+  );
+};
+
+const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
+  // =============== Colors ===============
+  const COLORS = useColors();
+  // =============== Language ===============
+  const { t } = useTranslation();
+  // =============== Navigation ===============
+  const navigation = useNavigation();
+  // =============== Get contexts ===============
+  const { userInfo } = useContext(AuthContext);
+  // =============== Get data ===============
+  const [organizations, setOrganizations] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const flatListRef = listRef || useRef(null);
+
+  // Fetch data from API
+  const fetchSearchData = async (searchTerm) => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+
+    const params = {
+      data: searchTerm,
+      status_id: 7,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API.url}/organization/search`,
+        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
+        {
+          headers: {
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+            'X-user-id': userInfo.id,
+            'Content-Type': 'application/x-www-form-urlencoded', // consistent
+          },
+        }
+      );
+
+      setOrganizations(response.data.data);
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
+
+  // Handle search event
+  const handleSearch = (text) => {
+    setInputValue(text);
+    fetchSearchData(text);
+  };
+
+  const fetchOrganizations = async (pageToFetch = 1) => {
+    if (isLoading || pageToFetch > lastPage) return;
+
+    setIsLoading(true);
+
+    const qs = require('qs');
+    const url = `${API.url}/user/member_groups/organization/${userInfo.id}/15`;
+    const mHeaders = {
+      'X-localization': 'fr',
+      'Authorization': `Bearer ${userInfo.api_token}`
+    };
+
+    try {
+      const response = await axios.get(url, { headers: mHeaders });
+
+      if (pageToFetch === 1) {
+        setOrganizations(response.data.data);
+
+      } else {
+        setOrganizations(prev => [...prev, ...response.data.data]);
+      }
+
+      setAd(response.data.ad);
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrganizations(1); // Initial loading
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchOrganizations(page);
+    }
+  }, [page]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    await fetchOrganizations(1);
+    setRefreshing(false);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      setPage(prev => prev + 1);
+    }
+  };
+
+  const combinedData = [...organizations];
+
+  if (ad) {
+    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+      {showBackToTop && (
+        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+        </TouchableOpacity>
+      )}
+      <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Search bar */}
+          <View style={[homeStyles.searchContainer, { marginTop: 48, backgroundColor: COLORS.white }]}>
+            <View style={homeStyles.searchInput}>
+              <TextInput placeholder={t('search')} placeholderTextColor={COLORS.black} onChangeText={handleSearch} style={[homeStyles.searchInputText, { color: COLORS.black, borderColor: COLORS.dark_secondary, marginHorizontal: 0 }]} />
+              <TouchableOpacity style={[homeStyles.searchInputSubmit, { borderColor: COLORS.dark_secondary }]} onPress={() => fetchSearchData(inputValue)}>
+                <FontAwesome6 name='magnifying-glass' size={IMAGE_SIZE.s04} color={COLORS.black} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Organizations List */}
+          <Animated.FlatList
+            ref={flatListRef}
+            data={combinedData}
+            keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
+            renderItem={({ item }) => (
+              <EntityItemComponent
+                item={item}
+                entity='organization'
+                entity_id={item.id}
+                entity_name={item.org_name}
+                entity_profile={item.cover_url} />
+            )}
+            showsVerticalScrollIndicator={false}
+            onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingTop: 0 }}
+            windowSize={10}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                progressViewOffset={-30}
+              />
+            }
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
+            ListEmptyComponent={
+              <EmptyListComponent
+                iconName='bank-outline'
+                title={t('empty_list.title')}
+                description={t('empty_list.description_chat_organization')}
               />
             }
             ListFooterComponent={() =>
@@ -541,27 +664,32 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
             data={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
             renderItem={({ item }) => (
-              <EntityItemComponent item={item} entity='event' entity_id={item.id} />
+              <EntityItemComponent
+                item={item}
+                entity='event'
+                entity_id={item.id}
+                entity_name={item.event_title}
+                entity_profile={item.cover_url} />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
-            contentContainerStyle={homeStyles.scrollableList}
+            contentContainerStyle={{ paddingTop: 0 }}
             windowSize={10}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                progressViewOffset={105}
+                progressViewOffset={-30}
               />
             }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
             ListEmptyComponent={
               <EmptyListComponent
-                iconName='wechat'
+                iconName='calendar-outline'
                 title={t('empty_list.title')}
                 description={t('empty_list.description_chat_event')}
               />
@@ -595,18 +723,11 @@ const ChatEntityScreen = () => {
     events: false,
   });
 
-  const scrollY = useRef(new Animated.Value(0)).current;
   const savedScrollOffsets = useRef({
     members: 0,
     organizations: 0,
     circles: 0,
     events: 0,
-  });
-
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [0, -60],
-    extrapolate: 'clamp',
   });
 
   const [routes] = useState([
@@ -631,35 +752,23 @@ const ChatEntityScreen = () => {
     }
   };
 
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      useNativeDriver: true,
-      listener: (event) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        const currentTab = ['members', 'circles', 'organizations', 'events'][index];
+  const handleScroll = (event) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const currentTab = ['members', 'circles', 'organizations', 'events'][index];
 
-        savedScrollOffsets.current[currentTab] = offsetY;
-        const isAtTop = offsetY <= 0;
+    savedScrollOffsets.current[currentTab] = offsetY;
+    const isAtTop = offsetY <= 0;
 
-        setShowBackToTopByTab((prev) => ({
-          ...prev,
-          [currentTab]: !isAtTop,
-        }));
-      },
-    }
-  );
+    setShowBackToTopByTab((prev) => ({
+      ...prev,
+      [currentTab]: !isAtTop,
+    }));
+  };
 
   const handleIndexChange = (newIndex) => {
     const tabKeys = ['members', 'circles', 'organizations', 'events'];
     const newTabKey = tabKeys[newIndex];
     const offset = savedScrollOffsets.current[newTabKey] || 0;
-
-    Animated.timing(scrollY, {
-      toValue: offset,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
 
     const refMap = {
       members: membersListRef,
@@ -676,7 +785,7 @@ const ChatEntityScreen = () => {
 
   const renderTabBar = (props) => (
     <>
-      <Animated.View style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
+      <View style={{ zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white }}>
         <HeaderComponent />
         <TabBar
           {...props}
@@ -688,7 +797,7 @@ const ChatEntityScreen = () => {
           activeColor={COLORS.black}
           inactiveColor={COLORS.dark_secondary}
         />
-      </Animated.View>
+      </View>
     </>
   );
 

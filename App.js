@@ -218,7 +218,7 @@ const HomeStackNav = () => {
           headerLeft: () => {
             return (
               <>
-                <TouchableOpacity onPress={() => navigation.navigate('Home', { screen: 'HomeStack' })}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
                   <Icon name='arrow-left' color={COLORS.black} style={{ fontSize: 24 }} />
                 </TouchableOpacity>
                 <Logo width={41} height={41} style={{ marginHorizontal: PADDING.p01 }} />

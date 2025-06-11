@@ -177,7 +177,7 @@ const FloatingActionsButton = () => {
         <View style={styles.container}>
             {/* New message */}
             <Animated.View style={[styles.contentContainer, fourthIcon, fourthWidthStyle, { backgroundColor: COLORS.primary }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('Chats'); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('Chats'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='chat-plus' size={IMAGE_SIZE.s06} color='white' />
                     </View>
@@ -187,7 +187,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a work */}
             <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
                     </View>
@@ -197,7 +197,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a school */}
             <Animated.View style={[styles.contentContainer, secondIcon, secondWidthStyle, { backgroundColor: COLORS.warning }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
                     </View>
@@ -207,7 +207,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a government */}
             <Animated.View style={[styles.contentContainer, firstIcon, firstWidthStyle, { backgroundColor: COLORS.danger }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddGovernment'); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddGovernment'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='city-variant' size={IMAGE_SIZE.s06} color='white' />
                     </View>

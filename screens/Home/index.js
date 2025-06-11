@@ -310,16 +310,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View
-          style={[
-            homeStyles.cardEmpty,
-            {
-              height: Dimensions.get('window').height,
-              marginLeft: 0,
-              paddingHorizontal: 2,
-            },
-          ]}
-        >
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
           {/* Categories */}
           <FlatList
             data={categories}
@@ -348,11 +339,11 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
             onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
             windowSize={10}
-            refreshControl={ <RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} /> }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
             contentInset={{ top: 105 }}
             contentOffset={{ y: -105 }}
-            ListEmptyComponent={ <EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} /> }
-            ListFooterComponent={() => isLoading ? ( <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null }
+            ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
+            ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
           />
         </View>
       </SafeAreaView>

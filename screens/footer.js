@@ -6,7 +6,6 @@ import React, { useContext } from 'react';
 import { Linking, Switch, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { PADDING } from '../tools/constants';
-import { AuthContext } from '../contexts/AuthContext';
 import ThemeContext from '../contexts/ThemeContext';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
@@ -26,7 +25,6 @@ const FooterComponent = ({color}) => {
   };
 
   // =============== Get data ===============
-  const { userInfo } = useContext(AuthContext);
   const d = new Date();
   let year = d.getFullYear();
 

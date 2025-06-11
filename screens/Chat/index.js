@@ -3,10 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useEffect, useState, useRef, useContext } from 'react';
-import {
-  View, Text, SafeAreaView, RefreshControl, Animated, FlatList,
-  TouchableOpacity, Dimensions
-} from 'react-native';
+import { View, Text, SafeAreaView, RefreshControl, Animated, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -19,10 +16,13 @@ import EmptyListComponent from '../../components/empty_list';
 import HeaderComponent from '../header';
 
 const ChatsScreen = () => {
+  // =============== Colors ===============
   const COLORS = useColors();
-  const { userInfo } = useContext(AuthContext);
+  // =============== Navigation ===============
   const navigation = useNavigation();
-  const flatListRef = useRef(null);
+  // =============== Get contexts ===============
+  const { userInfo } = useContext(AuthContext);
+  // =============== Get data ===============
   const [discussions, setDiscussions] = useState([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -30,42 +30,53 @@ const ChatsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [ad, setAd] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const flatListRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const fetchDiscussions = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
+
     setIsLoading(true);
+
     try {
-      const response = await axios.get(`${API.url}/message/chat_with_user/fr/Discussion/${userInfo.id}`, {
-        headers: {
-          'X-localization': 'fr',
-          Authorization: `Bearer ${userInfo.api_token}`
-        },
-        params: { page: pageToFetch }
+      const response = await axios.get(`${API.url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
+        headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` }, params: { page: pageToFetch }
       });
 
       const data = response.data.data || [];
+
       if (pageToFetch === 1) {
         setDiscussions(data);
+
       } else {
         setDiscussions(prev => [...prev, ...data]);
       }
+
       setLastPage(response.data.lastPage || 1);
       setAd(response.data.ad || null);
+
     } catch (error) {
       console.error(error);
+
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => { fetchDiscussions(1); }, []);
-  useEffect(() => { if (page > 1) fetchDiscussions(page); }, [page]);
+  useEffect(() => {
+    fetchDiscussions(1);
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) fetchDiscussions(page);
+  }, [page]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
+
     await fetchDiscussions(1);
+
     setRefreshing(false);
   };
 
@@ -76,6 +87,7 @@ const ChatsScreen = () => {
   const scrollToTop = () => flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
 
   const combinedData = [...discussions];
+
   if (ad) combinedData.push({ ...ad, id: 'ad', realId: ad.id });
 
   const handleScroll = Animated.event(
@@ -91,7 +103,7 @@ const ChatsScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {/* <HeaderComponent /> */}
+      <HeaderComponent />
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
@@ -124,7 +136,7 @@ const ChatsScreen = () => {
           contentOffset={{ y: -105 }}
           ListEmptyComponent={
             <EmptyListComponent
-              iconName='message-outline'
+              iconName='wechat'
               title="Aucune discussion"
               description="Vous n’avez encore discuté avec personne."
             />

@@ -80,13 +80,13 @@ const SearchScreen = () => {
     try {
       const response = await axios.post(
         `${API.url}/work/search`,
-        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 clé ici
+        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
         {
           headers: {
             'X-localization': 'fr',
             'Authorization': `Bearer ${userInfo.api_token}`,
             'X-user-id': userInfo.id,
-            'Content-Type': 'application/x-www-form-urlencoded', // cohérent
+            'Content-Type': 'application/x-www-form-urlencoded', // consistent
           },
         }
       );
