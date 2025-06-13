@@ -29,11 +29,11 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get data ===============
   const [addressees, setAddressees] = useState([]);
-  const [inputValue, setInputValue] = useState('');
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
@@ -72,10 +72,6 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
 
   // Handle search event
@@ -120,6 +116,10 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
     }
   };
 
+  const scrollToTop = () => {
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
@@ -142,14 +142,10 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
   }
 
   useEffect(() => {
-    console.log(`Page ${page} chargée`);
-
     fetchAddressees(1); // Initial loading
   }, []);
 
   useEffect(() => {
-    console.log(`Page ${page} chargée`);
-
     if (page > 1) {
       fetchAddressees(page);
     }
@@ -237,12 +233,51 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  // Fetch data from API
+  const fetchSearchData = async (searchTerm) => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+
+    const params = {
+      data: searchTerm,
+      'categories_ids[0]': 2,
+      'categories_ids[1]': 4,
+      'categories_ids[2]': 5,
+    };
+
+    try {
+      const response = await axios.post(
+        `${API.url}/user/search`,
+        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
+        {
+          headers: {
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+            'X-user-id': userInfo.id,
+            'Content-Type': 'application/x-www-form-urlencoded', // consistent
+          },
+        }
+      );
+
+      setAddressees(response.data.data);
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle search event
+  const handleSearch = (text) => {
+    setInputValue(text);
+    fetchSearchData(text);
   };
 
   const fetchCircles = async (pageToFetch = 1) => {
@@ -251,7 +286,7 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.url}/user/member_groups/circle/${userInfo.id}/15`;
+    const url = `${API.url}/user/member_groups/circle/${userInfo.id}/15?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -281,15 +316,9 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
     }
   };
 
-  useEffect(() => {
-    fetchCircles(1); // Initial loading
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchCircles(page);
-    }
-  }, [page]);
+  const scrollToTop = () => {
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -300,7 +329,9 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
 
   const onEndReached = () => {
     if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
+      const nextPage = page + 1;
+
+      setPage(nextPage); // Update the page
     }
   };
 
@@ -310,15 +341,40 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
   }
 
+  useEffect(() => {
+    fetchCircles(1); // Initial loading
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchCircles(page);
+    }
+  }, [page]);
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]}>
+        <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      </TouchableOpacity>
+
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Search bar */}
+          <View style={[homeStyles.searchContainer, { marginTop: 48, backgroundColor: COLORS.white }]}>
+            <View style={homeStyles.searchInput}>
+              <TextInput placeholder={t('search')} placeholderTextColor={COLORS.black} onChangeText={handleSearch} style={[homeStyles.searchInputText, { color: COLORS.black, borderColor: COLORS.dark_secondary, marginHorizontal: 0 }]} />
+              <TouchableOpacity style={[homeStyles.searchInputSubmit, { borderColor: COLORS.dark_secondary }]} onPress={() => fetchSearchData(inputValue)}>
+                <FontAwesome6 name='magnifying-glass' size={IMAGE_SIZE.s04} color={COLORS.black} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Circles List */}
           <Animated.FlatList
             ref={flatListRef}
             data={combinedData}
@@ -377,11 +433,11 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get data ===============
   const [organizations, setOrganizations] = useState([]);
-  const [inputValue, setInputValue] = useState('');
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [count, setCount] = useState(0);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
@@ -418,10 +474,6 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
 
   // Handle search event
@@ -466,15 +518,9 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
     }
   };
 
-  useEffect(() => {
-    fetchOrganizations(1); // Initial loading
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchOrganizations(page);
-    }
-  }, [page]);
+  const scrollToTop = () => {
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -485,7 +531,9 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
 
   const onEndReached = () => {
     if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
+      const nextPage = page + 1;
+
+      setPage(nextPage); // Update the page
     }
   };
 
@@ -494,6 +542,16 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
   if (ad) {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
   }
+
+  useEffect(() => {
+    fetchOrganizations(1); // Initial loading
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchOrganizations(page);
+    }
+  }, [page]);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
@@ -581,10 +639,6 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-  };
-
   const fetchEvents = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
 
@@ -621,15 +675,9 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
     }
   };
 
-  useEffect(() => {
-    fetchEvents(1); // Initial loading
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchEvents(page);
-    }
-  }, [page]);
+  const scrollToTop = () => {
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -640,7 +688,9 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
 
   const onEndReached = () => {
     if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
+      const nextPage = page + 1;
+
+      setPage(nextPage); // Update the page
     }
   };
 
@@ -649,6 +699,16 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
   if (ad) {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
   }
+
+  useEffect(() => {
+    fetchEvents(1); // Initial loading
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchEvents(page);
+    }
+  }, [page]);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
