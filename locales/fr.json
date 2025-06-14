@@ -47,7 +47,8 @@
         "no_server_response": "Aucune réponse reçue du serveur.",
         "missing_parameters": "Il y a des paramètres qui manquent.",
         "word_not_found": "Mot non trouvé",
-        "cannot_be_empty": "Ceci ne peut pas être vide."
+        "cannot_be_empty": "Ceci ne peut pas être vide.",
+        "cannot_switch_like": "Impossible de mettre à jour votre like. Essayez à nouveau."
     },
     "empty_list": {
         "title": "La liste est vide",

@@ -47,7 +47,8 @@
         "no_server_response": "Eyano moko te ezwami uta na serveur.",
         "missing_parameters": "Ba paramètres misusu ez’ozanga.",
         "word_not_found": "Oyo oluki emonani te",
-        "cannot_be_empty": "Oyo ekoki kozala mpamba te."
+        "cannot_be_empty": "Oyo ekoki kozala mpamba te.",
+        "cannot_switch_like": "Incapable ya ko bongola like na yo. Meká lisusu."
     },
     "empty_list": {
         "title": "Liste ezali pamba",

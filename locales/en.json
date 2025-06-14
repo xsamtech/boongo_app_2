@@ -47,7 +47,8 @@
         "no_server_response": "No response received from the server.",
         "missing_parameters": "There are missing parameters.",
         "word_not_found": "Word not found",
-        "cannot_be_empty": "This cannot be empty."
+        "cannot_be_empty": "This cannot be empty.",
+        "cannot_switch_like": "Unable to update your like. Try again."
     },
     "empty_list": {
         "title": "The list is empty",
