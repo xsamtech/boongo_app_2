@@ -31,6 +31,7 @@
     },
     "chat": {
         "new": "Banda masolo",
+        "write": "Komá message ...",
         "circle": {
             "create": "Kela lisanga",
             "description": "Ba lisanga ya masolo esungaka yo o solola na ba membres ebele na mbala moko."
@@ -48,7 +49,12 @@
         "missing_parameters": "Ba paramètres misusu ez’ozanga.",
         "word_not_found": "Oyo oluki emonani te",
         "cannot_be_empty": "Oyo ekoki kozala mpamba te.",
-        "cannot_switch_like": "Incapable ya ko bongola like na yo. Meká lisusu."
+        "cannot_switch_like": "Incapable ya ko bongola like na yo. Meká lisusu.",
+        "report_reason_empty": "Poná tina moko !",
+        "no_addressee_selected": "Oponi mutu ya kotindela te !"
+    },
+    "success_message": {
+        "message_reported": "Message efundami malamu !"
     },
     "empty_list": {
         "title": "Liste ezali pamba",
@@ -94,12 +100,20 @@
     "all_f": "Nyonso",
     "see_all": "Tala nionso",
     "see_details": "Tala makambo na mikemike",
-    "expand": "Kokomisa mingi",
-    "cut": "Kokata",
+    "expand": "Komisa mingi",
+    "cut": "Kata",
+    "report": "Funda",
+    "select_report_reason": "Pona tina yako funda",
+    "explanation_optional": "Explication (Facultatif)",
+    "delete": {
+        "just": "Longola",
+        "for_me": "Longola pona nga",
+        "for_everybody": "Longola pona batu nionso"
+    },
     "confirm": "Ndimisa",
     "save": "Bomba",
     "send": "Tinda",
-    "cancel": "Longola",
+    "cancel": "Tika",
     "update": "Bongola",
     "change": "Bongola",
     "start": "Banda",

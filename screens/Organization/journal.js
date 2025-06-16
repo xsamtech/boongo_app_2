@@ -81,7 +81,7 @@ const JournalScreen = () => {
   const getCategories = () => {
     setIsLoading(true);
 
-    const config = { method: 'GET', url: `${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`, headers: { 'X-localization': 'fr' } };
+    const config = { method: 'GET', url: `${API.boongo_url}/category/find_by_group/Catégorie%20pour%20œuvre`, headers: { 'X-localization': 'fr' } };
     const item_all = { "id": 0, "category_name": t('all_f'), "category_name_fr": "Toutes", "category_name_en": "All", "category_description": null };
 
     axios(config)
@@ -104,7 +104,7 @@ const JournalScreen = () => {
     setIsLoading(true);
 
     let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories_type_status/fr/Article/Pertinente`;
+    const url = `${API.boongo_url}/work/filter_by_categories_type_status/fr/Article/Pertinente`;
     let mParams = { 'categories_ids[0]': idCat }
     const mHeaders = {
       'X-localization': 'fr'
@@ -139,7 +139,7 @@ const JournalScreen = () => {
     setIsLoading(true);
 
     let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories_type_status/fr/Article/Pertinente`;
+    const url = `${API.boongo_url}/work/filter_by_categories_type_status/fr/Article/Pertinente`;
     let mParams = { 'categories_ids[0]': id }
     const mHeaders = {
       'X-localization': 'fr'
@@ -207,7 +207,7 @@ const JournalScreen = () => {
     return (
       <View style={[homeStyles.workTop, { marginBottom: 30 }]}>
         <View>
-          <Image source={{ uri: item.image_url ? item.image_url : `${WEB.url}/assets/img/cover.png` }} style={homeStyles.workImage} />
+          <Image source={{ uri: item.image_url ? item.image_url : `${WEB.boongo_url}/assets/img/cover.png` }} style={homeStyles.workImage} />
         </View>
         <View style={homeStyles.workDescTop}>
           <Text style={homeStyles.workTitle} numberOfLines={2}>{item.work_title}</Text>

@@ -77,7 +77,7 @@ const WorkDataScreen = ({ route, navigation }) => {
     NetworkInfo.getIPAddress().then(ip_address => {
       const config = {
         method: 'GET',
-        url: `${API.url}/work/${itemId}`,
+        url: `${API.boongo_url}/work/${itemId}`,
         headers: {
           'X-localization': 'fr',
           'X-user-id': userInfo.id ? userInfo.id : null,
@@ -111,7 +111,7 @@ const WorkDataScreen = ({ route, navigation }) => {
         <View style={homeStyles.workCard}>
           <View style={homeStyles.workTop}>
             <View>
-              <Image source={{ uri: work.image_url ? work.image_url : `${WEB.url}/assets/img/cover.png` }} style={homeStyles.workImage} />
+              <Image source={{ uri: work.image_url ? work.image_url : `${WEB.boongo_url}/assets/img/cover.png` }} style={homeStyles.workImage} />
             </View>
             <View style={homeStyles.workDescTop}>
               <Text style={homeStyles.workTitle}>{work.work_title}</Text>

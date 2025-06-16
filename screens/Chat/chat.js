@@ -54,7 +54,7 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
 
     try {
       const response = await axios.post(
-        `${API.url}/user/search`,
+        `${API.boongo_url}/user/search`,
         qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
         {
           headers: {
@@ -85,7 +85,7 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
 
     setIsLoading(true);
 
-    const url = `${API.url}/user/find_by_role/Membre?page=${pageToFetch}`;
+    const url = `${API.boongo_url}/user/find_by_role/Membre?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`,
@@ -254,7 +254,7 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
 
     try {
       const response = await axios.post(
-        `${API.url}/user/search`,
+        `${API.boongo_url}/user/search`,
         qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
         {
           headers: {
@@ -286,7 +286,7 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.url}/user/member_groups/circle/${userInfo.id}/15?page=${pageToFetch}`;
+    const url = `${API.boongo_url}/user/member_groups/circle/${userInfo.id}/15?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -456,7 +456,7 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
 
     try {
       const response = await axios.post(
-        `${API.url}/organization/search`,
+        `${API.boongo_url}/organization/search`,
         qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
         {
           headers: {
@@ -488,7 +488,7 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.url}/user/member_groups/organization/${userInfo.id}/15`;
+    const url = `${API.boongo_url}/user/member_groups/organization/${userInfo.id}/15`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -645,7 +645,7 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.url}/user/member_groups/event/${userInfo.id}/15`;
+    const url = `${API.boongo_url}/user/member_groups/event/${userInfo.id}/15`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`

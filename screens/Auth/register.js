@@ -37,7 +37,7 @@ const RegisterScreen = () => {
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-    axios({ method: 'GET', url: `${API.url}/role/search/Membre` })
+    axios({ method: 'GET', url: `${API.boongo_url}/role/search/Membre` })
       .then(function (res) {
         let roleData = res.data.data;
 

@@ -45,7 +45,7 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
 
     setIsLoading(true);
     const qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories`;
+    const url = `${API.boongo_url}/work/filter_by_categories`;
     const mParams = { type_id: 33, status_id: 17, page: pageToFetch };
     const mHeaders = {
       'X-localization': 'fr',
@@ -185,7 +185,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
     };
 
     try {
-      const res = await axios.get(`${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`, { headers });
+      const res = await axios.get(`${API.boongo_url}/category/find_by_group/Catégorie%20pour%20œuvre`, { headers });
       const data = res.data.data;
       const itemAll = { id: 0, category_name: t('all_f'), category_name_fr: "Toutes", category_name_en: "All", category_name_ln: "Nioso", category_description: null, };
 
@@ -208,7 +208,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories?page=${page}`;
+    const url = `${API.boongo_url}/work/filter_by_categories?page=${page}`;
     const params = {
       'categories_ids[0]': idCat,
       type_id: 29,

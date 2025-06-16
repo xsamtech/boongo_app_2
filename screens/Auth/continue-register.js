@@ -44,7 +44,7 @@ const ContinueRegisterScreen = () => {
   useEffect(() => {
     const config = {
       method: 'GET',
-      url: `${API.url}/country`,
+      url: `${API.boongo_url}/country`,
       headers: {
         'X-localization': 'fr'
       }

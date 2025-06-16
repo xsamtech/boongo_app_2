@@ -59,7 +59,7 @@ const SubscriptionScreen = ({ route }) => {
   }, []);
 
   const getSubscription = () => {
-    const config = { method: 'GET', url: `${API.url}/subscription`, headers: { 'X-localization': 'fr' } };
+    const config = { method: 'GET', url: `${API.boongo_url}/subscription`, headers: { 'X-localization': 'fr' } };
 
     axios(config)
       .then(res => {

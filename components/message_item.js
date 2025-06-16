@@ -2,7 +2,7 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Image, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,8 @@ import Video from 'react-native-video';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import useColors from '../hooks/useColors';
 import AudioPlayer from '../screens/audio_player';
+import homeStyles from '../screens/style';
+import { Button } from 'react-native-paper';
 
 const MessageItem = ({ item, isOwnMessage }) => {
     // =============== Colors ===============
@@ -26,6 +28,11 @@ const MessageItem = ({ item, isOwnMessage }) => {
     const { userInfo } = useContext(AuthContext);
     // =============== Get data ===============
     const [modalVisible, setModalVisible] = useState(false);
+    const [reportModalVisible, setReportModalVisible] = useState(false);
+    const [contextMenuVisible, setContextMenuVisible] = useState(false);
+    const [selectedReason, setSelectedReason] = useState(null);
+    const [explanation, setExplanation] = useState('');
+    const [reportReasons, setReportReasons] = useState([]);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [likes, setLikes] = useState(item.likes || []);
     const [hasLiked, setHasLiked] = useState(false);
@@ -44,6 +51,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
     const hasExternalDocuments = item.documents && item.documents.length > 0;
     const hasImagesOrVideos = (item.images && item.images.length > 0) || (item.videos && item.videos.length > 0);
     const hasAudio = item.audios && item.audios.length > 0;
+    const isToxic = item.user.toxic_contents && item.user.toxic_contents.some(toxic => toxic.for_message_id === item.id);
 
     // Rendering images and videos
     const renderImagesAndVideos = () => {
@@ -151,7 +159,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
 
         try {
             // Call the API to switch like status
-            const response = await fetch(`${API.url}/message/switch_like/${message_id}/${user_id}`, {
+            const response = await fetch(`${API.boongo_url}/message/switch_like/${message_id}/${user_id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${userInfo.api_token}`,
@@ -190,8 +198,8 @@ const MessageItem = ({ item, isOwnMessage }) => {
         );
     };
 
-    // Rendering of the Modal
-    const renderModal = () => {
+    // Rendering of the Modals
+    const renderMediaModal = () => { // Modal media
         if (selectedMedia) {
             return (
                 <Modal visible={modalVisible} transparent={true} onRequestClose={() => setModalVisible(false)}>
@@ -211,40 +219,178 @@ const MessageItem = ({ item, isOwnMessage }) => {
         return null;
     };
 
+    /*
+        Handle deleting/reporting
+     */
+    useEffect(() => {
+        if (reportModalVisible) {
+            // Load report reasons
+            axios.get(`${API.boongo_url}/report_reason/find_by_entity/message`)
+                .then(response => setReportReasons(response.data))
+                .catch(err => console.error('Error loading report reasons', err));
+        }
+    }, [reportModalVisible]);
+
+    // ACTION: Delete for myself
+    const handleDeleteForMyself = async () => {
+        try {
+            await axios.put(`${API.boongo_url}/message/delete_for_myself/${userInfo.id}/${item.id}`);
+        } catch (error) {
+            console.error('Message deleting error:', error);
+        }
+    };
+
+    // ACTION: Delete for everybody
+    const handleDeleteForEverybody = async () => {
+        try {
+            await axios.put(`${API.boongo_url}/message/delete_for_everybody/${item.id}`);
+        } catch (error) {
+            console.error('Message deleting error:', error);
+        }
+    };
+
+    // ACTION: Report message
+    const handleReportMessage = async () => {
+        if (!selectedReason) {
+            Alert.alert(t('error'), t('error_message.report_reason_empty'));
+
+            return;
+        }
+
+        try {
+            await axios.post(`${API.boongo_url}/toxic_content`, {
+                for_message_id: item.id,
+                explanation,
+                report_reason_id: selectedReason,
+                user_id: userInfo.id,
+            }, {
+                headers: {
+                    'X-localization': 'fr',
+                    'Authorization': `Bearer ${userInfo.api_token}`,
+                    'X-user-id': userInfo.id,
+                }
+            });
+
+            Alert.alert(t('success'), t('success_message.message_reported'));
+
+            setReportModalVisible(false);
+        } catch (error) {
+            console.error('Message reporting error:', error);
+        }
+    };
+
+    const renderContextMenu = () => (
+        <View style={{ position: 'absolute', top: 50, right: 10, backgroundColor: 'white', padding: PADDING.p01, borderRadius: PADDING.p01, elevation: 5 }}>
+            <Button style={homeStyles.authButton} onPress={handleDeleteForMyself}>
+                <Text style={[homeStyles.authButtonText, { color: COLORS.black, textAlign: 'left' }]}>{t('delete.for_me')}</Text>
+            </Button>
+            {isOwnMessage && (
+                <Button style={homeStyles.authButton} onPress={handleDeleteForEverybody}>
+                    <Text style={[homeStyles.authButtonText, { color: COLORS.black, textAlign: 'left' }]}>{t('delete.for_everybody')}</Text>
+                </Button>
+            )}
+            <Button style={homeStyles.authButton} title={t('report')} onPress={() => setReportModalVisible(true)} />
+        </View>
+    );
+
+    const renderReportModal = () => {
+        <Modal visible={reportModalVisible} transparent={true} animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+                <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
+                    {/* Title */}
+                    <Text style={[homeStyles.headingText, { color: COLORS.black }]}>{t('select_report_reason')}</Text>
+
+                    {/* Reasons list */}
+                    {reportReasons.map((reason) => (
+                        <Pressable key={reason.id} onPress={() => setSelectedReason(reason.id)}>
+                            <Text style={{ marginVertical: 5 }}>{reason.reason_content}</Text>
+                        </Pressable>
+                    ))}
+
+                    {/* Description for reason selection */}
+                    <TextInput
+                        style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                        value={explanation}
+                        placeholder={t('explanation_optional')}
+                        placeholderTextColor={COLORS.dark_secondary}
+                        onChangeText={text => setExplanation(text)} />
+
+                    {/* Send or Cancel */}
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Button style={[homeStyles.authButton, { width: '48%', color: COLORS.warning }]} title={t('send')} onPress={handleReportMessage} />
+                        <Button style={[homeStyles.authButton, { width: '48%', color: COLORS.light_secondary }]} title={t('cancel')} onPress={() => setReportModalVisible(false)} />
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    };
+
     return (
         <View style={{ flexDirection: 'row', alignSelf: (isOwnMessage ? 'flex-end' : 'flex-start'), marginVertical: 4 }}>
+            {/* Addressee image */}
             {!isOwnMessage && item.user.avatar_url && (
                 <Image source={{ uri: item.user.avatar_url }} style={{ width: PADDING.p15, height: PADDING.p15, borderRadius: PADDING.p15 / 2, marginRight: PADDING.p01, }} />
             )}
-            <View style={{ backgroundColor: (isOwnMessage ? COLORS.primary : COLORS.light_secondary), borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: 4, maxWidth: '80%', opacity: (isDocMessage ? 1 : 0.8), }}>
-                {/* 1) Displaying images/videos, external documents or audio player */}
-                {hasImagesOrVideos && renderImagesAndVideos()}
-                {renderExternalDocuments()}
-                {renderAudioPlayer()}
 
-                {/* 2) Displaying the message text */}
-                {item.message_content && (
+            {/* Sender context menu */}
+            {isOwnMessage && (
+                <>
+                    <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
+                        <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
+                    </Pressable>
+                    {contextMenuVisible && renderContextMenu()}
+                </>
+            )}
+
+            {/* Message content */}
+            <View style={{ backgroundColor: (isOwnMessage ? COLORS.primary : COLORS.light_secondary), borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: 4, maxWidth: '80%', opacity: (isDocMessage ? 1 : 0.8), }}>
+                {isToxic ?
                     <Text style={{ color: isOwnMessage ? COLORS.white : COLORS.black, fontSize: TEXT_SIZE.normal }}>
                         {item.message_content}
                     </Text>
-                )}
+                    :
+                    <>
+                        {/* 1) Displaying images/videos, external documents or audio player */}
+                        {hasImagesOrVideos && renderImagesAndVideos()}
+                        {renderExternalDocuments()}
+                        {renderAudioPlayer()}
 
-                {/* 3) Display for a note about a work */}
-                {isDocMessage && (
-                    <Pressable
-                        onPress={handlePress}
-                        style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
-                        <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>{item.doc_title}</Text>
-                        <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
-                    </Pressable>
-                )}
+                        {/* 2) Displaying the message text */}
+                        {item.message_content && (
+                            <Text style={{ color: isOwnMessage ? COLORS.white : COLORS.black, fontSize: TEXT_SIZE.normal }}>
+                                {item.message_content}
+                            </Text>
+                        )}
 
-                {/* 4) Displaying likes */}
-                {renderLike()}
+                        {/* 3) Display for a note about a work */}
+                        {isDocMessage && (
+                            <Pressable
+                                onPress={handlePress}
+                                style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
+                                <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>{item.doc_title}</Text>
+                                <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
+                            </Pressable>
+                        )}
 
-                {/* Modal to enlarge an image */}
-                {renderModal()}
+                        {/* 4) Displaying likes */}
+                        {renderLike()}
+                    </>
+                }
             </View>
+
+            {/* Addressee context menu */}
+            {!isOwnMessage && (
+                <>
+                    <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
+                        <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
+                    </Pressable>
+                    {contextMenuVisible && renderContextMenu()}
+                </>
+            )}
+
+            {/* Modals */}
+            {renderMediaModal()}
+            {renderReportModal()}
         </View>
     );
 };

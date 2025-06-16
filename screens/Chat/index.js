@@ -39,7 +39,7 @@ const ChatsScreen = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.get(`${API.url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
+      const response = await axios.get(`${API.boongo_url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
         headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` }, params: { page: pageToFetch }
       });
 
@@ -120,7 +120,7 @@ const ChatsScreen = () => {
         <Animated.FlatList
           ref={flatListRef}
           data={combinedData}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => (item.id ?? Math.random().toString()).toString()}
           renderItem={({ item }) => <ChatItemComponent item={item} />}
           onScroll={handleScroll}
           onEndReached={onEndReached}

@@ -80,7 +80,7 @@ const MediaScreen = () => {
   const getCategories = () => {
     setIsLoading(true);
 
-    const config = { method: 'GET', url: `${API.url}/category/find_by_group/Catégorie%20pour%20œuvre`, headers: { 'X-localization': 'fr' } };
+    const config = { method: 'GET', url: `${API.boongo_url}/category/find_by_group/Catégorie%20pour%20œuvre`, headers: { 'X-localization': 'fr' } };
     const item_all = { "id": 0, "category_name": t('all_f'), "category_name_fr": "Toutes", "category_name_en": "All", "category_description": null };
 
     axios(config)
@@ -103,7 +103,7 @@ const MediaScreen = () => {
     setIsLoading(true);
     
     let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories_type_status/fr/Médias/Pertinente`;
+    const url = `${API.boongo_url}/work/filter_by_categories_type_status/fr/Médias/Pertinente`;
     let mParams = { 'categories_ids[0]': idCat }
     const mHeaders = {
       'X-localization': 'fr'
@@ -138,7 +138,7 @@ const MediaScreen = () => {
     setIsLoading(true);
     
     let qs = require('qs');
-    const url = `${API.url}/work/filter_by_categories_type_status/fr/Médias/Pertinente`;
+    const url = `${API.boongo_url}/work/filter_by_categories_type_status/fr/Médias/Pertinente`;
     let mParams = { 'categories_ids[0]': id }
     const mHeaders = {
       'X-localization': 'fr'
@@ -207,7 +207,7 @@ const MediaScreen = () => {
       <TouchableOpacity onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
         <View style={[homeStyles.cardEmpty, { marginLeft: 0, marginBottom: 0 }]}>
           <View>
-            <Image source={{ uri: item.image_url ? item.image_url : `${WEB.url}/assets/img/cover.png` }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 45, height: Dimensions.get('window').width / 1.5 }]} />
+            <Image source={{ uri: item.image_url ? item.image_url : `${WEB.boongo_url}/assets/img/cover.png` }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 45, height: Dimensions.get('window').width / 1.5 }]} />
           </View>
           <View style={homeStyles.workDescTop}>
             <Text style={[homeStyles.workTitle, { textAlign: 'center', fontWeight: '500' }]}>{item.work_title}</Text>
