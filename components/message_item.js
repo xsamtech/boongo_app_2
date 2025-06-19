@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, Pressable, Alert } from 'react-native';
+import { View, Text, Image, Pressable, Alert, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import FileViewer from 'react-native-file-viewer';
@@ -185,14 +185,14 @@ const MessageItem = ({ item, isOwnMessage }) => {
     // Likes rendering
     const renderLike = () => {
         return (
-            <View style={{ position: 'absolute', bottom: (0 - PADDING.p01), zIndex: 999, right: PADDING.p01, flexDirection: 'row', alignItems: 'center' }}>
-                <Pressable onPress={handleLike}>
-                    <Icon name={hasLiked ? 'cards-heart' : 'cards-heart-outline'} size={IMAGE_SIZE.s05} color={hasLiked ? COLORS.danger : COLORS.light_secondary} />
-                </Pressable>
+            <View style={{ position: 'absolute', bottom: (0 - PADDING.p03), flexDirection: 'row', alignSelf: (isOwnMessage ? 'flex-start' : 'flex-end'), alignItems: 'center', marginHorizontal: PADDING.p03 }}>
+                <View style={{ width: PADDING.p10, height: PADDING.p10, backgroundColor: (hasLiked ? COLORS.danger : '#999'), padding: PADDING.p00, borderRadius: PADDING.p10 / 2 }}>
+                    <Pressable onPress={handleLike}>
+                        <Icon name={hasLiked ? 'cards-heart' : 'cards-heart'} size={IMAGE_SIZE.s02} color='white' />
+                    </Pressable>
+                </View>
                 {likes.length > 0 && (
-                    <Text style={{ marginLeft: PADDING.p00 }}>
-                        {likes.length <= 99 ? likes.length : '99+'}
-                    </Text>
+                    <Text style={{ fontSize: 12, color: COLORS.black, fontWeight: '600', marginLeft: PADDING.p00 }}>{likes.length <= 99 ? likes.length : '99+'}</Text>
                 )}
             </View>
         );
@@ -280,22 +280,24 @@ const MessageItem = ({ item, isOwnMessage }) => {
     };
 
     const renderContextMenu = () => (
-        <View style={{ position: 'absolute', top: 50, right: 10, backgroundColor: 'white', padding: PADDING.p01, borderRadius: PADDING.p01, elevation: 5 }}>
-            <Button style={homeStyles.authButton} onPress={handleDeleteForMyself}>
-                <Text style={[homeStyles.authButtonText, { color: COLORS.black, textAlign: 'left' }]}>{t('delete.for_me')}</Text>
-            </Button>
+        <View style={{ position: 'absolute', bottom: -70, zIndex: 5, alignSelf: 'center', backgroundColor: 'white', width: 250, padding: PADDING.p01, borderRadius: PADDING.p01 }}>
+            <TouchableOpacity style={[homeStyles.authButton, { marginVertical: PADDING.p00, paddingVertical: 0 }]} onPress={handleDeleteForMyself}>
+                <Text style={{ color: COLORS.black }}>{t('delete.for_me')}</Text>
+            </TouchableOpacity>
             {isOwnMessage && (
-                <Button style={homeStyles.authButton} onPress={handleDeleteForEverybody}>
-                    <Text style={[homeStyles.authButtonText, { color: COLORS.black, textAlign: 'left' }]}>{t('delete.for_everybody')}</Text>
-                </Button>
+                <TouchableOpacity style={[homeStyles.authButton, { marginVertical: PADDING.p00, paddingVertical: 0 }]} onPress={handleDeleteForEverybody}>
+                    <Text style={{ color: COLORS.black }}>{t('delete.for_everybody')}</Text>
+                </TouchableOpacity>
             )}
-            <Button style={homeStyles.authButton} title={t('report')} onPress={() => setReportModalVisible(true)} />
+            <TouchableOpacity style={[homeStyles.authButton, { marginVertical: PADDING.p00, paddingVertical: 0 }]} onPress={() => setReportModalVisible(true)}>
+                <Text style={{ color: COLORS.black }}>{t('report')}</Text>
+            </TouchableOpacity>
         </View>
     );
 
     const renderReportModal = () => {
         <Modal visible={reportModalVisible} transparent={true} animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                 <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
                     {/* Title */}
                     <Text style={[homeStyles.headingText, { color: COLORS.black }]}>{t('select_report_reason')}</Text>
@@ -326,72 +328,73 @@ const MessageItem = ({ item, isOwnMessage }) => {
     };
 
     return (
-        <View style={{ flexDirection: 'row', alignSelf: (isOwnMessage ? 'flex-end' : 'flex-start'), marginVertical: 4 }}>
-            {/* Addressee image */}
-            {!isOwnMessage && item.user.avatar_url && (
-                <Image source={{ uri: item.user.avatar_url }} style={{ width: PADDING.p15, height: PADDING.p15, borderRadius: PADDING.p15 / 2, marginRight: PADDING.p01, }} />
-            )}
+        <>
+            {contextMenuVisible && renderContextMenu()}
+            <View style={{ flexDirection: 'row', alignSelf: (isOwnMessage ? 'flex-end' : 'flex-start'), alignItems: 'center', marginTop: PADDING.p01 }}>
+                {/* Addressee image */}
+                {!isOwnMessage && item.user.avatar_url && !item.addressee_user && (
+                    <Image source={{ uri: item.user.avatar_url }} style={{ width: PADDING.p12, height: PADDING.p12, borderRadius: PADDING.p12 / 2, marginRight: PADDING.p01, }} />
+                )}
 
-            {/* Sender context menu */}
-            {isOwnMessage && (
-                <>
-                    <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
-                        <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
-                    </Pressable>
-                    {contextMenuVisible && renderContextMenu()}
-                </>
-            )}
-
-            {/* Message content */}
-            <View style={{ backgroundColor: (isOwnMessage ? COLORS.primary : COLORS.light_secondary), borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: 4, maxWidth: '80%', opacity: (isDocMessage ? 1 : 0.8), }}>
-                {isToxic ?
-                    <Text style={{ color: isOwnMessage ? COLORS.white : COLORS.black, fontSize: TEXT_SIZE.normal }}>
-                        {item.message_content}
-                    </Text>
-                    :
+                {/* Sender context menu */}
+                {isOwnMessage && (
                     <>
-                        {/* 1) Displaying images/videos, external documents or audio player */}
-                        {hasImagesOrVideos && renderImagesAndVideos()}
-                        {renderExternalDocuments()}
-                        {renderAudioPlayer()}
-
-                        {/* 2) Displaying the message text */}
-                        {item.message_content && (
-                            <Text style={{ color: isOwnMessage ? COLORS.white : COLORS.black, fontSize: TEXT_SIZE.normal }}>
-                                {item.message_content}
-                            </Text>
-                        )}
-
-                        {/* 3) Display for a note about a work */}
-                        {isDocMessage && (
-                            <Pressable
-                                onPress={handlePress}
-                                style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
-                                <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>{item.doc_title}</Text>
-                                <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
-                            </Pressable>
-                        )}
-
-                        {/* 4) Displaying likes */}
-                        {renderLike()}
+                        <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
+                            <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
+                        </Pressable>
                     </>
-                }
+                )}
+
+                {/* Message content */}
+                <View style={{ backgroundColor: (isOwnMessage ? COLORS.primary : 'rgba(0,0,0,0.1)'), borderRadius: PADDING.p01, paddingHorizontal: PADDING.p01, paddingTop: PADDING.p01, paddingBottom: PADDING.p03, marginVertical: 4, maxWidth: '65%', opacity: (isDocMessage ? 1 : 0.8), borderWidth: 1, borderColor: (isOwnMessage ? COLORS.dark_primary : 'rgba(0,0,0,0.3)') }}>
+                    {isToxic ?
+                        <Text style={{ color: 'white', fontSize: TEXT_SIZE.paragraph, fontStyle: 'italic' }}>
+                            {item.message_content}
+                        </Text>
+                        :
+                        <>
+                            {/* 1) Displaying images/videos, external documents or audio player */}
+                            {hasImagesOrVideos && renderImagesAndVideos()}
+                            {renderExternalDocuments()}
+                            {renderAudioPlayer()}
+
+                            {/* 2) Displaying the message text */}
+                            {item.message_content && (
+                                <Text style={{ color: !isOwnMessage ? COLORS.black : 'white', fontSize: TEXT_SIZE.normal }}>
+                                    {item.message_content}
+                                </Text>
+                            )}
+
+                            {/* 3) Display for a note about a work */}
+                            {isDocMessage && (
+                                <Pressable
+                                    onPress={handlePress}
+                                    style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
+                                    <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>{item.doc_title}</Text>
+                                    <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
+                                </Pressable>
+                            )}
+
+                            {/* 4) Displaying likes */}
+                            {renderLike()}
+                        </>
+                    }
+                </View>
+
+                {/* Addressee context menu */}
+                {!isOwnMessage && (
+                    <>
+                        <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
+                            <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
+                        </Pressable>
+                    </>
+                )}
+
+                {/* Modals */}
+                {renderMediaModal()}
+                {renderReportModal()}
             </View>
-
-            {/* Addressee context menu */}
-            {!isOwnMessage && (
-                <>
-                    <Pressable onPress={() => setContextMenuVisible(true)} style={{ marginRight: PADDING.p00 }}>
-                        <Icon name='dots-vertical' size={IMAGE_SIZE.s05} color={COLORS.black} />
-                    </Pressable>
-                    {contextMenuVisible && renderContextMenu()}
-                </>
-            )}
-
-            {/* Modals */}
-            {renderMediaModal()}
-            {renderReportModal()}
-        </View>
+        </>
     );
 };
 

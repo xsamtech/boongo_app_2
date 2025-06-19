@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, ToastAndroid, TouchableHighlight, FlatList, Text } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text } from 'react-native'
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';

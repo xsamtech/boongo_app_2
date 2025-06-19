@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, RefreshControl, Animated, Dimensions, SafeAreaView, ToastAndroid, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, RefreshControl, Animated, Dimensions, SafeAreaView, TextInput } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useNavigation } from '@react-navigation/native';
 import useColors from '../../hooks/useColors';
