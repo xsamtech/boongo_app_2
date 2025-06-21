@@ -58,6 +58,8 @@
     },
     "empty_list": {
         "title": "Liste ezali pamba",
+        "description_unpaid_consultation": "Awa ekolakisama misala oyo ofuti naino te mpo na kotala.",
+        "description_unpaid_subscription": "Ozali nanu na abonnement o commander te.",
         "description_chat_user": "Awa okomona ba membres oyo okoki ko solola na bango.",
         "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
         "description_chat_organization": "Awa ekomona ba échanges na yo na ba eteyelo mpe/to ba institutions.",
@@ -68,6 +70,11 @@
         "description_mags": "Awa, eko lakisama ba journals, ba journaux to ba magazines oyo ba membres bakoki ko consulte.",
         "description_medias": "Awa, eko lakisama ba médias oyo ba membres bakoki ko consulte.",
         "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte."
+    },
+    "unpaid": {
+        "consultation": "Ba consultations o commander",
+        "subscription": "Ba abonnements o commander",
+        "add": "Commander lisusu"
     },
     "back_list": "Zonga na liste",
     "work": {
@@ -152,6 +159,7 @@
             "title": "Compte",
             "profile": "Profil",
             "my_works": "Misala na nga",
+            "my_cart": "Kitunga na nga",
             "subscribers": "Ba abonné",
             "subscriptions": "Ba abonema"
         },

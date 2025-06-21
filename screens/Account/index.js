@@ -2,7 +2,7 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, ScrollView, ActivityIndicator } from 'react-native'
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { DataTable } from 'react-native-paper';
 
 // Works frame
-const MyWorks = ({ handleScroll, showBackToTop, listRef }) => {
+const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -181,7 +181,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef }) => {
             keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ height: 40, marginTop: 105, flexGrow: 0 }}
+            style={{ height: 40, marginTop: headerHeight, flexGrow: 0 }}
             contentContainerStyle={{
               alignItems: 'center',
               paddingHorizontal: PADDING.p00,
@@ -198,6 +198,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef }) => {
             renderItem={({ item }) => <WorkItemComponent item={item} />}
             horizontal={false}
             showsVerticalScrollIndicator={false}
+            // contentContainerStyle={{ paddingTop: headerHeight }}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
@@ -216,7 +217,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef }) => {
 };
 
 // Works frame
-const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
+const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -228,46 +229,9 @@ const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
   // =============== Get data ===============
   const consultations = userInfo.unpaid_consultations;
   const subscriptions = userInfo.unpaid_subscriptions;
+  const totalConsultations = userInfo.total_unpaid_consultations;
+  const totalSubscriptions = userInfo.total_unpaid_subscriptions;
   const [isLoading, setIsLoading] = useState(false);
-  const [totalConsultationPrice, setTotalConsultationPrice] = useState('');
-
-  const getTotalConsultationPrice = async () => {
-    setIsLoading(true);
-
-    try {
-      if (item.currency.currency_acronym === userInfo.currency.currency_acronym) {
-        setPrice(item.consultation_price + ' ' + userInfo.currency.currency_acronym);
-
-      } else {
-        const qs = require('qs');
-        const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${item.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
-        const mParams = { type_id: 33, status_id: 17, page: pageToFetch };
-        const mHeaders = {
-          'X-localization': 'fr',
-          'Authorization': `Bearer ${userInfo.api_token}`
-        };
-        const response = axios.post(url, qs.stringify(mParams), { headers: mHeaders });
-        const responseData = response.data.data;
-        const userPrice = item.consultation_price * responseData.rate;
-
-        setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
-      }
-
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-
-  };
-
-  useEffect(() => {
-    getTotalConsultationPrice();
-  }, []);
 
   // ================= Handlers =================
   const onRefresh = useCallback(() => {
@@ -293,14 +257,12 @@ const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
           setPrice(item.consultation_price + ' ' + userInfo.currency.currency_acronym);
 
         } else {
-          const qs = require('qs');
           const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${item.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
-          const mParams = { type_id: 33, status_id: 17, page: pageToFetch };
           const mHeaders = {
             'X-localization': 'fr',
             'Authorization': `Bearer ${userInfo.api_token}`
           };
-          const response = axios.post(url, qs.stringify(mParams), { headers: mHeaders });
+          const response = axios.get(url, { headers: mHeaders });
           const responseData = response.data.data;
           const userPrice = item.consultation_price * responseData.rate;
 
@@ -354,11 +316,11 @@ const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
             <View style={homeStyles.listTitleArea}>
               <View style={{ flexDirection: 'column' }}>
                 <Text style={homeStyles.listTitle}>{t('unpaid.consultation')}</Text>
-                <Text style={{ fontWeight: '500' }}>{totalConsultationPrice}</Text>
+                <Text style={{ fontWeight: '500' }}>{totalConsultations + ' ' + userInfo.currency.currency_acronym}</Text>
               </View>
               <TouchableOpacity style={[homeStyles.linkIcon, { color: COLORS.link_color }]} onPress={() => { navigation.navigate('HomeStack') }}>
                 <Text style={homeStyles.link}>{t('unpaid.add')} </Text>
-                <MaterialCommunityIcons name='chevron-double-right' size={ICON_SIZE.s3} />
+                <Icon name='chevron-double-right' size={IMAGE_SIZE.s04} />
               </TouchableOpacity>
             </View>
             <FlatList
@@ -374,10 +336,13 @@ const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
 
             {/* SUBSCRIPTIONS */}
             <View style={homeStyles.listTitleArea}>
-              <Text style={homeStyles.listTitle}>{t('unpaid.subscription')}</Text>
+              <View style={{ flexDirection: 'column' }}>
+                <Text style={homeStyles.listTitle}>{t('unpaid.subscription')}</Text>
+                <Text style={{ fontWeight: '500' }}>{totalSubscriptions + ' ' + userInfo.currency.currency_acronym}</Text>
+              </View>
               <TouchableOpacity style={[homeStyles.linkIcon, { color: COLORS.link_color }]} onPress={() => { navigation.navigate('Subscription') }}>
                 <Text style={homeStyles.link}>{t('unpaid.add')} </Text>
-                <MaterialCommunityIcons name='chevron-double-right' size={ICON_SIZE.s3} />
+                <Icon name='chevron-double-right' size={IMAGE_SIZE.s04} />
               </TouchableOpacity>
             </View>
             {subscriptions.length > 0 ?
@@ -410,11 +375,111 @@ const MyCart = ({ handleScroll, showBackToTop, listRef }) => {
 };
 
 const AccountScreen = () => {
+  // =============== Colors ===============
+  const COLORS = useColors();
+  // =============== Language ===============
+  const { t } = useTranslation();
+  // =============== Get data ===============
+  const myWorksListRef = useRef(null);
+  const [index, setIndex] = useState(0); // State for managing active tab index
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [showBackToTopByTab, setShowBackToTopByTab] = useState({ my_works: false });
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const savedScrollOffsets = useRef({ my_works: 0 });
+
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight], // The header hides at -60px
+    extrapolate: 'clamp',
+  });
+
+  const [routes] = useState([
+    { key: 'my_works', title: t('navigation.account.my_works') },
+    { key: 'my_cart', title: t('navigation.account.my_cart') },
+  ]);
+
+  const renderScene = ({ route }) => {
+    const sceneProps = {
+      handleScroll,
+      headerHeight,
+    };
+
+    switch (route.key) {
+      case 'my_works':
+        return <MyWorks {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.my_works} listRef={myWorksListRef} />;
+      case 'my_cart':
+        return <MyCart {...sceneProps} />;
+      default:
+        return null;
+    }
+  };
+
+  // Handle scrolling and show/hide the header
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      useNativeDriver: true,
+      listener: (event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        const currentTab = (index === 0 ? 'my_works' : 'my_cart');
+
+        savedScrollOffsets.current[currentTab] = offsetY;
+
+        const isAtTop = (offsetY <= 0);
+        setShowBackToTopByTab(prev => ({
+          ...prev,
+          [currentTab]: !isAtTop,
+        }));
+      },
+    }
+  );
+
+  // On "TabBar" index change
+  const handleIndexChange = (newIndex) => {
+    const newTabKey = newIndex === 0 ? 'my_works' : 'my_cart';
+    const offset = savedScrollOffsets.current[newTabKey] || 0;
+
+    // Animate scrollY back to 0 smoothly (for header + tabbar)
+    Animated.timing(scrollY, {
+      toValue: offset,
+      duration: 300, // 300ms for smooth effect
+      useNativeDriver: true,
+    }).start();
+
+    // Remonte en haut selon l'onglet sélectionné
+    if (newIndex === 0 && myWorksListRef.current) {
+      myWorksListRef.current.scrollToOffset({ offset, animated: true });
+    }
+
+    setIndex(newIndex);
+  };
+
+  // Custom "TabBar"
+  const renderTabBar = (props) => (
+    <>
+      <Animated.View onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)} style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
+        <HeaderComponent />
+        <TabBar
+          {...props}
+          style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
+          indicatorStyle={{ backgroundColor: COLORS.black }}
+          activeColor={COLORS.black}
+          inactiveColor={COLORS.dark_secondary}
+        />
+      </Animated.View>
+      <FloatingActionsButton />
+    </>
+  );
+
   return (
-    <View>
-      <Text>Account</Text>
-    </View>
-  )
-}
+    <TabView
+      navigationState={{ index, routes }}
+      renderScene={renderScene}
+      onIndexChange={handleIndexChange}
+      initialLayout={{ width: 100 }}
+      renderTabBar={renderTabBar} // Using the Custom TabBar
+    />
+  );
+};
 
 export default AccountScreen

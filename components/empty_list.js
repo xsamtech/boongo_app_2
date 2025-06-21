@@ -14,7 +14,7 @@ const EmptyListComponent = ({ iconName, title, description }) => {
     const COLORS = useColors();
 
     return (
-        <View style={{ flex: 1, height: Dimensions.get('window').height - 200, justifyContent: 'center' }}>
+        <View style={{ flex: 1, height: Dimensions.get('window').height - 400, justifyContent: 'center' }}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', marginBottom: PADDING.p01, paddingHorizontal: PADDING.p05 }]}>
                 <Icon name={iconName} size={IMAGE_SIZE.s20} color={COLORS.black} />
                 <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.link_color, marginVertical: PADDING.p03 }]}>{title}</Text>

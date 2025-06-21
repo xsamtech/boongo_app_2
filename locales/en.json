@@ -58,6 +58,8 @@
     },
     "empty_list": {
         "title": "The list is empty",
+        "description_unpaid_consultation": "Here will be displayed the works for which you have not yet paid to view.",
+        "description_unpaid_subscription": "You have no unpaid subscriptions.",
         "description_chat_user": "Here you will see the members you can communicate with.",
         "description_chat_circle": "Here will be displayed your chat circles with other members.",
         "description_chat_organization": "Your exchanges in establishments and/or institutions will be displayed here.",
@@ -68,6 +70,11 @@
         "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
         "description_medias": "Here, the medias will be displayed which can be consulted by members.",
         "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
+    },
+    "unpaid": {
+        "consultation": "Ordered consultations",
+        "subscription": "Ordered subscriptions",
+        "add": "Order again"
     },
     "back_list": "Back to the list",
     "work": {
@@ -152,6 +159,7 @@
             "title": "Account",
             "profile": "Profile",
             "my_works": "My works",
+            "my_cart": "My cart",
             "subscribers": "Subscribers",
             "subscriptions": "Subscriptions"
         },

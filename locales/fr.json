@@ -58,6 +58,8 @@
     },
     "empty_list": {
         "title": "La liste est vide",
+        "description_unpaid_consultation": "Ici seront affichées les oeuvres dont vous n'avez pas encore payées la consultation.",
+        "description_unpaid_subscription": "Vous n'avez aucun abonnement non payé.",
         "description_chat_user": "Ici seront affichées les membres avec qui vous pouvez échanger.",
         "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d'autres membres.",
         "description_chat_organization": "Ici seront affichées vos échanges dans les établissements et/ou institutions.",
@@ -68,6 +70,11 @@
         "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",
         "description_medias": "Ici, seront affichés les médias qui pourront être consultés par les membres.",
         "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres."
+    },
+    "unpaid": {
+        "consultation": "Consultations commandées",
+        "subscription": "Abonnements commandés",
+        "add": "Commander encore"
     },
     "back_list": "Retour à la liste",
     "work": {
@@ -152,6 +159,7 @@
             "title": "Compte",
             "profile": "Profil",
             "my_works": "Mes œuvres",
+            "my_cart": "Mon panier",
             "subscribers": "Abonnés",
             "subscriptions": "Abonnements"
         },
