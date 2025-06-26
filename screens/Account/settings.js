@@ -67,6 +67,7 @@ const SettingsScreen = () => {
       url: `${API.boongo_url}/country`,
       headers: {
         'X-localization': 'fr',
+        'X-user-id': userInfo.id,
         Authorization: `Bearer ${userInfo.api_token}`,
       }
     };
@@ -84,6 +85,41 @@ const SettingsScreen = () => {
         }
 
         setCountries(countryArray);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+  // ORGANIZATION dropdown
+  const [organizationIsFocus, setOrganizationIsFocus] = useState(false);
+  const [organization, setOrganization] = useState(userInfo.last_organization ? userInfo.last_organization.id : null);
+  const [organizations, setOrganizations] = useState([]);
+
+  useEffect(() => {
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/organization`,
+      headers: {
+        'X-localization': 'fr',
+        'X-user-id': userInfo.id,
+        Authorization: `Bearer ${userInfo.api_token}`,
+      }
+    };
+
+    axios(config)
+      .then(function (response) {
+        const count = Object.keys(response.data.data).length;
+        let organizationArray = [];
+
+        for (let i = 0; i < count; i++) {
+          organizationArray.push({
+            value: response.data.data[i].id,
+            label: response.data.data[i].org_name
+          })
+        }
+
+        setOrganizations(organizationArray);
       })
       .catch(function (error) {
         console.log(error);
@@ -147,7 +183,7 @@ const SettingsScreen = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
       {/* Custom header */}
-      <View style={{ flexDirection: 'row', paddingVertical: PADDING.p01 }}>
+      <View style={{ flexDirection: 'row', paddingVertical: PADDING.p02 }}>
         <TouchableOpacity style={{ position: 'absolute', left: 7, top: 5, zIndex: 10 }} onPress={() => navigation.goBack()}>
           <Icon name='chevron-left' size={37} color={COLORS.black} />
         </TouchableOpacity>
@@ -167,6 +203,29 @@ const SettingsScreen = () => {
 
         {/* Personal infos */}
         <View style={[homeStyles.cardEmpty, { marginBottom: PADDING.vertical, marginLeft: 0 }]}>
+          {/* Organization  */}
+          <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.organization.label')}</Text>
+          <Dropdown
+            style={[homeStyles.authInput, { height: 50 }]}
+            borderColor={COLORS.dark_secondary}
+            textStyle={{ color: COLORS.black }}
+            placeholderStyle={{ color: COLORS.black }}
+            arrowIconStyle={{ tintColor: COLORS.black }}
+            data={organizations}
+            search
+            labelField='label'
+            valueField='value'
+            placeholder={!organizationIsFocus ? t('auth.organization.label') : '...'}
+            searchPlaceholder={t('search')}
+            maxHeight={300}
+            value={organization}
+            onFocus={() => setOrganizationIsFocus(true)}
+            onBlur={() => setOrganizationIsFocus(false)}
+            onChange={item => {
+              setOrganization(item.value);
+              setOrganizationIsFocus(false);
+            }} />
+
           {/* First name */}
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.firstname')}</Text>
           <TextInput
@@ -346,7 +405,7 @@ const SettingsScreen = () => {
 
           {/* Submit */}
           <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary, marginTop: 16 }]} onPress={() => {
-            update(userInfo.id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, (country ? country.id : null), null, null);
+            update(userInfo.id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country, null, organization);
             navigation.navigate('Account'); }}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('update')}</Text>
           </Button>

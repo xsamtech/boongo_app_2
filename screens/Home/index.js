@@ -302,7 +302,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
         <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning, bottom: 30 }]}
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
           <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
@@ -418,7 +418,7 @@ const HomeScreen = () => {
       useNativeDriver: true,
     }).start();
 
-    // Remonte en haut selon l'onglet sélectionné
+    // Back to top according to selected tab
     if (newIndex === 0 && newsListRef.current) {
       newsListRef.current.scrollToOffset({ offset, animated: true });
 

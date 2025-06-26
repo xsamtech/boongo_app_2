@@ -23,6 +23,7 @@
     "see_less": "Voir moins",
     "dark_theme": "Mode sombre",
     "page": "Page",
+    "total_price": "Prix total",
     "notepad": {
         "title": "Enregistrez des résumés",
         "title_edit": "Editer le résumé",
@@ -58,8 +59,10 @@
     },
     "empty_list": {
         "title": "La liste est vide",
+        "description_cart": "Vous n'avez encore rien ajouté au panier",
         "description_unpaid_consultation": "Ici seront affichées les oeuvres dont vous n'avez pas encore payées la consultation.",
         "description_unpaid_subscription": "Vous n'avez aucun abonnement non payé.",
+        "description_subscribers": "Ici seront affichés les personnes qui ont payé pour consulter vos œuvres.",
         "description_chat_user": "Ici seront affichées les membres avec qui vous pouvez échanger.",
         "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d'autres membres.",
         "description_chat_organization": "Ici seront affichées vos échanges dans les établissements et/ou institutions.",
@@ -139,9 +142,9 @@
         "price": "Prix",
         "link": "S’abonner"
     },
-    "addToCart": "Ajouter au panier",
-    "withdrawFromCart": "Retirer du panier",
-    "pay": "Payer maintenant",
+    "add_to_cart": "Ajouter au panier",
+    "withdraw_from_cart": "Retirer du panier",
+    "pay": "Payer",
 
     "navigation": {
         "home": {
@@ -241,6 +244,11 @@
     },
 
     "auth": {
+        "organization": {
+            "title": "Choisir une organisation",
+            "new": "Ajouter organisation",
+            "label": "Établissement / Institution"
+        },
         "firstname": "Prénom",
         "lastname": "Nom",
         "surname": "Post-nom",

@@ -16,9 +16,15 @@ const EmptyListComponent = ({ iconName, title, description }) => {
     return (
         <View style={{ flex: 1, height: Dimensions.get('window').height - 400, justifyContent: 'center' }}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', marginBottom: PADDING.p01, paddingHorizontal: PADDING.p05 }]}>
-                <Icon name={iconName} size={IMAGE_SIZE.s20} color={COLORS.black} />
-                <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.link_color, marginVertical: PADDING.p03 }]}>{title}</Text>
-                <Text style={[homeStyles.cardEmptyText, { color: COLORS.black, marginBottom: PADDING.p03 }]}>{description}</Text>
+                {iconName &&
+                    <Icon name={iconName} size={IMAGE_SIZE.s20} color={COLORS.black} />
+                }
+                {title &&
+                    <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.link_color, marginVertical: PADDING.p03 }]}>{title}</Text>
+                }
+                {description &&
+                    <Text style={[homeStyles.cardEmptyText, { color: COLORS.black, marginBottom: PADDING.p03 }]}>{description}</Text>
+                }
             </View>
         </View>
     );

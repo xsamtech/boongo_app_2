@@ -20,6 +20,7 @@ import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
 import Logo from './assets/img/logo.svg';
 import useColors from './hooks/useColors';
+import homeStyles from './screens/style';
 import SplashScreen from './screens/splash_screen';
 import OnboardScreen from './screens/Auth';
 import RegisterScreen from './screens/Auth/register';
@@ -56,9 +57,11 @@ import AddGovernmentScreen from './screens/Organization/Government/add_governmen
 import AudioPlayerScreen from './screens/audio_player';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
-import homeStyles from './screens/style';
-import ChatsScreen from './screens/Chat';
 import ChatEntityScreen from './screens/Chat/chat';
+import ProfileScreen from './screens/profile';
+import MobileSubscribeScreen from './screens/subscribe_mobile';
+import BankCardSubscribeScreen from './screens/subscribe_bank_card';
+import ChatsScreen from './screens/Chat';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -280,6 +283,7 @@ const HomeStackNav = () => {
           }
         }} />
       <Stack.Screen name='Settings' component={SettingsScreen} />
+      <Stack.Screen name='Profile' component={ProfileScreen} />
       <Stack.Screen name='Account' component={AccountScreen} />
       <Stack.Screen name='Notifications' component={NotificationsScreen} />
       <Stack.Screen name='Search' component={SearchScreen} />
@@ -302,8 +306,8 @@ const HomeStackNav = () => {
       <Stack.Screen name='AudioPlayer' component={AudioPlayerScreen} />
       <Stack.Screen name='VideoPlayer' component={VideoPlayerScreen} />
       <Stack.Screen name='Subscription' component={SubscriptionScreen} />
-      {/* <Stack.Screen name='MobileSubscribe' component={MobileSubscribeScreen} />
-      <Stack.Screen name='BankCardSubscribe' component={BankCardSubscribeScreen} /> */}
+      <Stack.Screen name='MobileSubscribe' component={MobileSubscribeScreen} />
+      <Stack.Screen name='BankCardSubscribe' component={BankCardSubscribeScreen} />
     </Stack.Navigator>
   );
 };

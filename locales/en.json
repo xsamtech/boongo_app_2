@@ -23,6 +23,7 @@
     "see_less": "See less",
     "dark_theme": "Dark mode",
     "page": "Page",
+    "total_price": "Total price",
     "notepad": {
         "title": "Save summaries",
         "title_edit": "Edit the summary",
@@ -58,8 +59,10 @@
     },
     "empty_list": {
         "title": "The list is empty",
+        "description_cart": "You haven't added anything to your cart yet.",
         "description_unpaid_consultation": "Here will be displayed the works for which you have not yet paid to view.",
         "description_unpaid_subscription": "You have no unpaid subscriptions.",
+        "description_subscribers": "Here you will see people who have paid to view your works.",
         "description_chat_user": "Here you will see the members you can communicate with.",
         "description_chat_circle": "Here will be displayed your chat circles with other members.",
         "description_chat_organization": "Your exchanges in establishments and/or institutions will be displayed here.",
@@ -139,9 +142,9 @@
         "price": "Price",
         "link": "Subscribe"
     },
-    "addToCart": "Add to cart",
-    "withdrawFromCart": "Withdraw from cart",
-    "pay": "Pay now",
+    "add_to_cart": "Add to cart",
+    "withdraw_from_cart": "Withdraw from cart",
+    "pay": "Pay",
 
     "navigation": {
         "home": {
@@ -241,6 +244,11 @@
     },
 
     "auth": {
+        "organization": {
+            "title": "Choose an organization",
+            "new": "Add organization",
+            "label": "School / Institution"
+        },
         "firstname": "First name",
         "lastname": "Last name",
         "surname": "Surname",

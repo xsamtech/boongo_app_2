@@ -6,12 +6,14 @@ import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StatusBar, Image, Dimensions } from 'react-native';
 import { DrawerActions, useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import { PADDING, TEXT_SIZE } from '../tools/constants';
 // import Logo from '../assets/img/logo.svg';
 import LogoText from '../assets/img/text.svg';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 import { AuthContext } from '../contexts/AuthContext';
+import { t } from 'i18next';
 
 const HeaderComponent = ({ title }) => {
   // =============== Colors ===============
@@ -55,6 +57,13 @@ const HeaderComponent = ({ title }) => {
 
   if (route.name === 'Account') {
     const { userInfo } = useContext(AuthContext);
+
+    // Adjust icon name
+    const cleanIconName = (icon) => {
+      // Separates the string by space and takes the last part, without the prefix
+      const iconParts = icon.split(' ');  // Separates the prefix and the icon name
+      return iconParts[iconParts.length - 1].replace(/^fa-/, '');  // Remove "fa-" if necessary
+    };
 
     return (
       <>
@@ -107,6 +116,19 @@ const HeaderComponent = ({ title }) => {
                     {userInfo.address_1}
                   </Text>
                 </View>
+              }
+              {userInfo.last_organization ?
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: 8 }}>
+                  <FaIcon name={cleanIconName(userInfo.last_organization.type.icon)} size={16} color={COLORS.black} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+                  <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, maxWidth: '75%' }}>
+                    {userInfo.last_organization.org_name}
+                  </Text>
+                </View> :
+                <TouchableOpacity style={[homeStyles.authButton, { width: 210, backgroundColor: COLORS.danger, marginTop: 8, paddingHorizontal: PADDING.p02 }]} onPress={() => navigation.navigate('Settings')}>
+                  <Text style={{ fontSize: TEXT_SIZE.label, fontWeight: '400', color: 'white', textAlign: 'center' }}>
+                    {t('auth.organization.new')}
+                  </Text>
+                </TouchableOpacity>
               }
             </View>
           </View>

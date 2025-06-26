@@ -23,6 +23,7 @@
     "see_less": "Tala moke",
     "dark_theme": "Mode ya molili",
     "page": "Lokasa",
+    "total_price": "Prix total :",
     "notepad": {
         "title": "Bomba ba résumés",
         "title_edit": "Bongisa résumé",
@@ -58,8 +59,10 @@
     },
     "empty_list": {
         "title": "Liste ezali pamba",
+        "description_cart": "Obakisi nanu eloko te na kitunga na yo.",
         "description_unpaid_consultation": "Awa ekolakisama misala oyo ofuti naino te mpo na kotala.",
         "description_unpaid_subscription": "Ozali nanu na abonnement o commander te.",
+        "description_subscribers": "Awa okomona bato oyo bafutaki mpo na kotala misala na yo.",
         "description_chat_user": "Awa okomona ba membres oyo okoki ko solola na bango.",
         "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
         "description_chat_organization": "Awa ekomona ba échanges na yo na ba eteyelo mpe/to ba institutions.",
@@ -139,9 +142,9 @@
         "price": "Ntalo",
         "link": "S’abonner"
     },
-    "addToCart": "Ajouter au panier",
-    "withdrawFromCart": "Retirer du panier",
-    "pay": "Futa sikoyo",
+    "add_to_cart": "Ajouter au panier",
+    "withdraw_from_cart": "Retirer du panier",
+    "pay": "Nafuta",
 
     "navigation": {
         "home": {
@@ -241,6 +244,11 @@
     },
 
     "auth": {
+        "organization": {
+            "title": "Pona organisation",
+            "new": "Bakisa organisation",
+            "label": "Eteyelo / Institution"
+        },
         "firstname": "Prénom",
         "lastname": "Nom",
         "surname": "Post-nom",
