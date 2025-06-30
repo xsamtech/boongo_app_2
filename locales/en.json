@@ -23,6 +23,8 @@
     "see_less": "See less",
     "dark_theme": "Dark mode",
     "page": "Page",
+    "yes": "Yes",
+    "no": "No",
     "total_price": "Total price",
     "notepad": {
         "title": "Save summaries",
@@ -83,12 +85,30 @@
     "work": {
         "title": "Details about the work",
         "publish_new": "Publish a work",
+        "publishing_info": "Your work will be reviewed before becoming visible on the platform.",
+        "work_title": "Work title",
+        "work_content": "Description",
+        "work_url": "YouTube URL",
+        "media_length": "Length (Hour:Minute:Second)",
+        "author": "Author",
+        "editor": "Editor / Director / Producer",
+        "is_public": {
+            "title": "Paid consultation",
+            "description": "For medias, viewing cost $2; and for other types of works, it's $1. Boongo is entitled to 20% of each viewing payment.",
+            "consult_price": "Price"
+        },
+        "currency": {
+            "title": "Currency: ",
+            "label": "Select your currency"
+        },
+        "for_org": "Belongs to organization",
         "type": "Type: ",
         "categories": "Categories: ",
         "category": "Category: ",
-        "author": "Author: ",
         "consultation_price": "Consultation",
-        "subscription_info": "Subscribe to be able to consult, or become partner to publish your own works."
+        "add_files": "Associate files",
+        "selected_files": "Selected files:",
+        "max_files": "Limit of {{ count }} files reached. Some files were skipped."
     },
     "most_popular": "The most popular",
     "have_account": "Already have an account?",
@@ -124,6 +144,7 @@
     "confirm": "Confirm",
     "save": "Save",
     "send": "Send",
+    "publish": "Publish",
     "cancel": "Cancel",
     "update": "Update",
     "change": "Change",
@@ -138,6 +159,7 @@
     "change_password": "Change password",
     "subscription":  {
         "title": "Choose a subscription",
+        "info": "You do not have a subscription. Please subscribe to view.",
         "type": "Subscription type",
         "price": "Price",
         "link": "Subscribe"

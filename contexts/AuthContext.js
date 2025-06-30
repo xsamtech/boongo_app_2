@@ -357,10 +357,10 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const changeRole = (user_id, role_id) => {
+    const changeRole = (action, user_id, role_id) => {
         setIsLoading(true);
 
-        axios.put(`${API.boongo_url}/user/update_role/${user_id}`, { role_id }, {
+        axios.put(`${API.boongo_url}/user/update_role/${action}/${user_id}`, { role_id }, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const message = res.data.message;
@@ -516,6 +516,36 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const invalidateSubscription = (user_id) => {
+        axios.put(`${API.url}/subscription/invalidate_subscription/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            let success = res.data.success;
+
+            if (success) {
+                let userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
+                // console.log(`${error}`);
+            }
+        });
+    };
+
     const login = (username, password) => {
         setIsLoading(true);
 
@@ -609,7 +639,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription, invalidateSubscription }}>
             {children}
         </AuthContext.Provider>
     );

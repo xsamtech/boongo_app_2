@@ -323,6 +323,7 @@ const homeStyles = StyleSheet.create({
 
     authText: {
         fontSize: 16,
+        marginBottom: 3,
     },
 
     authInput: {
@@ -465,8 +466,7 @@ const homeStyles = StyleSheet.create({
     },
 
     workCard: {
-        marginBottom: 14,
-        padding: 15,
+        paddingHorizontal: 15,
     },
 
     workTop: {
@@ -481,8 +481,8 @@ const homeStyles = StyleSheet.create({
     },
 
     workImage: {
-        width: Dimensions.get('window').width / 2.5,
-        height: (Dimensions.get('window').width / 2.5) * 1.5,
+        width: Dimensions.get('window').width / 3,
+        height: (Dimensions.get('window').width / 3) * 1.5,
         marginRight: 10,
         marginVertical: 7,
         borderWidth: 1,
@@ -495,7 +495,7 @@ const homeStyles = StyleSheet.create({
     },
 
     workTitle: {
-        fontSize: 19,
+        fontSize: 21,
         fontWeight: '500',
     },
 

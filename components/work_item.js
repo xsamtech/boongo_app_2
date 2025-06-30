@@ -40,13 +40,13 @@ const WorkItemComponent = ({ item }) => {
     }
 
     return (
-        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p12, padding: PADDING.p03 }]}>
+        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, padding: PADDING.p03 }]}>
             <View>
                 <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} />
             </View>
             <View style={homeStyles.workDescTop}>
                 <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={3}>{item.work_title}</Text>
-                <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={2}>{item.work_content}</Text>
+                <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3}>{item.work_content}</Text>
                 <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
                     <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
                     <Icon name='chevron-right' size={IMAGE_SIZE.s05} color={COLORS.link_color} />

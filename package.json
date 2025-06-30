@@ -51,6 +51,7 @@
     "react-native-image-generator": "^0.3.1",
     "react-native-language-select": "^1.1.1",
     "react-native-loading-spinner-overlay": "^3.0.1",
+    "react-native-masked-text": "^1.13.0",
     "react-native-network-info": "^5.2.1",
     "react-native-orientation-locker": "^1.7.0",
     "react-native-pager-view": "^6.7.0",

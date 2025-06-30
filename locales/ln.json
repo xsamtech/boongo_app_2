@@ -23,6 +23,8 @@
     "see_less": "Tala moke",
     "dark_theme": "Mode ya molili",
     "page": "Lokasa",
+    "yes": "Iyo",
+    "no": "Te",
     "total_price": "Prix total :",
     "notepad": {
         "title": "Bomba ba résumés",
@@ -81,14 +83,32 @@
     },
     "back_list": "Zonga na liste",
     "work": {
-        "title": "Makambo etali œuvre",
-        "publish_new": "Tinda œuvre",
+        "title": "Makambo etali mosala",
+        "publish_new": "Tinda mosala",
+        "publishing_info": "Tokolandela mosala na yo liboso ete emonana na plateforme mobimba.",
+        "work_title": "Titre ya mosala",
+        "work_content": "Ndimbola",
+        "work_url": "URL ya YouTube",
+        "media_length": "Molayi (Heure:Minute:Seconde)",
+        "author": "Mokeli",
+        "editor": "Mokambi / Prodicter",
+        "is_public": {
+            "title": "Kotala efutamaka",
+            "description": "Pona ba medias, kotala ekosɛnga 2$, mpe pona ba lolenge mosusu ya misala ekosɛnga 1$. Boongo ezali na lotomo ya 20% ya mbongo moko na moko ya kotala.",
+            "consult_price": "Ntalo"
+        },
+        "currency": {
+            "title": "Mbongo: ",
+            "label": "Pona mbongo na yo"
+        },
+        "for_org": "Ezali ya organizacion moko",
         "type": "Lolenge : ",
         "categories": "Catégories : ",
         "category": "Catégorie : ",
-        "author": "Mokomi : ",
         "consultation_price": "Kotala",
-        "subscription_info": "Abonnez-vous po ozala na makoki ya ko consulter, to okoma partenaire pona kobimisa ba oeuvres nayo moko."
+        "add_files": "Tia na ba fichiers",
+        "selected_files": "Ba fichiers otie :",
+        "max_files": "Limite ya {{ count }} fichiers ekoki. Ba fichiers misusu ekoti te."
     },
     "most_popular": "Oyo eza na lupemba ya makasi",
     "have_account": "Ozali déjà na compte?",
@@ -124,6 +144,7 @@
     "confirm": "Ndimisa",
     "save": "Bomba",
     "send": "Tinda",
+    "publish": "Panza",
     "cancel": "Tika",
     "update": "Bongola",
     "change": "Bongola",
@@ -138,6 +159,7 @@
     "change_password": "Kobongola mot de passe",
     "subscription":  {
         "title": "Pona abonnément moko",
+        "info": "Ozali na abonnément te. Banda ko s'abonner po otala.",
         "type": "Lolenge ya abonnément",
         "price": "Ntalo",
         "link": "S’abonner"

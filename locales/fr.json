@@ -23,6 +23,8 @@
     "see_less": "Voir moins",
     "dark_theme": "Mode sombre",
     "page": "Page",
+    "yes": "Oui",
+    "no": "Non",
     "total_price": "Prix total",
     "notepad": {
         "title": "Enregistrez des résumés",
@@ -83,12 +85,30 @@
     "work": {
         "title": "Détails sur l’œuvre",
         "publish_new": "Publier une œuvre",
+        "publishing_info": "Votre œuvre sera examinée avant de devenir visible sur la plateforme.",
+        "work_title": "Titre de l’œuvre",
+        "work_content": "Description",
+        "work_url": "URL YouTube",
+        "media_length": "Longueur (Heure:Minute:Seconde)",
+        "author": "Auteur",
+        "editor": "Editeur / Réalisateur / Producteur",
+        "is_public": {
+            "title": "Consultation payante",
+            "description": "Pour les médias, la consultation coûtera 2$ ; et pour les autres type d’œuvres c'est 1$. Boongo a droit à 20% de chaque paiement de consultation.",
+            "consult_price": "Prix"
+        },
+        "currency": {
+            "title": "Devise : ",
+            "label": "Sélectionner votre devise"
+        },
+        "for_org": "Appartient à une organisation",
         "type": "Type : ",
         "categories": "Catégories : ",
         "category": "Catégorie : ",
-        "author": "Auteur : ",
         "consultation_price": "Consultation",
-        "subscription_info": "Abonnez-vous pour être en mesure de consulter, ou bien devenez partenaire pour publier vos propres ouvrages."
+        "add_files": "Associer des fichiers",
+        "selected_files": "Fichiers sélectionnés :",
+        "max_files": "Limite de {{ count }} fichiers atteinte. Certains fichiers ont été ignorés."
     },
     "most_popular": "Les plus populaires",
     "have_account": "Vous avez déjà un compte ?",
@@ -124,6 +144,7 @@
     "confirm": "Confirmer",
     "save": "Enregistrer",
     "send": "Envoyer",
+    "publish": "Publier",
     "cancel": "Annuler",
     "update": "Mettre à jour",
     "change": "Modifier",
@@ -138,6 +159,7 @@
     "change_password": "Modifier mot de passe",
     "subscription":  {
         "title": "Choisir un abonnement",
+        "info": "Vous n'avez aucun un abonnement. Veuillez vous abonner pour consulter",
         "type": "Type d’abonnement",
         "price": "Prix",
         "link": "S’abonner"

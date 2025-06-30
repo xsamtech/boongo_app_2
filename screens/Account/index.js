@@ -19,6 +19,8 @@ import useColors from '../../hooks/useColors';
 import { useNavigation } from '@react-navigation/native';
 import UserItemComponent from '../../components/user_item';
 
+const TAB_BAR_HEIGHT = 48;
+
 // Works frame
 const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
@@ -76,7 +78,8 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
     const qs = require('qs');
     const url = `${API.boongo_url}/work/filter_by_categories?page=${page}`;
     const params = {
-      'categories_ids[0]': idCat
+      'categories_ids[0]': idCat,
+      user_id: userInfo.id,
     };
 
     const headers = {
@@ -174,40 +177,44 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
-          {/* Categories */}
-          <FlatList
-            data={categories}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ height: 40, marginTop: headerHeight, flexGrow: 0 }}
-            contentContainerStyle={{
-              alignItems: 'center',
-              paddingHorizontal: PADDING.p00,
-            }}
-            renderItem={({ item }) => <CategoryItem item={item} />}
-          />
-
-          {/* Works List */}
-          <Animated.FlatList
-            ref={flatListRef}
-            data={combinedData}
-            extraData={combinedData}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <WorkItemComponent item={item} />}
-            horizontal={false}
-            showsVerticalScrollIndicator={false}
-            onScroll={handleScroll}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.1}
-            scrollEventThrottle={16}
-            windowSize={10}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
-            ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
-          />
-        </View>
+        {/* Works List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <WorkItemComponent item={item} />}
+          horizontal={false}
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: headerHeight + TAB_BAR_HEIGHT,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
+          ListHeaderComponent={
+            <>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 40, flexGrow: 0 }}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: PADDING.p00,
+                }}
+                renderItem={({ item }) => <CategoryItem item={item} />}
+              />
+            </>
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
       </SafeAreaView>
     </View>
   );
@@ -424,6 +431,10 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       }
     };
 
+    useEffect(() => {
+      getPrice();
+    }, []);
+
     return (
       <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p12, padding: PADDING.p03 }]}>
         <View style={{ flexDirection: 'column' }}>
@@ -464,11 +475,14 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               }
             }}
             horizontal={false}
-            style={{ marginTop: headerHeight }}
+            bounces={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             scrollEventThrottle={16}
             windowSize={10}
+            contentContainerStyle={{
+              paddingTop: headerHeight + TAB_BAR_HEIGHT,
+            }}
             refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
             ListEmptyComponent={<EmptyListComponent iconName="cart-outline" title={t('empty_list.title')} description={t('empty_list.description_cart')} />}
             ListHeaderComponent={() => {
@@ -589,13 +603,16 @@ const MySubscribers = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <UserItemComponent item={item} />}
             horizontal={false}
-            style={{ marginTop: headerHeight }}
+            bounces={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
             scrollEventThrottle={16}
             windowSize={10}
+            contentContainerStyle={{
+              paddingTop: headerHeight + TAB_BAR_HEIGHT,
+            }}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             ListEmptyComponent={<EmptyListComponent iconName="book-search-outline" title={t('empty_list.title')} description={t('empty_list.description_subscribers')} />}
             ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
@@ -621,7 +638,9 @@ const AccountScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const savedScrollOffsets = useRef({ my_works: 0, my_cart: 0, my_subscribers: 0 });
 
-  const headerTranslateY = scrollY.interpolate({
+  // const headerTranslateY = scrollY.interpolate({
+  const clampedScrollY = Animated.diffClamp(scrollY, 0, headerHeight);
+  const headerTranslateY = clampedScrollY.interpolate({
     inputRange: [0, headerHeight],
     outputRange: [0, -headerHeight],
     extrapolate: 'clamp',
@@ -702,6 +721,17 @@ const AccountScreen = () => {
     <>
       <Animated.View onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)} style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
         <HeaderComponent />
+      </Animated.View>
+      <Animated.View
+        style={{
+          transform: [{ translateY: headerTranslateY }],
+          position: 'absolute',
+          top: headerHeight, // Positionnée juste en dessous du header
+          zIndex: 999,
+          width: '100%',
+          height: TAB_BAR_HEIGHT,
+          backgroundColor: COLORS.white,
+        }}>
         <TabBar
           {...props}
           style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}

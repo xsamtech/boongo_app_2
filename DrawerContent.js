@@ -17,7 +17,7 @@ import homeStyles from './screens/style';
 import useColors from './hooks/useColors';
 
 const DrawerList = [
-    { icon: 'home-outline', label: 'navigation.home.title', navigateTo: 'Home', toScreen: null },
+    { icon: 'home-outline', label: 'navigation.home.title', navigateTo: 'HomeStack', toScreen: null },
     { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Account', toScreen: null },
     { icon: 'bank-outline', label: 'navigation.school.title', navigateTo: 'School', toScreen: null },
     { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Government', toScreen: null },

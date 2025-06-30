@@ -317,7 +317,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
             keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ height: 40, marginTop: 105, flexGrow: 0 }}
+            style={{ height: 50, marginTop: 105, flexGrow: 0 }}
             contentContainerStyle={{
               alignItems: 'center',
               paddingHorizontal: PADDING.p00,
