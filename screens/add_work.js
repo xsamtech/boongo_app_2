@@ -29,18 +29,18 @@ const AddWorkScreen = () => {
   // =============== Get contexts ===============
   const { userInfo, changeRole } = useContext(AuthContext);
   // =============== Get data ===============
-  const [workTitle, setWorkTitle] = useState(null);
-  const [workContent, setWorkContent] = useState(null);
+  const [workTitle, setWorkTitle] = useState('');
+  const [workContent, setWorkContent] = useState('');
   const [inputHeight, setInputHeight] = useState(40);
-  const [workUrl, setWorkUrl] = useState(null);
+  const [workUrl, setWorkUrl] = useState('');
   const [mediaLengthStr, setMediaLengthStr] = useState('00:00:00');
-  const [author, setAuthor] = useState(null);
-  const [editor, setEditor] = useState(null);
+  const [author, setAuthor] = useState('');
+  const [editor, setEditor] = useState('');
   const [isPublic, setIsPublic] = useState(1);
-  const [consultationPrice, setConsultationPrice] = useState(null);
+  const [consultationPrice, setConsultationPrice] = useState(undefined);
   const [files, setFiles] = useState([]);
-  const [currency, setCurrency] = useState(null);
-  const [selectedType, setSelectedType] = useState(null);
+  const [currency, setCurrency] = useState(undefined);
+  const [selectedType, setSelectedType] = useState(undefined);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [types, setTypes] = useState([]);
   const [currencies, setCurrencies] = useState([]);
@@ -232,16 +232,16 @@ const AddWorkScreen = () => {
     const mediaLengthInSeconds = convertTimeToSeconds(mediaLengthStr);
     const formData = new FormData();
 
-    formData.append('work_title', workTitle);
-    formData.append('work_content', workContent);
-    formData.append('work_url', workUrl);
+    formData.append('work_title', workTitle || '');
+    formData.append('work_content', workContent || '');
+    formData.append('work_url', workUrl || '');
     formData.append('media_length', mediaLengthInSeconds);
-    formData.append('author', author);
-    formData.append('editor', editor);
-    formData.append('consultation_price', consultationPrice);
+    formData.append('author', author || '');
+    formData.append('editor', editor || '');
+    formData.append('consultation_price', consultationPrice ?? '');
     formData.append('is_public', isPublic);
-    formData.append('currency_id', currency);
-    formData.append('type_id', selectedType);
+    formData.append('currency_id', currency ?? '');
+    formData.append('type_id', selectedType ?? '');
     formData.append('status_id', 18);
     formData.append('user_id', userInfo.id);
 
@@ -280,16 +280,16 @@ const AddWorkScreen = () => {
       }
 
       // Reset all after success
-      setWorkTitle(null);
-      setWorkContent(null);
-      setWorkUrl(null);
+      setWorkTitle('');
+      setWorkContent('');
+      setWorkUrl('');
       setMediaLengthStr('00:00:00');
-      setAuthor(null);
-      setEditor(null);
+      setAuthor('');
+      setEditor('');
       setIsPublic(1);
-      setConsultationPrice(null);
-      setCurrency(null);
-      setSelectedType(null);
+      setConsultationPrice(undefined);
+      setCurrency(undefined);
+      setSelectedType(undefined);
       setSelectedCategories([]);
       setFiles([]);
 
@@ -321,7 +321,7 @@ const AddWorkScreen = () => {
         <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.work_title')}</Text> */}
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={workTitle}
+          value={workTitle || ''}
           placeholder={t('work.work_title')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setWorkTitle} />
@@ -334,7 +334,7 @@ const AddWorkScreen = () => {
             setInputHeight(e.nativeEvent.contentSize.height)
           }
           style={[homeStyles.authInput, { height: Math.max(40, inputHeight), color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={workContent}
+          value={workContent || ''}
           placeholder={t('work.work_content')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setWorkContent} />
@@ -343,7 +343,7 @@ const AddWorkScreen = () => {
         <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.work_url')}</Text> */}
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={workUrl}
+          value={workUrl || ''}
           placeholder={t('work.work_url')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setWorkUrl} />
@@ -361,7 +361,7 @@ const AddWorkScreen = () => {
           options={{
             mask: '99:99:99', // HH:MM:SS
           }}
-          value={mediaLengthStr}
+          value={mediaLengthStr || ''}
           onChangeText={setMediaLengthStr}
           placeholder="00:00:00"
           keyboardType="numeric"
@@ -371,7 +371,7 @@ const AddWorkScreen = () => {
         <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.author')}</Text> */}
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={author}
+          value={author || ''}
           placeholder={t('work.author')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setAuthor} />
@@ -380,7 +380,7 @@ const AddWorkScreen = () => {
         <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.editor')}</Text> */}
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={editor}
+          value={editor || ''}
           placeholder={t('work.editor')}
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setEditor} />
@@ -460,26 +460,6 @@ const AddWorkScreen = () => {
             )}
           />
         )}
-        {/* <FlatList
-          data={categories}
-          scrollEnabled={false}
-          nestedScrollEnabled
-          keyExtractor={(item) => item.value.toString()}
-          renderItem={({ item }) => (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Checkbox
-                status={selectedCategories.includes(item.value) ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  if (selectedCategories.includes(item.value)) {
-                    setSelectedCategories(selectedCategories.filter(id => id !== item.value));
-                  } else {
-                    setSelectedCategories([...selectedCategories, item.value]);
-                  }
-                }} />
-              <Text style={{ color: COLORS.black }}>{item.label}</Text>
-            </View>
-          )}
-        /> */}
 
         {/* Select Files */}
         <TouchableOpacity

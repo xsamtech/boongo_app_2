@@ -13,14 +13,16 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING, PHONE, WEB } from '../tools/constants';
+import { API, PADDING, PHONE, TEXT_SIZE, WEB } from '../tools/constants';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
+import FileThumbnail from '../components/file_thumbnail';
+import GalleryModal from '../components/gallery_modal';
 
 const sendWhatsAppMessage = async () => {
   const phoneNumber = PHONE.admin;
-  const message = "Bonjour Boongo.\n\nJe voudrais devenir partenaire pour être en mesure de publier mes ouvrages.\n\nQue dois-je faire ?";
+  const message = "Bonjour Boongo.\n\nJe voudrais devenir partenaire pour faire la promotion de vos services.\n\nQue dois-je faire ?";
   const text = encodeURIComponent(message);
   const url = `whatsapp://send?phone=${phoneNumber}&text=${text}`;
 
@@ -46,7 +48,26 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [work, setWork] = useState({});
   const [categoryCount, setCategoryCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const mWidth = Dimensions.get('window').width / 1.7
+  const mWidth = Dimensions.get('window').width / 1.7;
+  const [imageModal, setImageModal] = useState({ visible: false, index: 0 });
+
+  // =============== Check if file is video ===============
+  const isVideoFile = (url) => {
+    if (!url) return false;
+
+    const videoExtensions = ['.mp4', '.mov', '.avi', '.webm', '.mkv'];
+
+    return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+  };
+
+  // =============== Image mapping ===============
+  const galleryFiles = work.images?.filter(image => { return image.type.alias === 'image_file'; });
+  // const galleryFiles = work.images?.filter(f => f.type.name === 'Image (Photo/Vidéo)') || [];
+
+  const gallerySources = galleryFiles?.map(file => ({
+    uri: file.file_url,
+    type: isVideoFile(file.file_url) ? 'video' : 'image',
+  }));
 
   // =============== Refresh control ===============
   const onRefresh = useCallback(() => {
@@ -123,33 +144,7 @@ const WorkDataScreen = ({ route, navigation }) => {
               </View>
               <View style={homeStyles.workDescTop}>
                 <Text style={[homeStyles.workTitle, { color: COLORS.black }]}>{work.work_title}</Text>
-                <Text style={[homeStyles.workContent, { color: COLORS.black }]}>{work.work_content}</Text>
-                {userInfo.id ? (
-                  userInfo.has_valid_subscription ?
-                    ''
-                    :
-                    <>
-                      <Divider />
-                      <View style={[homeStyles.workIconBtns, { justifyContent: 'center', paddingHorizontal: 10 }]}>
-                        {work.document_url &&
-                          <TouchableOpacity style={{ marginRight: 20 }} onPress={() => navigation.navigate('PDFViewer', { docTitle: work.work_title, docUri: work.document_url, curPage: 1 })}>
-                            <Icon name='file-document-outline' style={[homeStyles.workIconBtn, { fontSize: 37, color: COLORS.danger }]} />
-                          </TouchableOpacity>
-                        }
-                        {work.video_url ? (
-                          <TouchableOpacity style={{ marginRight: 20 }} onPress={() => navigation.navigate('VideoPlayer', { videoTitle: work.workTitle, videoUri: work.video_url })}>
-                            <Icon name='television-play' style={[homeStyles.workIconBtn, { fontSize: 37, color: COLORS.primary }]} />
-                          </TouchableOpacity>
-                        ) : ''}
-                        {work.audio_url ? (
-                          <TouchableOpacity onPress={() => navigation.navigate('AudioPlayer', { audioTitle: work.workTitle, audioUri: work.audio_url })}>
-                            <Icon name='microphone-outline' style={[homeStyles.workIconBtn, { fontSize: 37, color: COLORS.success }]} />
-                          </TouchableOpacity>
-                        ) : ''}
-                      </View>
-                    </>)
-                  :
-                  ''}
+                <Text style={[homeStyles.workContent, { color: COLORS.black, textAlign: 'justify' }]}>{work.work_content}</Text>
               </View>
             </View>
 
@@ -181,6 +176,95 @@ const WorkDataScreen = ({ route, navigation }) => {
                     return (<Text style={homeStyles.workDescBadge}>{item.category_name}</Text>);
                   }} />
               </View>
+              {!userInfo.has_valid_subscription && (
+                <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
+                  <Divider style={{ marginTop: PADDING.p01 }} />
+                  {/* Documents */}
+                  {Array.isArray(work.documents) && work.documents.length > 0 && (
+                    <View style={{ padding: PADDING.p00 }}>
+                      <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
+
+                      {work.documents?.map((doc, idx) => (
+                        <FileThumbnail
+                          key={`doc-${idx}`}
+                          uri={null}
+                          type="document"
+                          title={`${t('file.document')} ${idx + 1}`}
+                          onPress={() => navigation.navigate('PDFViewer', {
+                            docTitle: work.work_title,
+                            docUri: doc.file_url,
+                            curPage: 1,
+                          })}
+                        />
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Audios */}
+                  {Array.isArray(work.audios) && work.audios.length > 0 && (
+                    <View style={{ padding: PADDING.p00 }}>
+                      <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
+
+                      {work.audios?.map((audio, idx) => (
+                        <FileThumbnail
+                          key={`audio-${idx}`}
+                          uri={null}
+                          type="audio"
+                          title={`${t('file.audio')} ${idx + 1}`}
+                          onPress={() => navigation.navigate('AudioPlayer', {
+                            audioTitle: work.work_title,
+                            audioUri: audio.file_url,
+                          })}
+                        />
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Gallery (Local photos/videos) */}
+                  {Array.isArray(work.images) && work.images.length > 0 && (
+                    <View style={{ padding: PADDING.p00 }}>
+                      <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
+
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        {gallerySources.map((file, index) => (
+                          <FileThumbnail
+                            key={`media-${index}`}
+                            uri={file.uri}
+                            type={file.type}
+                            title={`${t('file.image')} ${index + 1}`}
+                            onPress={() => setImageModal({ visible: true, index })}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Remote video (YouTube or other) */}
+                  {work.work_url && (
+                    <View style={{ padding: PADDING.p00 }}>
+                      <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
+
+                      <FileThumbnail
+                        uri={work.work_url}
+                        type="video"
+                        title={t('file.video')}
+                        onPress={() => navigation.navigate('VideoPlayer', {
+                          videoTitle: work.work_title,
+                          videoUri: work.work_url,
+                        })}
+                      />
+                    </View>
+                  )}
+
+                  {/* Modal */}
+                  <GalleryModal
+                    visible={imageModal.visible}
+                    index={imageModal.index}
+                    files={gallerySources}
+                    onClose={() => setImageModal({ visible: false, index: 0 })}
+                  />
+                </View>
+              )}
             </View>
           </View>
           <View style={homeStyles.workCard}>
@@ -189,16 +273,16 @@ const WorkDataScreen = ({ route, navigation }) => {
                 <>
                   <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
                   <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { message: t('error_message.pending_after_payment') }) }}>
-                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: COLORS.white }]} name='money-check-dollar' />
-                    <Text style={{ color: COLORS.white }}>{t('subscription.link')}</Text>
+                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='money-check-dollar' />
+                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('subscription.link')}</Text>
                   </TouchableOpacity>
                 </>
               }
               {!userInfo.is_partner &&
                 <>
                   <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.warning }]} onPress={sendWhatsAppMessage}>
-                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: COLORS.black }]} name='handshake-angle' />
-                    <Text style={{ color: COLORS.black }}>{t('auth.my_works.start_button')}</Text>
+                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'black' }]} name='handshake-angle' />
+                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'black' }}>{t('auth.my_works.start_button')}</Text>
                   </TouchableOpacity>
                 </>
               }
