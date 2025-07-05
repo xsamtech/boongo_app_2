@@ -136,11 +136,11 @@ const WorkDataScreen = ({ route, navigation }) => {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.white }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
-        <View style={[homeStyles.workBody, { paddingTop: 0, paddingBottom: PADDING.p01 }]}>
+        <View style={[homeStyles.workBody, {  paddingTop: 0, paddingBottom: PADDING.p01 }]}>
           <View style={homeStyles.workCard}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', alignItems: 'flex-start' }]}>
               <View>
-                <Image source={{ uri: work.photo_url }} style={[homeStyles.workImage, { width: mWidth, height: mWidth * 1.6 }]} />
+                <Image source={{ uri: work.photo_url }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 40, height: mWidth * 1.6 }]} />
               </View>
               <View style={homeStyles.workDescTop}>
                 <Text style={[homeStyles.workTitle, { color: COLORS.black }]}>{work.work_title}</Text>

@@ -97,10 +97,10 @@ const RegisterScreen = () => {
 
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p16, paddingHorizontal: PADDING.p10 }}>
         {/* Brand / Title */}
-        <View style={homeStyles.authlogo}>
+        <View style={[homeStyles.authlogo, { marginBottom: PADDING.p10 }]}>
           <LogoText width={200} height={48} />
         </View>
-        <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_register')}</Text>
+        {/* <Text style={[homeStyles.authTitle, { color: COLORS.black }]}>{t('i_register')}</Text> */}
 
         {/* First name */}
         <TextInput

@@ -74,6 +74,7 @@ const SearchScreen = () => {
     const params = {
       data: searchTerm,
       type_id: selectedType,
+      status_id: 17,
       categories_ids: selectedCategories,
     };
 
