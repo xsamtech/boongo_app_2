@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     Modal, View, TouchableOpacity, StyleSheet,
-    Image, Dimensions
+    Image, Dimensions, Text
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import Slider from '@react-native-community/slider';
 import useColors from '../hooks/useColors';
 
 const { width, height } = Dimensions.get('window');
@@ -15,27 +16,30 @@ const GalleryModal = ({ visible, index = 0, files = [], onClose }) => {
 
     const safeIndex = Number.isInteger(index) && index >= 0 && index < files.length ? index : 0;
     const [currentIndex, setCurrentIndex] = useState(safeIndex);
-    const [shouldPlay, setShouldPlay] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(true);
+    const [videoProgress, setVideoProgress] = useState(0);
+    const [videoDuration, setVideoDuration] = useState(0);
+    const videoRef = useRef(null);
 
     const currentFile = files[currentIndex] || {};
-    const isVideo = currentFile?.type === 'video';
-    const videoUri = encodeURI(currentFile?.uri || '');
+    // const isVideo = currentFile?.type === 'video';
+    // const videoUri = encodeURI(currentFile?.uri || '');
 
     const mediaSources = files.map(file => ({ url: file.uri }));
 
     useEffect(() => {
-        if (visible && isVideo) {
-            setShouldPlay(true);
-        } else {
-            setShouldPlay(false);
-        }
-    }, [visible, isVideo]);
-
-    useEffect(() => {
         if (!visible) {
-            setCurrentIndex(safeIndex); // Reset index when modal is closed
+            setCurrentIndex(safeIndex);
+            setIsPlaying(true);
+            setVideoProgress(0);
         }
     }, [visible]);
+
+    const formatTime = seconds => {
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s < 10 ? '0' + s : s}`;
+    };
 
     return (
         <Modal visible={visible} transparent>
@@ -56,28 +60,67 @@ const GalleryModal = ({ visible, index = 0, files = [], onClose }) => {
                     backgroundColor="black"
                     onChange={newIndex => {
                         setCurrentIndex(newIndex);
+                        setIsPlaying(true);
+                        setVideoProgress(0);
                     }}
-                    renderImage={props => (
-                        <Image
-                            source={{ uri: encodeURI(files[currentIndex]?.uri || '') }}
-                            style={{ flex: 1, resizeMode: 'contain' }}
-                        />
-                    )}
-                />
+                    renderImage={() => {
+                        const file = files[currentIndex];
+                        const uri = encodeURI(file?.uri || '');
+                        const isVideo = file?.type === 'video';
 
-                {isVideo && (
-                    <View style={StyleSheet.absoluteFill}>
-                        <Video
-                            key={videoUri}
-                            source={{ uri: videoUri }}
-                            style={{ flex: 1 }}
-                            controls
-                            resizeMode="contain"
-                            paused={!shouldPlay}
-                            onError={e => console.log('Video error:', e)}
-                        />
-                    </View>
-                )}
+                        if (isVideo) {
+                            return (
+                                <View style={styles.videoContainer}>
+                                    <Video
+                                        ref={videoRef}
+                                        source={{ uri: uri }}
+                                        style={StyleSheet.absoluteFill}
+                                        resizeMode="contain"
+                                        paused={!isPlaying}
+                                        onProgress={({ currentTime }) => setVideoProgress(currentTime)}
+                                        onLoad={({ duration }) => setVideoDuration(duration)}
+                                        onError={e => console.log('Video error:', e)}
+                                    />
+
+                                    {/* Controls */}
+                                    <View style={styles.controls}>
+                                        <TouchableOpacity onPress={() => setIsPlaying(!isPlaying)}>
+                                            <Icon
+                                                name={isPlaying ? 'pause-circle' : 'play-circle'}
+                                                size={40}
+                                                color={COLORS.white}
+                                            />
+                                        </TouchableOpacity>
+
+                                        <View style={styles.progressRow}>
+                                            <Text style={styles.timeText}>{formatTime(videoProgress)}</Text>
+                                            <Slider
+                                                style={{ flex: 1 }}
+                                                minimumValue={0}
+                                                maximumValue={videoDuration}
+                                                value={videoProgress}
+                                                minimumTrackTintColor={COLORS.white}
+                                                maximumTrackTintColor={COLORS.dark_secondary}
+                                                onSlidingComplete={val => {
+                                                    videoRef.current?.seek(val);
+                                                    setVideoProgress(val);
+                                                }}
+                                            />
+                                            <Text style={styles.timeText}>{formatTime(videoDuration)}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            );
+                        }
+
+                        return (
+                            <Image
+                                source={{ uri }}
+                                style={{ width, height, resizeMode: 'contain' }}
+                            />
+                        );
+                    }}
+                />
             </View>
         </Modal>
     );
