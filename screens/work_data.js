@@ -49,6 +49,9 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const mWidth = Dimensions.get('window').width / 1.7;
   const [imageModal, setImageModal] = useState({ visible: false, index: 0 });
+  const [price, setPrice] = useState('');
+  // Check if user has valid consultation if the work is not public
+  const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
 
   // =============== Check if file is video ===============
   const isVideoFile = (url) => {
@@ -124,6 +127,52 @@ const WorkDataScreen = ({ route, navigation }) => {
     })
   };
 
+  const getPrice = () => {
+    if (!work.consultation_price) return;
+
+    setIsLoading(true);
+
+    if (work.currency.currency_acronym === userInfo.currency.currency_acronym) {
+      setPrice(work.consultation_price + ' ' + userInfo.currency.currency_acronym);
+      setIsLoading(false);
+
+    } else {
+      const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${work.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
+      const mHeaders = {
+        'X-localization': 'fr',
+        'Authorization': `Bearer ${userInfo.api_token}`
+      };
+
+      axios.get(url, { headers: mHeaders })
+        .then(response => {
+          // Vérifie si la réponse contient les données nécessaires
+          if (response && response.data && response.data.success && response.data.data) {
+            const responseData = response.data.data;
+            const userPrice = work.consultation_price * responseData.rate;
+            setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
+          } else {
+            console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
+          }
+        })
+        .catch(error => {
+          // Gère les erreurs liées à la requête
+          if (error.response?.status === 429) {
+            console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+          } else {
+            console.error('Erreur lors de la récupération du taux de change', error);
+          }
+        })
+        .finally(() => {
+          // Enfin, on met à jour l'état de chargement
+          setIsLoading(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    getPrice();
+  }, []);
+
   return (
     <>
       {/* Header */}
@@ -146,20 +195,35 @@ const WorkDataScreen = ({ route, navigation }) => {
                 <Text style={[homeStyles.workContent, { color: COLORS.black, textAlign: 'justify' }]}>{work.work_content}</Text>
               </View>
             </View>
-
+            {/* Metadata */}
             <View style={homeStyles.workBottom}>
-              {work.user_owner ? (
+              {/* Auhtor */}
+              {work.author ? (
                 <>
                   <View style={homeStyles.workDescBottom}>
-                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.author')}</Text>
-                    <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.user_owner ? work.user_owner : null}</Text>
+                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.author')} : </Text>
+                    <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.author ? work.author : null}</Text>
                   </View>
                 </>
               ) : ''}
+
+              {/* Editor */}
+              {work.editor ? (
+                <>
+                  <View style={homeStyles.workDescBottom}>
+                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.editor')} : </Text>
+                    <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.editor ? work.editor : null}</Text>
+                  </View>
+                </>
+              ) : ''}
+
+              {/* Type */}
               <View style={homeStyles.workDescBottom}>
                 <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.type')}</Text>
                 <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.type ? work.type.type_name : null}</Text>
               </View>
+
+              {/* Categor(ies)y */}
               <View style={homeStyles.workDescBottom}>
                 <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>
                   {categoryCount > 1 ? t('work.categories') : t('work.category')}
@@ -175,7 +239,19 @@ const WorkDataScreen = ({ route, navigation }) => {
                     return (<Text style={homeStyles.workDescBadge}>{item.category_name}</Text>);
                   }} />
               </View>
-              {!userInfo.has_valid_subscription && (
+
+              {/* Consultation price */}
+              {work.is_public === 0 ? (
+                <>
+                  <View style={homeStyles.workDescBottom}>
+                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')} : </Text>
+                    <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.consultation_price ? price : null}</Text>
+                  </View>
+                </>
+              ) : ''}
+
+              {/* Work files */}
+              {userInfo.has_valid_subscription && (
                 <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
                   <Divider style={{ marginTop: PADDING.p01 }} />
                   {/* Documents */}
@@ -273,9 +349,18 @@ const WorkDataScreen = ({ route, navigation }) => {
               {!userInfo.has_valid_subscription &&
                 <>
                   <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
-                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { message: t('error_message.pending_after_payment') }) }}>
+                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { object: 'subscription', message: t('error_message.pending_after_payment') }) }}>
                     <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='money-check-dollar' />
                     <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('subscription.link')}</Text>
+                  </TouchableOpacity>
+                </>
+              }
+              {userInfo.has_valid_subscription && work.is_public === 0 && isPaid &&
+                <>
+                  <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
+                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={() => { navigation.navigate('MobileSubscribe', { object: 'consultation' }) }}>
+                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
+                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('consultation.link')}</Text>
                   </TouchableOpacity>
                 </>
               }

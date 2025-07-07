@@ -108,7 +108,7 @@
         "is_public": {
             "title": "Kotala efutamaka",
             "description": "Pona ba medias, kotala ekosɛnga 2$, mpe pona ba lolenge mosusu ya misala ekosɛnga 1$. Boongo ezali na lotomo ya 20% ya mbongo moko na moko ya kotala.",
-            "consult_price": "Ntalo"
+            "consult_price": "Ntalo ya kotala"
         },
         "currency": {
             "title": "Mbongo: ",
@@ -176,6 +176,10 @@
         "type": "Lolenge ya abonnément",
         "price": "Ntalo",
         "link": "S’abonner"
+    },
+    "consultation":  {
+        "info": "Kotala mosala oyo eza ofele te, ndenge okoki komona yango.",
+        "link": "Nafuta po natala"
     },
     "add_to_cart": "Ajouter au panier",
     "withdraw_from_cart": "Retirer du panier",

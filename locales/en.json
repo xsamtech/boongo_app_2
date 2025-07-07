@@ -108,7 +108,7 @@
         "is_public": {
             "title": "Paid consultation",
             "description": "For medias, viewing cost $2; and for other types of works, it's $1. Boongo is entitled to 20% of each viewing payment.",
-            "consult_price": "Price"
+            "consult_price": "Consulation price"
         },
         "currency": {
             "title": "Currency: ",
@@ -176,6 +176,10 @@
         "type": "Subscription type",
         "price": "Price",
         "link": "Subscribe"
+    },
+    "consultation":  {
+        "info": "Consulting this work is not free, as you may have noticed.",
+        "link": "Pay to consult"
     },
     "add_to_cart": "Add to cart",
     "withdraw_from_cart": "Withdraw from cart",

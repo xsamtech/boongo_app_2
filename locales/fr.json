@@ -108,7 +108,7 @@
         "is_public": {
             "title": "Consultation payante",
             "description": "Pour les médias, la consultation coûtera 2$ ; et pour les autres type d’œuvres c'est 1$. Boongo a droit à 20% de chaque paiement de consultation.",
-            "consult_price": "Prix"
+            "consult_price": "Prix de la consulation"
         },
         "currency": {
             "title": "Devise : ",
@@ -176,6 +176,10 @@
         "type": "Type d’abonnement",
         "price": "Prix",
         "link": "S’abonner"
+    },
+    "consultation":  {
+        "info": "La consultation de cette œuvre n’est pas gratuite comme vous l'avez remarqué.",
+        "link": "Payer pour consulter"
     },
     "add_to_cart": "Ajouter au panier",
     "withdraw_from_cart": "Retirer du panier",
