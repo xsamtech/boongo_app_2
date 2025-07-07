@@ -8,7 +8,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { Divider } from 'react-native-paper';
 import { NetworkInfo } from 'react-native-network-info';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
@@ -211,9 +210,11 @@ const WorkDataScreen = ({ route, navigation }) => {
                           uri={null}
                           type="audio"
                           title={`${t('file.audio')} ${idx + 1}`}
-                          onPress={() => navigation.navigate('AudioPlayer', {
+                          onPress={() => navigation.navigate('Audio', {
                             audioTitle: work.work_title,
-                            audioUri: audio.file_url,
+                            audioUrl: audio.file_url,
+                            mediaCover: work.photo_url,
+                            mediaAuthor: work.author,
                           })}
                         />
                       ))}

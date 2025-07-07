@@ -137,7 +137,7 @@ const HeaderComponent = ({ title }) => {
     );
   }
 
-  if (route.name === 'WorkData') {
+  if (route.name === 'WorkData' || route.name === 'Audio') {
     return (
         <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
           {/* Brand */}

@@ -1,8 +1,9 @@
+/**
+ * @author Xanders
+ * @see https://team.xsamtech.com/xanderssamoth
+ */
 import React, { useEffect, useState, useRef } from 'react';
-import {
-    Modal, View, TouchableOpacity, StyleSheet,
-    Image, Dimensions, Text
-} from 'react-native';
+import { Modal, View, TouchableOpacity, StyleSheet, Image, Dimensions, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import ImageViewer from 'react-native-image-zoom-viewer';
@@ -22,8 +23,6 @@ const GalleryModal = ({ visible, index = 0, files = [], onClose }) => {
     const videoRef = useRef(null);
 
     const currentFile = files[currentIndex] || {};
-    // const isVideo = currentFile?.type === 'video';
-    // const videoUri = encodeURI(currentFile?.uri || '');
 
     const mediaSources = files.map(file => ({ url: file.uri }));
 

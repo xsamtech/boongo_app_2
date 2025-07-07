@@ -50,11 +50,11 @@ import JournalScreen from './screens/Organization/journal';
 import MappingScreen from './screens/Organization/mapping';
 import MediaScreen from './screens/Organization/media';
 import PDFViewerScreen from './screens/pdf_viewer';
-import VideoPlayerScreen from './screens/video_player';
+import YouTubePlayerScreen from './screens/youtube_screen';
 import OrganizationDataScreen from './screens/Organization/organization_data';
 import GovernmentScreen from './screens/Organization/Government';
 import AddGovernmentScreen from './screens/Organization/Government/add_government';
-import AudioPlayerScreen from './screens/audio_player';
+import AudioScreen from './screens/audio_screen';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
 import ChatEntityScreen from './screens/Chat/chat';
@@ -303,8 +303,8 @@ const HomeStackNav = () => {
       <Stack.Screen name='Media' component={MediaScreen} />
       <Stack.Screen name='WorkData' component={WorkDataScreen} />
       <Stack.Screen name='PDFViewer' component={PDFViewerScreen} />
-      <Stack.Screen name='AudioPlayer' component={AudioPlayerScreen} />
-      <Stack.Screen name='VideoPlayer' component={VideoPlayerScreen} />
+      <Stack.Screen name='Audio' component={AudioScreen} />
+      <Stack.Screen name='VideoPlayer' component={YouTubePlayerScreen} />
       <Stack.Screen name='Subscription' component={SubscriptionScreen} />
       <Stack.Screen name='MobileSubscribe' component={MobileSubscribeScreen} />
       <Stack.Screen name='BankCardSubscribe' component={BankCardSubscribeScreen} />

@@ -15,7 +15,7 @@ import LogoText from '../assets/img/brand.svg';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
 
-const VideoPlayerScreen = ({ route, navigation }) => {
+const YouTubePlayerScreen = ({ route, navigation }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -101,4 +101,4 @@ const VideoPlayerScreen = ({ route, navigation }) => {
   );
 };
 
-export default VideoPlayerScreen;
+export default YouTubePlayerScreen;

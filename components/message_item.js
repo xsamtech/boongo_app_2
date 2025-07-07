@@ -13,7 +13,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import Video from 'react-native-video';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import useColors from '../hooks/useColors';
-import AudioPlayer from '../screens/audio_player';
+import AudioPlayer from '../screens/audio_screen';
 import homeStyles from '../screens/style';
 import { Button } from 'react-native-paper';
 
