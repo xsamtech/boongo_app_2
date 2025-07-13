@@ -2,39 +2,35 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, Dimensions, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { Button, DataTable, Divider } from 'react-native-paper';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import * as RNLocalize from 'react-native-localize';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING } from '../tools/constants';
+import { API, PADDING, TEXT_SIZE } from '../tools/constants';
 import homeStyles from '../screens/style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
+import EmptyListComponent from '../components/empty_list';
 
 const SubscriptionScreen = ({ route }) => {
-  // =============== Colors ===============
   const COLORS = useColors();
-  // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Get parameters ===============
   const { message } = route.params;
-  // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Get context ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get data ===============
   const [subscriptions, setSubscriptions] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [prices, setPrices] = useState({});  // État pour stocker les prix des abonnements
+  const [prices, setPrices] = useState({});
 
-  // =============== Refresh control ===============
   const onRefresh = useCallback(() => {
     setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
   }, []);
 
   useEffect(() => {
@@ -42,10 +38,9 @@ const SubscriptionScreen = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    // Vérifier si les abonnements ont été chargés et ensuite appeler les prix
     if (Object.keys(subscriptions).length > 0) {
-      Object.keys(subscriptions).forEach(categoryName => {
-        subscriptions[categoryName].forEach(item => {
+      Object.keys(subscriptions).forEach((categoryName) => {
+        subscriptions[categoryName].forEach((item) => {
           const subscriptionId = `${categoryName}-${item.id}`;
           if (!prices[subscriptionId]) {
             getPrice(item.price, item.currency.currency_acronym, subscriptionId);
@@ -53,167 +48,153 @@ const SubscriptionScreen = ({ route }) => {
         });
       });
     }
-  }, [subscriptions]);  // Ce useEffect sera exécuté lorsque les abonnements changent
+  }, [subscriptions]);
 
+  // Get system language
+  const getLanguage = () => {
+    const locales = RNLocalize.getLocales();
+
+    if (locales && locales.length > 0) {
+      return locales[0].languageCode;
+    }
+
+    return 'fr';
+  };
+
+  // Get all subscription
   const getSubscription = () => {
-    const config = { method: 'GET', url: `${API.boongo_url}/subscription`, headers: { 'X-localization': 'fr' } };
-
-    axios(config)
-      .then(res => {
-        // Vérification si les données existent
+    axios
+      .get(`${API.boongo_url}/subscription`, { headers: { 'X-localization': 'fr' } })
+      .then((res) => {
         if (res.data.success && res.data.data) {
-          setSubscriptions(res.data.data);  // On stocke directement les catégories dans l'état
+          setSubscriptions(res.data.data);
         }
         setIsLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
         setIsLoading(false);
       });
   };
 
-  // Fonction pour obtenir le prix de l'abonnement avec conversion de devise
+  // Get price according to user currency
   const getPrice = (price, currency_acronym, id) => {
+    const userLang = getLanguage();
+
+    // Apply language-specific formatting
+    let formattedPrice = price.toLocaleString(userLang, {
+      style: 'decimal',
+      useGrouping: true,
+      minimumFractionDigits: 0, // No digits after the decimal point
+      maximumFractionDigits: 0, // No digits after the decimal point
+    });
+
     if (currency_acronym === userInfo.currency.currency_acronym) {
-      setPrices(prevPrices => ({ ...prevPrices, [id]: price + ' ' + userInfo.currency.currency_acronym }));
+      setPrices((prevPrices) => ({ ...prevPrices, [id]: `${formattedPrice} ${userInfo.currency.currency_acronym}` }));
+
     } else {
       const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${currency_acronym}/${userInfo.currency.currency_acronym}`;
       const mHeaders = {
         'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
+        Authorization: `Bearer ${userInfo.api_token}`,
       };
 
-      axios
-        .get(url, { headers: mHeaders })
-        .then(response => {
-          if (response && response.data && response.data.success && response.data.data) {
-            const responseData = response.data.data;
-            const userPrice = price * responseData.rate;
-            setPrices(prevPrices => ({ ...prevPrices, [id]: userPrice.toFixed(2) + ' ' + userInfo.currency.currency_acronym }));
-          } else {
-            console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-          }
-        })
-        .catch(error => {
+      axios.get(url, { headers: mHeaders }).then((response) => {
+        if (response.data.success && response.data.data) {
+          const responseData = response.data.data;
+          const userPrice = price * responseData.rate;
+          const formattedUserPrice = userPrice.toLocaleString(userLang, {
+            style: 'decimal',
+            useGrouping: true,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          });
+
+          setPrices((prevPrices) => ({ ...prevPrices, [id]: `${formattedUserPrice} ${userInfo.currency.currency_acronym}` }));
+        }
+      })
+        .catch((error) => {
           console.error('Erreur lors de la récupération du taux de change', error);
         });
     }
   };
 
+  const renderCategory = ({ item, index }) => (
+    <View style={{ marginVertical: 10 }}>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', color: COLORS.link_color }}>
+        {item}
+      </Text>
+      <FlatList
+        data={subscriptions[item]}
+        keyExtractor={(subItem) => subItem.id.toString()}
+        renderItem={({ item: subItem }) => (
+          <SubscriptionItem
+            item={subItem}
+            categoryName={item}
+            prices={prices}
+            getPrice={getPrice}
+            userInfo={userInfo}
+          />
+        )}
+        ListEmptyComponent={<Text>{t('empty_list.title')}</Text>}
+      />
+    </View>
+  );
+
+  const categories = Object.keys(subscriptions);
+
+  const SubscriptionItem = ({ item, categoryName, prices, getPrice, userInfo }) => {
+    const subscriptionId = `${categoryName}-${item.id}`;
+    const price = prices[subscriptionId];
+    // Check if user has added subscription in the 
+    const isInCart = userInfo.unpaid_subscriptions && userInfo.unpaid_subscriptions.some(subscription => subscription.id === item.id);
+
+    useEffect(() => {
+      if (!prices[subscriptionId]) {
+        getPrice(item.price, item.currency.currency_acronym, subscriptionId);
+      }
+    }, [prices, item, categoryName, subscriptionId, getPrice]);
+
+    return (
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: COLORS.light_secondary }}>
+        <View style={{ flexDirection: 'column' }}>
+          <Text style={{ flex: 2, color: COLORS.dark_secondary }}>{item.type.type_name}</Text>
+          <Text style={{ flex: 1, fontWeight: '500', color: COLORS.black }}>{price ? price : <ActivityIndicator size="small" />}</Text>
+        </View>
+        {isInCart ?
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.light_secondary, paddingVertical: 5 }]}>
+            <Icon name="window-close" size={20} color={COLORS.danger} />
+            <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw_from_cart')}</Text>
+          </TouchableOpacity>
+          :
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.light_secondary, paddingVertical: 5 }]}>
+            <Icon name="plus" size={20} color={COLORS.success} />
+            <Text style={{ color: COLORS.success, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('add_to_cart')}</Text>
+          </TouchableOpacity>
+        }
+      </View>
+    );
+  };
+
   return (
     <>
-      {/* Header */}
-      <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
+      <View style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p01 }}>
         <HeaderComponent />
       </View>
 
-      {/* Content */}
-      <ScrollView
-        style={{
-          flex: 1,
-          height: Dimensions.get('window').height - 20,
-          backgroundColor: COLORS.white,
-        }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
-      >
-        <View
-          style={[
-            homeStyles.cardEmpty,
-            {
-              flexShrink: 0,
-              width: Dimensions.get('window').width,
-              height: Dimensions.get('window').height + 200,
-              marginLeft: 0,
-              paddingBottom: 30,
-            },
-          ]}
-        >
-          {Object.keys(subscriptions).length > 0 ? (
-            // On itère maintenant sur les catégories
-            Object.keys(subscriptions).map((categoryName, categoryIndex) => {
-              const categorySubscriptions = subscriptions[categoryName];
-
-              return (
-                <View key={categoryIndex} style={{ marginVertical: 10 }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-                    {categoryName}
-                  </Text>
-
-                  {/* Table des abonnements */}
-                  <DataTable style={{ paddingVertical: 15, paddingHorizontal: 0 }}>
-                    <DataTable.Header style={{ backgroundColor: COLORS.secondary }}>
-                      <DataTable.Title style={{ minWidth: 80 }}>{t('subscription.type')}</DataTable.Title>
-                      <DataTable.Title style={{ maxWidth: 40 }}>{t('subscription.price')}</DataTable.Title>
-                      <DataTable.Title></DataTable.Title>
-                    </DataTable.Header>
-
-                    {categorySubscriptions.map((item) => {
-                      const subscriptionId = `${categoryIndex}-${item.id}`;  // Clé unique pour chaque abonnement
-                      const price = prices[subscriptionId];  // On récupère le prix du tableau `prices`
-
-                      return (
-                        <DataTable.Row key={item.id}>
-                          <DataTable.Cell style={{ minWidth: 80 }}>{item.type.type_name}</DataTable.Cell>
-                          <DataTable.Cell style={{ maxWidth: 40 }}>
-                            {price ? (
-                              price
-                            ) : (
-                              <ActivityIndicator size="small" color={COLORS.primary} />
-                            )}
-                          </DataTable.Cell>
-                          <DataTable.Cell>
-                            <TouchableOpacity
-                              style={[homeStyles.workCmd, { backgroundColor: COLORS.success, paddingVertical: 5 }]}
-                              onPress={() => {
-                                userInfo.id
-                                  ? redirectToSubscribe(navigation, item.id, userInfo.id, userInfo.api_token)
-                                  : navigation.navigate('Login', {
-                                    message: t('error_message.login_before_operation'),
-                                  });
-                              }}
-                            >
-                              <Text style={{ color: COLORS.white }}>{t('subscription.link')}</Text>
-                            </TouchableOpacity>
-                          </DataTable.Cell>
-                        </DataTable.Row>
-                      );
-                    })}
-                  </DataTable>
-                </View>
-              );
-            })
-          ) : (
-            <Text style={[homeStyles.cardEmptyTitle, { marginTop: 20, textAlign: 'center' }]}>
-              {t('empty_list.title')}
-            </Text>
-          )}
-
-          {/* Terms accept */}
-          <Divider style={[homeStyles.authDivider, { marginHorizontal: PADDING.horizontal }]} />
-          <Text style={[homeStyles.authTermsText, { marginBottom: 40 }]}>
-            {t('terms_accept1_')}
-            <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Terms' })}>
-              {t('navigation.terms')}
-            </Text>
-            {t('terms_accept2')}{' '}
-            <Text style={homeStyles.link} onPress={() => navigation.navigate('About', { screen: 'Privacy' })}>
-              {t('navigation.privacy')}
-            </Text>
-          </Text>
-
-          <View style={{ backgroundColor: '#fea', marginVertical: 30, padding: PADDING.vertical }}>
-            <FontAwesome6 style={[homeStyles.workCmdIcon, { fontSize: 20, alignSelf: 'center' }]} name="circle-info" />
-            <Text style={[homeStyles.authTermsText, { fontWeight: '600' }]}>{message}</Text>
-          </View>
-
-          {/* Submit */}
-          <Button
-            style={[homeStyles.authButton, { marginHorizontal: PADDING.horizontal }]}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={homeStyles.authButtonText}>{t('cancel')}</Text>
-          </Button>
-        </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
+        <SafeAreaView style={{ padding: PADDING.p01 }}>
+          <FlatList
+            data={categories}
+            scrollEnabled={false}
+            nestedScrollEnabled
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={renderCategory}
+            ListHeaderComponent={<Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center' }]}>{t('subscription.title')}</Text>}
+            ListEmptyComponent={<EmptyListComponent iconName="credit-card-outline" title={t('empty_list.title')} description={t('empty_list.description_subscription')} />}
+          />
+        </SafeAreaView>
       </ScrollView>
     </>
   );

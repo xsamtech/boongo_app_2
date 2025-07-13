@@ -82,6 +82,7 @@
         "description_chat_circle": "Here will be displayed your chat circles with other members.",
         "description_chat_organization": "Your exchanges in establishments and/or institutions will be displayed here.",
         "description_chat_event": "Here will be displayed your exchanges in the events to which you are invited.",
+        "description_subscription": "Here you will see the subscriptions you can add to your cart.",
         "description_news": "Here, news about the organizations (school or government) on the platform will be displayed.",
         "description_popular": "Here, the works most consulted by members will be displayed.",
         "description_books": "Here, the books will be displayed which can be consulted by members.",
@@ -108,7 +109,7 @@
         "is_public": {
             "title": "Paid consultation",
             "description": "For medias, viewing cost $2; and for other types of works, it's $1. Boongo is entitled to 20% of each viewing payment.",
-            "consult_price": "Consulation price"
+            "consult_price": "Consultation price"
         },
         "currency": {
             "title": "Currency: ",
@@ -171,7 +172,7 @@
     "personal_infos": "Personal infos",
     "change_password": "Change password",
     "subscription":  {
-        "title": "Choose a subscription",
+        "title": "Add subscriptions to your cart",
         "info": "You do not have a subscription. Please subscribe to view.",
         "type": "Subscription type",
         "price": "Price",

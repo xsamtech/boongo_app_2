@@ -192,6 +192,8 @@ const HomeStackNav = () => {
   const navigation = useNavigation();
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Authentication context ===============
+  const { userInfo, invalidateConsultations } = useContext(AuthContext);
   // =============== Get data ===============
   const [isSearchActive, setIsSearchActive] = useState(false); // Status to know if the search is active
   const { searchQuery, setSearchQuery } = useContext(SearchContext);
@@ -204,6 +206,14 @@ const HomeStackNav = () => {
     setIsSearchActive(false);  // Close the search field
     setSearchQuery('');        // Reset the search text
   };
+
+  useEffect(() => {
+    const validationInterval = setInterval(() => {
+      invalidateConsultations(userInfo.id);
+    }, 1000);
+
+    return () => clearInterval(validationInterval);
+  }, []);
 
   return (
     <Stack.Navigator

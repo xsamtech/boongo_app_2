@@ -82,6 +82,7 @@
         "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
         "description_chat_organization": "Awa ekomona ba échanges na yo na ba eteyelo mpe/to ba institutions.",
         "description_chat_event": "Awa ekolakisama ba échanges na yo na ba événements oyo babengi yo.",
+        "description_subscription": "Awa ekolakisama ba abonnéments oyo okoki kobakisa na kitunga na yo.",
         "description_news": "Awa, ba sango etali ba organisations (eteyelo to institution ya gouvernement) oyo ezali na plateforme ekolakisama.",
         "description_popular": "Awa, misala oyo ba membres ba consulté mingi ekolakisama.",
         "description_books": "Awa, misala mikolakisama miye mikoki kozala consulte na ba membres.",
@@ -171,7 +172,7 @@
     "personal_infos": "Ba sango ya moto ye moko",
     "change_password": "Kobongola mot de passe",
     "subscription":  {
-        "title": "Pona abonnément moko",
+        "title": "Bakisa ba abonnéments na kitunga na yo",
         "info": "Ozali na abonnément te. Banda ko s'abonner po otala.",
         "type": "Lolenge ya abonnément",
         "price": "Ntalo",

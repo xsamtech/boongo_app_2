@@ -346,6 +346,7 @@ const WorkDataScreen = ({ route, navigation }) => {
           </View>
           <View style={homeStyles.workCard}>
             <View style={homeStyles.workCmds}>
+              {/* Subscriptions link */}
               {!userInfo.has_valid_subscription &&
                 <>
                   <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
@@ -355,12 +356,14 @@ const WorkDataScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                 </>
               }
+              {/* Adding conultation */}
               {userInfo.has_valid_subscription && work.is_public === 0 && isPaid &&
                 <>
                   <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
-                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={() => { navigation.navigate('MobileSubscribe', { object: 'consultation' }) }}>
+                  {/* <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={addToCart}> */}
+                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]}>
                     <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
-                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('consultation.link')}</Text>
+                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('add_to_cart')}</Text>
                   </TouchableOpacity>
                 </>
               }

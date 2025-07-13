@@ -127,13 +127,13 @@ export const AuthProvider = ({ children }) => {
 
                         return 'done';
 
-                    // Phone NOT yet verified
+                        // Phone NOT yet verified
                     } else {
                         // We do NOT save "endRegisterInfo"
                         return 'phone_not_validated';
                     }
 
-                // === User hasn't phone ===
+                    // === User hasn't phone ===
                 } else {
                     // We can save "endRegisterInfo" directly
                     await AsyncStorage.removeItem('startRegisterInfo');
@@ -161,13 +161,13 @@ export const AuthProvider = ({ children }) => {
 
                         return 'done';
 
-                    // Phone NOT yet verified
+                        // Phone NOT yet verified
                     } else {
                         // We do NOT save "endRegisterInfo"
                         return 'email_not_validated';
                     }
 
-                // === User hasn't email ===
+                    // === User hasn't email ===
                 } else {
                     // We can save "endRegisterInfo" directly
                     await AsyncStorage.removeItem('startRegisterInfo');
@@ -465,47 +465,61 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const validateSubscription = (user_id) => {
-        axios.get(`${API.boongo_url}/user/${user_id}`, {
+    const activateSubscriptionByCode = (user_id, code, partner_id) => {
+        setIsLoading(true);
+
+        axios.get(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': 'fr' }
-        }).then(rs => {
-            const currentUser = rs.data.data.user;
+        }).then(res => {
+            const message = res.data.message;
+            const userData = res.data.data.user;
 
-            if (currentUser.recent_payment.status.status_name_fr == 'Effectué') {
-                axios.put(`${API.boongo_url}/subscription/validate_subscription/${user_id}`, null, {
-                    headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
-                }).then(res => {
-                    let success = res.data.success;
+            setUserInfo(userData);
 
-                    if (success) {
-                        let userData = res.data.data;
+            AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+            console.log(`${message}`);
 
-                        setUserInfo(userData);
+            setIsLoading(false);
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
-                        AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-                    }
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
 
-                }).catch(error => {
-                    if (error.response) {
-                        // The request was made and the server responded with a status code
-                        // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-                    } else if (error.request) {
-                        // The request was made but no response was received
-                        console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-                    } else {
-                        // An error occurred while configuring the query
-                        // console.log(`${error}`);
-                    }
-                });
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
             }
-        }).catch(err => {
-            if (err.response) {
+
+            setIsLoading(false);
+        });
+    };
+
+    const validateSubscription = (user_id) => {
+        axios.put(`${API.boongo_url}/subscription/validate_subscription/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            }
+
+        }).catch(error => {
+            if (error.response) {
                 // The request was made and the server responded with a status code
                 // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
-            } else if (err.request) {
+            } else if (error.request) {
                 // The request was made but no response was received
                 console.log(t('error') + ' ' + t('error_message.no_server_response'));
 
@@ -520,10 +534,40 @@ export const AuthProvider = ({ children }) => {
         axios.put(`${API.url}/subscription/invalidate_subscription/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
-            let success = res.data.success;
+            const success = res.data.success;
 
             if (success) {
-                let userData = res.data.data;
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
+                // console.log(`${error}`);
+            }
+        });
+    };
+
+    const invalidateConsultations = (user_id) => {
+        axios.put(`${API.url}/work/invalidate_consultations/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const userData = res.data.data;
 
                 setUserInfo(userData);
 
@@ -639,7 +683,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, validateSubscription, invalidateSubscription }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, validateSubscription, invalidateSubscription, invalidateConsultations }}>
             {children}
         </AuthContext.Provider>
     );

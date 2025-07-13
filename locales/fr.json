@@ -82,6 +82,7 @@
         "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d'autres membres.",
         "description_chat_organization": "Ici seront affichées vos échanges dans les établissements et/ou institutions.",
         "description_chat_event": "Ici seront affichées vos échanges dans les événements dans lesquels vous êtes invités.",
+        "description_subscription": "Ici, seront affichés les abonnements que vous pourrez ajouter à votre panier.",
         "description_news": "Ici, sera affichée l’actualité sur les organisations (établissement ou institution) de la plateforme.",
         "description_popular": "Ici, seront affichés les œuvres les plus consultées par les membres.",
         "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
@@ -171,7 +172,7 @@
     "personal_infos": "Infos personnelles",
     "change_password": "Modifier mot de passe",
     "subscription":  {
-        "title": "Choisir un abonnement",
+        "title": "Ajouter des abonnements à votre panier",
         "info": "Vous n'avez aucun un abonnement. Veuillez vous abonner pour consulter",
         "type": "Type d’abonnement",
         "price": "Prix",

@@ -6,6 +6,8 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image } from 'react-native'
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
+import * as RNLocalize from 'react-native-localize';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
@@ -16,7 +18,6 @@ import WorkItemComponent from '../../components/work_item';
 import FloatingActionsButton from '../../components/floating_actions_button';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
-import { useNavigation } from '@react-navigation/native';
 import UserItemComponent from '../../components/user_item';
 
 const TAB_BAR_HEIGHT = 48;
@@ -256,14 +257,36 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
+  // Get system language
+  const getLanguage = () => {
+    const locales = RNLocalize.getLocales();
+
+    if (locales && locales.length > 0) {
+      return locales[0].languageCode;
+    }
+
+    return 'fr';
+  };
+
+  // Get total prices of consultations and subscriptions
   const getTotalPrice = () => {
     setIsLoading(true);
+
+    const userLang = getLanguage();
 
     if (userInfo.currency.currency_acronym === 'USD') {
       const price = totalConsultations + totalSubscriptions;
 
+      // Apply language-specific formatting
+      const formattedPrice = price.toLocaleString(userLang, {
+        style: 'decimal',
+        useGrouping: true,
+        minimumFractionDigits: 0, // No digits after the decimal point
+        maximumFractionDigits: 0, // No digits after the decimal point
+      });
+
       setTotalPriceNum(price);
-      setTotalPrice(`${price} USD`);
+      setTotalPrice(`${formattedPrice} USD`);
       setIsLoading(false);
 
     } else {
@@ -278,11 +301,19 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           // Vérifie si la réponse contient les données nécessaires
           if (response && response.data && response.data.success && response.data.data) {
             const responseData = response.data.data;
-            const userPrice = totalSubscriptions * responseData.rate;
-            const price = totalConsultations + userPrice;
+            const userTotalSubscriptions = totalSubscriptions * responseData.rate;
+            const price = totalConsultations + userTotalSubscriptions;
+
+            // Apply language-specific formatting
+            const formattedPrice = price.toLocaleString(userLang, {
+              style: 'decimal',
+              useGrouping: true,
+              minimumFractionDigits: 0, // No digits after the decimal point
+              maximumFractionDigits: 0, // No digits after the decimal point
+            });
 
             setTotalPriceNum(price);
-            setTotalPrice(`${price} ${userInfo.currency.currency_acronym}`);
+            setTotalPrice(`${formattedPrice} ${userInfo.currency.currency_acronym}`);
 
           } else {
             console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
@@ -319,8 +350,18 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     const getPrice = () => {
       setIsLoading(true);
 
+      const userLang = getLanguage();
+
       if (item.currency.currency_acronym === userInfo.currency.currency_acronym) {
-        setPrice(item.consultation_price + ' ' + userInfo.currency.currency_acronym);
+        // Apply language-specific formatting
+        const formattedPrice = item.consultation_price.toLocaleString(userLang, {
+          style: 'decimal',
+          useGrouping: true,
+          minimumFractionDigits: 0, // No digits after the decimal point
+          maximumFractionDigits: 0, // No digits after the decimal point
+        });
+
+        setPrice(formattedPrice + ' ' + userInfo.currency.currency_acronym);
         setIsLoading(false);
 
       } else {
@@ -336,7 +377,15 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             if (response && response.data && response.data.success && response.data.data) {
               const responseData = response.data.data;
               const userPrice = item.consultation_price * responseData.rate;
-              setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
+              const formattedUserPrice = userPrice.toLocaleString(userLang, {
+                style: 'decimal',
+                useGrouping: true,
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              });
+
+              setPrice(formattedUserPrice + ' ' + userInfo.currency.currency_acronym);
+
             } else {
               console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
             }
