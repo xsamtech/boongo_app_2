@@ -184,6 +184,8 @@
     },
     "add_to_cart": "Add to cart",
     "withdraw_from_cart": "Withdraw from cart",
+    "already_ordered": "Already ordered",
+    "withdraw": "Withdraw",
     "pay": "Pay",
 
     "navigation": {

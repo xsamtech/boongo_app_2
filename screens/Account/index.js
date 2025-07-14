@@ -223,39 +223,36 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
 
 // Cart frame
 const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
-  // =============== Colors ===============
+  // =============== Colors, Language, Navigation ===============
   const COLORS = useColors();
-  // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
   const navigation = useNavigation();
+
   // =============== Get contexts ===============
-  const { userInfo } = useContext(AuthContext);
-  // =============== Get data ===============
+  const { userInfo, removeFromCart, isLoading } = useContext(AuthContext);
   const consultations = userInfo.unpaid_consultations;
   const subscriptions = userInfo.unpaid_subscriptions;
   const totalConsultations = userInfo.total_unpaid_consultations;
   const totalSubscriptions = userInfo.total_unpaid_subscriptions;
-  const [totalPriceNum, setTotalPriceNum] = useState(0);
-  const [totalPrice, setTotalPrice] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const flatListRef = listRef || useRef(null);
 
-  // Combine "consultations" and "subscriptions"
-  const combinedData = [
-    ...consultations.map(item => ({ ...item, item_type: 'consultation' })),
-    ...subscriptions.map(item => ({ ...item, item_type: 'subscription' }))
-  ];
+  const [loading, setLoading] = useState(false);
+  const flatListRef = listRef || useRef(null);
 
   // ================= Handlers =================
   const onRefresh = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
+    setLoading(true);
+    setTimeout(() => setLoading(false), 2000);
   }, []);
 
   const scrollToTop = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
+
+  // Combine consultations and subscriptions
+  const combinedData = [
+    ...consultations.map(item => ({ ...item, item_type: 'consultation' })),
+    ...subscriptions.map(item => ({ ...item, item_type: 'subscription' }))
+  ];
 
   // Get system language
   const getLanguage = () => {
@@ -268,234 +265,123 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     return 'fr';
   };
 
-  // Get total prices of consultations and subscriptions
-  const getTotalPrice = () => {
-    setIsLoading(true);
+  // Utility function to retrieve the exchange rate
+  const fetchCurrencyRate = async (fromCurrency, toCurrency, apiToken) => {
+    if (fromCurrency === toCurrency) {
+      return 1; // No need for conversion if the currencies are the same
+    }
 
-    const userLang = getLanguage();
+    const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${fromCurrency}/${toCurrency}`;
 
-    if (userInfo.currency.currency_acronym === 'USD') {
-      const price = totalConsultations + totalSubscriptions;
+    const mHeaders = {
+      'X-localization': 'fr',
+      'Authorization': `Bearer ${apiToken}`,
+    };
 
-      // Apply language-specific formatting
-      const formattedPrice = price.toLocaleString(userLang, {
-        style: 'decimal',
-        useGrouping: true,
-        minimumFractionDigits: 0, // No digits after the decimal point
-        maximumFractionDigits: 0, // No digits after the decimal point
-      });
+    try {
+      const response = await axios.get(url, { headers: mHeaders });
 
-      setTotalPriceNum(price);
-      setTotalPrice(`${formattedPrice} USD`);
-      setIsLoading(false);
+      if (response && response.data && response.data.success && response.data.data) {
+        return response.data.data.rate;
 
-    } else {
-      const url = `${API.boongo_url}/currencies_rate/find_currency_rate/USD/${userInfo.currency.currency_acronym}`;
-      const mHeaders = {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      };
+      } else {
+        console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
+        return null;
+      }
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
 
-      axios.get(url, { headers: mHeaders })
-        .then(response => {
-          // Vérifie si la réponse contient les données nécessaires
-          if (response && response.data && response.data.success && response.data.data) {
-            const responseData = response.data.data;
-            const userTotalSubscriptions = totalSubscriptions * responseData.rate;
-            const price = totalConsultations + userTotalSubscriptions;
-
-            // Apply language-specific formatting
-            const formattedPrice = price.toLocaleString(userLang, {
-              style: 'decimal',
-              useGrouping: true,
-              minimumFractionDigits: 0, // No digits after the decimal point
-              maximumFractionDigits: 0, // No digits after the decimal point
-            });
-
-            setTotalPriceNum(price);
-            setTotalPrice(`${formattedPrice} ${userInfo.currency.currency_acronym}`);
-
-          } else {
-            console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-          }
-        })
-        .catch(error => {
-          if (error.response?.status === 429) {
-            console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-          } else {
-            console.error('Erreur lors de la récupération du taux de change', error);
-          }
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      } else {
+        console.error('Erreur lors de la récupération du taux de change', error);
+      }
+      return null;
     }
   };
 
-  useEffect(() => {
-    getTotalPrice();
-  }, []);
-
-  // Work Item
-  const InnerWorkItem = ({ item }) => {
-    // =============== Colors ===============
-    const COLORS = useColors();
-    // =============== Language ===============
-    const { t } = useTranslation();
-    // =============== Navigation ===============
-    const navigation = useNavigation();
-    // =============== Get data ===============
-    const [price, setPrice] = useState('');
-
-    const getPrice = () => {
-      setIsLoading(true);
-
-      const userLang = getLanguage();
-
-      if (item.currency.currency_acronym === userInfo.currency.currency_acronym) {
-        // Apply language-specific formatting
-        const formattedPrice = item.consultation_price.toLocaleString(userLang, {
-          style: 'decimal',
-          useGrouping: true,
-          minimumFractionDigits: 0, // No digits after the decimal point
-          maximumFractionDigits: 0, // No digits after the decimal point
-        });
-
-        setPrice(formattedPrice + ' ' + userInfo.currency.currency_acronym);
-        setIsLoading(false);
-
-      } else {
-        const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${item.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
-        const mHeaders = {
-          'X-localization': 'fr',
-          'Authorization': `Bearer ${userInfo.api_token}`
-        };
-
-        axios.get(url, { headers: mHeaders })
-          .then(response => {
-            // Vérifie si la réponse contient les données nécessaires
-            if (response && response.data && response.data.success && response.data.data) {
-              const responseData = response.data.data;
-              const userPrice = item.consultation_price * responseData.rate;
-              const formattedUserPrice = userPrice.toLocaleString(userLang, {
-                style: 'decimal',
-                useGrouping: true,
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              });
-
-              setPrice(formattedUserPrice + ' ' + userInfo.currency.currency_acronym);
-
-            } else {
-              console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-            }
-          })
-          .catch(error => {
-            // Gère les erreurs liées à la requête
-            if (error.response?.status === 429) {
-              console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-            } else {
-              console.error('Erreur lors de la récupération du taux de change', error);
-            }
-          })
-          .finally(() => {
-            // Enfin, on met à jour l'état de chargement
-            setIsLoading(false);
-          });
-      }
-    };
-
-    useEffect(() => {
-      getPrice();
-    }, []);
-
-    return (
-      <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p12, padding: PADDING.p03 }]}>
-        <View>
-          <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} />
-        </View>
-        <View style={homeStyles.workDescTop}>
-          <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={3}>{item.work_title}</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: PADDING.p00 }}>
-            <Text style={{ fontSize: TEXT_SIZE.normal, color: COLORS.black, marginRight: PADDING.p00, textDecorationLine: 'underline' }}>{t('work.consultation_price')}</Text>
-            <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500', color: COLORS.black }}>{`${price}`}</Text>
-          </View>
-          <TouchableOpacity style={homeStyles.linkIcon}>
-            <Icon name='trash-can-outline' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
-            <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('withdraw_from_cart')} </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  // Utility function to get formatted price
+  const getFormattedPrice = (price, currency, userLang) => {
+    return price.toLocaleString(userLang, {
+      style: 'decimal',
+      useGrouping: true,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }) + ' ' + currency;
   };
 
-  // Inner Subscription Item
-  const InnerSubscriptionItem = ({ item }) => {
-    // =============== Colors ===============
-    const COLORS = useColors();
-    // =============== Language ===============
-    const { t } = useTranslation();
-    // =============== Navigation ===============
-    const navigation = useNavigation();
-    // =============== Get data ===============
+  // ================= Render components =================
+  const PriceItem = ({ price }) => (
+    <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500', color: COLORS.black }}>{price}</Text>
+  );
+
+  // Inner Item component
+  const InnerItem = ({ item }) => {
     const [price, setPrice] = useState('');
+    const userLang = getLanguage();
+    const typePrice = item.item_type === 'subscription' ? item.price : item.consultation_price;
 
-    const getPrice = () => {
-      setIsLoading(true);
+    const fetchPrice = useCallback(async () => {
+      setLoading(true);
 
-      if (userInfo.currency.currency_acronym === 'USD') {
-        setPrice(item.price + ' USD');
-        setIsLoading(false);
+      const userCurrency = userInfo.currency.currency_acronym;
+
+      if (item.currency.currency_acronym === userCurrency) {
+        // If the currencies match, we format directly
+        setPrice(getFormattedPrice(typePrice, userCurrency, userLang));
+        setLoading(false);
 
       } else {
-        const url = `${API.boongo_url}/currencies_rate/find_currency_rate/USD/${userInfo.currency.currency_acronym}`;
-        const mHeaders = {
-          'X-localization': 'fr',
-          'Authorization': `Bearer ${userInfo.api_token}`
-        };
+        // If the currencies are different, we get the exchange rate
+        const rate = await fetchCurrencyRate(item.currency.currency_acronym, userCurrency, userInfo.api_token);
 
-        axios.get(url, { headers: mHeaders })
-          .then(response => {
-            if (response && response.data && response.data.success && response.data.data) {
-              const responseData = response.data.data;
-              const userPrice = item.price * responseData.rate;
-              setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
+        if (rate !== null) {
+          const convertedPrice = typePrice * rate;
+          setPrice(getFormattedPrice(convertedPrice, userCurrency, userLang));
 
-            } else {
-              console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-            }
-          })
-          .catch(error => {
-            // Gère les erreurs liées à la requête
-            if (error.response?.status === 429) {
-              console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-            } else {
-              console.error('Erreur lors de la récupération du taux de change', error);
-            }
-          })
-          .finally(() => {
-            // Enfin, on met à jour l'état de chargement
-            setIsLoading(false);
-          });
+        } else {
+          setPrice('Erreur de taux de change');
+        }
+
+        setLoading(false);
       }
-    };
+    }, [item, userInfo]);
 
     useEffect(() => {
-      getPrice();
-    }, []);
+      fetchPrice();
+    }, [item, userInfo]);
 
-    return (
-      <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p12, padding: PADDING.p03 }]}>
-        <View style={{ flexDirection: 'column' }}>
-          <Text style={{ fontSize: TEXT_SIZE.normal }}>{item.type.type_name}</Text>
-          <Text style={{ fontSize: TEXT_SIZE.title }}>{price}</Text>
+    if (item.item_type === 'subscription') {
+      return (
+        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
+          <View style={{ flexDirection: 'column' }}>
+            <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>{item.type.type_name}</Text>
+            <PriceItem price={price} />
+          </View>
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+            onPress={() => { removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id); }}
+          >
+            <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
+            <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw')}</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={homeStyles.linkIcon}>
-          <Icon name='trash-can-outline' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
-          <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('withdraw_from_cart')} </Text>
-        </TouchableOpacity>
-      </View>
-    );
+      );
+
+    } else {
+      return (
+        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
+          <View style={{ flexDirection: 'column' }}>
+            <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>{item.work_title}</Text>
+            <PriceItem price={price} />
+          </View>
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+            onPress={() => { removeFromCart(userInfo.unpaid_consultation_cart.id, item.id, null); }}
+          >
+            <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
+            <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw')}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
   };
 
   return (
@@ -514,14 +400,21 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           <Animated.FlatList
             ref={flatListRef}
             data={combinedData}
-            extraData={combinedData}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => {
-              if (item.item_type === 'consultation') {
-                return <InnerWorkItem item={item} />;
-              } else if (item.item_type === 'subscription') {
-                return <InnerSubscriptionItem item={item} />;
+            renderItem={({ item, index }) => {
+              if (index === 0 || combinedData[index - 1].item_type !== item.item_type) {
+                return (
+                  <View>
+                    {/* Titre de groupe */}
+                    <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '400', color: COLORS.black, textAlign: 'center', marginTop: PADDING.p02, marginBottom: PADDING.p00 }}>
+                      {item.item_type === 'consultation' ? t('unpaid.consultation') : t('unpaid.subscription')}
+                    </Text>
+                    {/* Element de la liste */}
+                    <InnerItem item={item} />
+                  </View>
+                );
               }
+              return <InnerItem item={item} />;
             }}
             horizontal={false}
             bounces={false}
@@ -532,21 +425,21 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             contentContainerStyle={{
               paddingTop: headerHeight + TAB_BAR_HEIGHT,
             }}
-            refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
             ListEmptyComponent={<EmptyListComponent iconName="cart-outline" title={t('empty_list.title')} description={t('empty_list.description_cart')} />}
             ListHeaderComponent={() => {
               return (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING.p01 }}>
                   <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.black }}>
-                    <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{totalPrice}</Text>
+                    <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.grand_totals_unpaid, userInfo.currency.currency_acronym, 'fr')}`}</Text>
                   </Text>
-                  <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.danger, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: totalPriceNum })}>
-                    <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'white' }]}>{t('pay')} </Text>
+                  <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.grand_totals_unpaid })}>
+                    <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'black' }]}>{t('pay')}</Text>
                   </TouchableOpacity>
                 </View>
               );
             }}
-            ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+            ListFooterComponent={() => loading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
           />
         </View>
       </SafeAreaView>

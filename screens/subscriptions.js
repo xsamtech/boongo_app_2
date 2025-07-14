@@ -2,12 +2,13 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableHighlight } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import * as RNLocalize from 'react-native-localize';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { API, PADDING, TEXT_SIZE } from '../tools/constants';
@@ -17,19 +18,25 @@ import HeaderComponent from './header';
 import EmptyListComponent from '../components/empty_list';
 
 const SubscriptionScreen = ({ route }) => {
+  // =============== Colors ===============
   const COLORS = useColors();
+  // =============== Language ===============
   const { t } = useTranslation();
-  const { message } = route.params;
+  // =============== Navigation ===============
   const navigation = useNavigation();
-  const { userInfo } = useContext(AuthContext);
+  // =============== Authentication context ===============
+  const { userInfo, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
+  // =============== Get parameters ===============
+  const { message } = route.params;
+  // =============== Get data ===============
   const [subscriptions, setSubscriptions] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState({});
 
   const onRefresh = useCallback(() => {
-    setIsLoading(true);
+    setLoading(true);
     setTimeout(() => {
-      setIsLoading(false);
+      setLoading(false);
     }, 2000);
   }, []);
 
@@ -69,11 +76,11 @@ const SubscriptionScreen = ({ route }) => {
         if (res.data.success && res.data.data) {
           setSubscriptions(res.data.data);
         }
-        setIsLoading(false);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
-        setIsLoading(false);
+        setLoading(false);
       });
   };
 
@@ -162,12 +169,16 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={{ flex: 1, fontWeight: '500', color: COLORS.black }}>{price ? price : <ActivityIndicator size="small" />}</Text>
         </View>
         {isInCart ?
-          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.light_secondary, paddingVertical: 5 }]}>
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+            onPress={() => { removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id); }}
+          >
             <Icon name="window-close" size={20} color={COLORS.danger} />
             <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw_from_cart')}</Text>
           </TouchableOpacity>
           :
-          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.light_secondary, paddingVertical: 5 }]}>
+          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+            onPress={() => { addToCart('subscription', userInfo.id, null, item.id); }}
+          >
             <Icon name="plus" size={20} color={COLORS.success} />
             <Text style={{ color: COLORS.success, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('add_to_cart')}</Text>
           </TouchableOpacity>
@@ -178,12 +189,17 @@ const SubscriptionScreen = ({ route }) => {
 
   return (
     <>
+      {/* Header */}
       <View style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p01 }}>
         <HeaderComponent />
       </View>
 
+      {/* Spinner (for AuthContext requests) */}
+      <Spinner visible={isLoading} />
+
+      {/* Content */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
         <SafeAreaView style={{ padding: PADDING.p01 }}>
           <FlatList
             data={categories}

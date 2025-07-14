@@ -4,6 +4,7 @@
  */
 import React, { createContext, useEffect, useState } from 'react'
 import { ToastAndroid } from 'react-native';
+import * as RNLocalize from 'react-native-localize';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from '../tools/constants';
@@ -19,6 +20,17 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [splashLoading, setSplashLoading] = useState(false);
     const [pushToken, setPushToken] = useState(null);
+
+    // Get system language
+    const getLanguage = () => {
+        const locales = RNLocalize.getLocales();
+
+        if (locales && locales.length > 0) {
+            return locales[0].languageCode;
+        }
+
+        return 'fr';
+    };
 
     const getPushToken = async () => {
         try {
@@ -469,7 +481,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoading(true);
 
         axios.get(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, {
-            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': 'fr' }
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
         }).then(res => {
             const message = res.data.message;
             const userData = res.data.data.user;
@@ -531,7 +543,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const invalidateSubscription = (user_id) => {
-        axios.put(`${API.url}/subscription/invalidate_subscription/${user_id}`, null, {
+        axios.put(`${API.boongo_url}/subscription/invalidate_subscription/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const success = res.data.success;
@@ -561,7 +573,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const invalidateConsultations = (user_id) => {
-        axios.put(`${API.url}/work/invalidate_consultations/${user_id}`, null, {
+        axios.put(`${API.boongo_url}/work/invalidate_consultations/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const success = res.data.success;
@@ -587,6 +599,86 @@ export const AuthProvider = ({ children }) => {
                 // An error occurred while configuring the query
                 // console.log(`${error}`);
             }
+        });
+    };
+
+    const addToCart = (entity, user_id, work_id, subscription_id) => {
+        setIsLoading(true);
+
+        axios.post(`${API.boongo_url}/cart/add_to_cart/${entity}`, { user_id, work_id, subscription_id }, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage(), }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const message = res.data.message;
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                console.log(`${message}`);
+                setIsLoading(false);
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
+    const removeFromCart = (cart_id, work_id, subscription_id) => {
+        setIsLoading(true);
+
+        axios.put(`${API.boongo_url}/cart/remove_from_cart/${cart_id}`, { work_id, subscription_id }, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const message = res.data.message;
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                console.log(`${message}`);
+                setIsLoading(false);
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
         });
     };
 
@@ -683,7 +775,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, validateSubscription, invalidateSubscription, invalidateConsultations }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, validateSubscription, invalidateSubscription, invalidateConsultations, addToCart, removeFromCart }}>
             {children}
         </AuthContext.Provider>
     );

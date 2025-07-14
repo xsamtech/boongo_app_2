@@ -184,6 +184,8 @@
     },
     "add_to_cart": "Ajouter au panier",
     "withdraw_from_cart": "Retirer du panier",
+    "already_ordered": "Déjà commandé",
+    "withdraw": "Retirer",
     "pay": "Payer",
 
     "navigation": {
