@@ -3,8 +3,9 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { View, Text, Image, Pressable, SafeAreaView } from 'react-native';
+import { View, Text, Image, Pressable, SafeAreaView, Dimensions, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import useColors from '../hooks/useColors';
 import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,6 +16,8 @@ const UserItemComponent = ({ item }) => {
     const COLORS = useColors();
     // =============== Navigation ===============
     const navigation = useNavigation();
+    // =============== Language ===============
+    const { t } = useTranslation();
 
     const handlePress = () => {
         navigation.navigate('Profile', { user_id: item.id });
@@ -24,7 +27,7 @@ const UserItemComponent = ({ item }) => {
         return (
             <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
                 <View>
-                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { width: Dimensions.get('window').width / 2.5, height: 'auto', borderColor: COLORS.light_secondary }]} />
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
                     <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>

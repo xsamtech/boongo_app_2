@@ -584,7 +584,7 @@ const homeStyles = StyleSheet.create({
     },
 
     newsContent: {
-        fontSize: 17,
+        fontSize: 13,
         fontWeight: '400',
         letterSpacing: 0.3,
         marginVertical: PADDING.p00

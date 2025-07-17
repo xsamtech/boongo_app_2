@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Dimensions, Image, Pressable, SafeAreaView, Text, View } from 'react-native';
+import { Dimensions, Image, Pressable, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -36,7 +36,7 @@ const NewsItemComponent = ({ item }) => {
         return (
             <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
                 <View>
-                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { width: Dimensions.get('window').width / 2.5, height: 'auto', borderColor: COLORS.light_secondary }]} />
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
                     <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>

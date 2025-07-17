@@ -5,6 +5,7 @@
 import React from 'react';
 import { View, Text, Image, Pressable, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import useColors from '../hooks/useColors';
 import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,6 +16,8 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
     const COLORS = useColors();
     // =============== Navigation ===============
     const navigation = useNavigation();
+    // =============== Language ===============
+    const { t } = useTranslation();
 
     const handlePress = () => {
         navigation.navigate('NewChat', { chat_entity: entity, chat_entity_id: entity_id, chat_entity_name: entity_name, chat_entity_profile: entity_profile });
@@ -24,7 +27,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
         return (
             <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
                 <View>
-                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { width: Dimensions.get('window').width / 2.5, height: 'auto', borderColor: COLORS.light_secondary }]} />
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
                     <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>

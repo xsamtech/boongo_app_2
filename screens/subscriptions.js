@@ -16,6 +16,7 @@ import homeStyles from '../screens/style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
 import EmptyListComponent from '../components/empty_list';
+import { Divider } from 'react-native-paper';
 
 const SubscriptionScreen = ({ route }) => {
   // =============== Colors ===============
@@ -24,7 +25,7 @@ const SubscriptionScreen = ({ route }) => {
   const { t } = useTranslation();
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Authentication context ===============
+  // =============== Get context ===============
   const { userInfo, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { message } = route.params;
@@ -33,6 +34,7 @@ const SubscriptionScreen = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState({});
 
+  // ================= Handlers =================
   const onRefresh = useCallback(() => {
     setLoading(true);
     setTimeout(() => {
@@ -201,13 +203,20 @@ const SubscriptionScreen = ({ route }) => {
       <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
         <SafeAreaView style={{ padding: PADDING.p01 }}>
+          {/* Subscriptions list */}
+          <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('activation.title')}</Text>
+          <Text style={{ color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }}>{t('activation.description')}</Text>
+
+          <Divider style={{ marginVertical: PADDING.p09, backgroundColor: COLORS.dark_secondary }} />
+
+          {/* Subscriptions list */}
           <FlatList
             data={categories}
             scrollEnabled={false}
             nestedScrollEnabled
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderCategory}
-            ListHeaderComponent={<Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center' }]}>{t('subscription.title')}</Text>}
+            ListHeaderComponent={<Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('subscription.title')}</Text>}
             ListEmptyComponent={<EmptyListComponent iconName="credit-card-outline" title={t('empty_list.title')} description={t('empty_list.description_subscription')} />}
           />
         </SafeAreaView>

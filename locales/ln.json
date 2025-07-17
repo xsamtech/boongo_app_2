@@ -171,6 +171,14 @@
     "logout": "Na bima",
     "personal_infos": "Ba sango ya moto ye moko",
     "change_password": "Kobongola mot de passe",
+    "activation":  {
+        "title": "Activer abonnément na nzela ya code",
+        "description": "Moko ya ba partenaires na biso akokaki kopesa yo code ya kosalela mbala moko pona ko activer abonnément.",
+        "partner": {
+            "label": "Partenaire",
+            "description": "Nani nde apesaki yo code na yo ?"
+        }
+    },
     "subscription":  {
         "title": "Bakisa ba abonnéments na kitunga na yo",
         "info": "Ozali na abonnément te. Banda ko s'abonner po otala.",

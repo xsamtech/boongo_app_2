@@ -171,6 +171,14 @@
     "logout": "Déconnexion",
     "personal_infos": "Infos personnelles",
     "change_password": "Modifier mot de passe",
+    "activation":  {
+        "title": "Activer l’abonnement avec un code",
+        "description": "L'un de nos partenaires peut vous avoir donné un code unique pour activer l’abonnement",
+        "partner": {
+            "label": "Partenaire",
+            "description": "Qui vous a donné votre code ?"
+        }
+    },
     "subscription":  {
         "title": "Ajouter des abonnements à votre panier",
         "info": "Vous n'avez aucun un abonnement. Veuillez vous abonner pour consulter",

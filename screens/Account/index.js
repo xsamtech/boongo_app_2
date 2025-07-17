@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, ActivityIndicator } from 'react-native'
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ import FloatingActionsButton from '../../components/floating_actions_button';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
 import UserItemComponent from '../../components/user_item';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -223,18 +224,17 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
 
 // Cart frame
 const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
-  // =============== Colors, Language, Navigation ===============
+  // =============== Colors ===============
   const COLORS = useColors();
+  // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Navigation ===============
   const navigation = useNavigation();
-
   // =============== Get contexts ===============
-  const { userInfo, removeFromCart, isLoading } = useContext(AuthContext);
+  const { userInfo, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
   const consultations = userInfo.unpaid_consultations;
   const subscriptions = userInfo.unpaid_subscriptions;
-  const totalConsultations = userInfo.total_unpaid_consultations;
-  const totalSubscriptions = userInfo.total_unpaid_subscriptions;
-
+  // =============== Get data ===============
   const [loading, setLoading] = useState(false);
   const flatListRef = listRef || useRef(null);
 
@@ -248,12 +248,6 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
-  // Combine consultations and subscriptions
-  const combinedData = [
-    ...consultations.map(item => ({ ...item, item_type: 'consultation' })),
-    ...subscriptions.map(item => ({ ...item, item_type: 'subscription' }))
-  ];
-
   // Get system language
   const getLanguage = () => {
     const locales = RNLocalize.getLocales();
@@ -263,6 +257,16 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     }
 
     return 'fr';
+  };
+
+  // Utility function to get formatted price
+  const getFormattedPrice = (price, currency, userLang) => {
+    return price.toLocaleString(userLang, {
+      style: 'decimal',
+      useGrouping: true,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }) + ' ' + currency;
   };
 
   // Utility function to retrieve the exchange rate
@@ -299,151 +303,148 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     }
   };
 
-  // Utility function to get formatted price
-  const getFormattedPrice = (price, currency, userLang) => {
-    return price.toLocaleString(userLang, {
-      style: 'decimal',
-      useGrouping: true,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }) + ' ' + currency;
-  };
-
-  // ================= Render components =================
-  const PriceItem = ({ price }) => (
-    <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500', color: COLORS.black }}>{price}</Text>
-  );
+  // Combine consultations and subscriptions
+  const combinedData = [
+    ...consultations.map(item => ({ ...item, item_type: 'consultation' })),
+    ...subscriptions.map(item => ({ ...item, item_type: 'subscription' }))
+  ];
 
   // Inner Item component
   const InnerItem = ({ item }) => {
     const [price, setPrice] = useState('');
+    const [isLoadingItem, setIsLoadingItem] = useState(true);  // État local pour le chargement
     const userLang = getLanguage();
     const typePrice = item.item_type === 'subscription' ? item.price : item.consultation_price;
 
+    // Vérifie si le prix est déjà disponible, sinon, on fait l'appel
     const fetchPrice = useCallback(async () => {
-      setLoading(true);
+      if (price) return;  // Si le prix est déjà chargé, on ne fait rien
+
+      setIsLoadingItem(true);  // On lance le chargement pour cet élément spécifique
 
       const userCurrency = userInfo.currency.currency_acronym;
 
       if (item.currency.currency_acronym === userCurrency) {
-        // If the currencies match, we format directly
+        // Si les devises sont identiques, on formate directement
         setPrice(getFormattedPrice(typePrice, userCurrency, userLang));
-        setLoading(false);
-
+        setIsLoadingItem(false);
       } else {
-        // If the currencies are different, we get the exchange rate
+        // Si les devises sont différentes, on obtient le taux de change
         const rate = await fetchCurrencyRate(item.currency.currency_acronym, userCurrency, userInfo.api_token);
 
         if (rate !== null) {
           const convertedPrice = typePrice * rate;
           setPrice(getFormattedPrice(convertedPrice, userCurrency, userLang));
-
         } else {
           setPrice('Erreur de taux de change');
         }
 
-        setLoading(false);
+        setIsLoadingItem(false);
       }
-    }, [item, userInfo]);
+    }, [item, userInfo, price]);
 
     useEffect(() => {
-      fetchPrice();
-    }, [item, userInfo]);
+      fetchPrice();  // On charge le prix lors du montage de l'élément
+    }, [item, userInfo, price]);
 
-    if (item.item_type === 'subscription') {
-      return (
-        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
-          <View style={{ flexDirection: 'column' }}>
-            <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>{item.type.type_name}</Text>
-            <PriceItem price={price} />
-          </View>
-          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
-            onPress={() => { removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id); }}
-          >
-            <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
-            <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw')}</Text>
-          </TouchableOpacity>
+    return (
+      <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
+        <View style={{ flexDirection: 'column' }}>
+          <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>
+            {item.item_type === 'subscription' ? item.type.type_name : item.work_title}
+          </Text>
+          {item.item_type === 'subscription' &&
+            <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.link_color, textTransform: 'uppercase' }}>{item.category.category_name}</Text>
+          }
+          <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>
+            {isLoadingItem ? <ActivityIndicator size="small" /> : price}  {/* Affiche le loader ou le prix */}
+          </Text>
         </View>
-      );
-
-    } else {
-      return (
-        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
-          <View style={{ flexDirection: 'column' }}>
-            <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>{item.work_title}</Text>
-            <PriceItem price={price} />
-          </View>
-          <TouchableOpacity style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
-            onPress={() => { removeFromCart(userInfo.unpaid_consultation_cart.id, item.id, null); }}
-          >
-            <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
-            <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>{t('withdraw')}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+        <TouchableOpacity
+          style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+          onPress={() => {
+            if (item.item_type === 'subscription') {
+              removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id);
+            } else {
+              removeFromCart(userInfo.unpaid_consultation_cart.id, item.id, null);
+            }
+          }}
+        >
+          <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
+          <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>
+            {t('withdraw')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
-        <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
-          onPress={scrollToTop}
-        >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
-        </TouchableOpacity>
-      )}
+    <>
+      {/* Spinner (for AuthContext requests) */}
+      <Spinner visible={isLoading} />
 
-      <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
-          <Animated.FlatList
-            ref={flatListRef}
-            data={combinedData}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item, index }) => {
-              if (index === 0 || combinedData[index - 1].item_type !== item.item_type) {
+      {/* Content */}
+      <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+        {showBackToTop && (
+          <TouchableOpacity
+            style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
+            onPress={scrollToTop}
+          >
+            <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          </TouchableOpacity>
+        )}
+
+        <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+          <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+            <Animated.FlatList
+              ref={flatListRef}
+              data={combinedData}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({ item, index }) => {
+                if (index === 0 || combinedData[index - 1].item_type !== item.item_type) {
+                  return (
+                    <View>
+                      {/* Titre de groupe */}
+                      <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '400', color: COLORS.black, textAlign: 'center', marginTop: PADDING.p02, marginBottom: PADDING.p00 }}>
+                        {item.item_type === 'consultation' ? t('unpaid.consultation') : t('unpaid.subscription')}
+                      </Text>
+                      {/* Element de la liste */}
+                      <InnerItem item={item} />
+                    </View>
+                  );
+                }
+                return <InnerItem item={item} />;
+              }}
+              horizontal={false}
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+              windowSize={10}
+              contentContainerStyle={{
+                paddingTop: headerHeight + TAB_BAR_HEIGHT,
+              }}
+              refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
+              ListEmptyComponent={<EmptyListComponent iconName="cart-outline" title={t('empty_list.title')} description={t('empty_list.description_cart')} />}
+              ListHeaderComponent={() => {
                 return (
-                  <View>
-                    {/* Titre de groupe */}
-                    <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '400', color: COLORS.black, textAlign: 'center', marginTop: PADDING.p02, marginBottom: PADDING.p00 }}>
-                      {item.item_type === 'consultation' ? t('unpaid.consultation') : t('unpaid.subscription')}
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING.p01 }}>
+                    <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.black }}>
+                      <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.grand_totals_unpaid, userInfo.currency.currency_acronym, 'fr')}`}</Text>
                     </Text>
-                    {/* Element de la liste */}
-                    <InnerItem item={item} />
+                    <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.grand_totals_unpaid })}>
+                      <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'black' }]}>{t('pay')}</Text>
+                    </TouchableOpacity>
                   </View>
                 );
-              }
-              return <InnerItem item={item} />;
-            }}
-            horizontal={false}
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            windowSize={10}
-            contentContainerStyle={{
-              paddingTop: headerHeight + TAB_BAR_HEIGHT,
-            }}
-            refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
-            ListEmptyComponent={<EmptyListComponent iconName="cart-outline" title={t('empty_list.title')} description={t('empty_list.description_cart')} />}
-            ListHeaderComponent={() => {
-              return (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING.p01 }}>
-                  <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.black }}>
-                    <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.grand_totals_unpaid, userInfo.currency.currency_acronym, 'fr')}`}</Text>
-                  </Text>
-                  <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.grand_totals_unpaid })}>
-                    <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'black' }]}>{t('pay')}</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            }}
-            ListFooterComponent={() => loading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
-          />
-        </View>
-      </SafeAreaView>
-    </View>
+              }}
+            // ListFooterComponent={() => loading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+            />
+          </View>
+        </SafeAreaView>
+      </View>
+    </>
   );
 };
 

@@ -171,6 +171,14 @@
     "logout": "Log out",
     "personal_infos": "Personal infos",
     "change_password": "Change password",
+    "activation":  {
+        "title": "Activate the subscription with a code",
+        "description": "One of our partners may have given you a unique code to activate the subscription",
+        "partner": {
+            "label": "Partner",
+            "description": "Who gave you your code?"
+        }
+    },
     "subscription":  {
         "title": "Add subscriptions to your cart",
         "info": "You do not have a subscription. Please subscribe to view.",

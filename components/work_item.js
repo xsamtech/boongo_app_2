@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,10 +21,10 @@ const WorkItemComponent = ({ item }) => {
 
     if (item.id === 'ad') {
         // If it is the "advertisement" object, we display the advertisement component
-        return (
+        if (item.has_promo_code) {
             <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
                 <View>
-                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { width: Dimensions.get('window').width / 2.5, height: 'auto', borderColor: COLORS.light_secondary }]} />
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
                     <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
@@ -36,7 +36,35 @@ const WorkItemComponent = ({ item }) => {
                     }
                 </View>
             </SafeAreaView>
-        );
+
+        } else {
+            if (item.website_url) {
+                return (
+                    <TouchableOpacity style={homeStyles.linkIcon} onPress={() => Linking.openURL(item.website_url)}>
+                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+                            <View>
+                                <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
+                            </View>
+                            <View style={homeStyles.workDescTop}>
+                                <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
+                                <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                            </View>
+                        </SafeAreaView>
+                    </TouchableOpacity>
+                );
+
+            } else {
+                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+                    <View>
+                        <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
+                    </View>
+                    <View style={homeStyles.workDescTop}>
+                        <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
+                        <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                    </View>
+                </SafeAreaView>
+            }
+        }
     }
 
     return (

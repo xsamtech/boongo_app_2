@@ -40,7 +40,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Authentication context ===============
-  const { userInfo, validateSubscription, invalidateSubscription } = useContext(AuthContext);
+  const { userInfo, addToCart, validateSubscription, invalidateSubscription } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { itemId } = route.params;
   // =============== Get data ===============
@@ -173,6 +173,37 @@ const WorkDataScreen = ({ route, navigation }) => {
     getPrice();
   }, []);
 
+  // Subscribe links component
+  const SubscribeLinks = () => {
+    if (!userInfo.has_valid_subscription) {
+      return (
+        <>
+          <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
+          <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { object: 'subscription', message: t('error_message.pending_after_payment') }) }}>
+            <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='money-check-dollar' />
+            <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('subscription.link')}</Text>
+          </TouchableOpacity>
+        </>
+      );
+
+    } else {
+      if (userInfo.has_valid_subscription && work.is_public === 0 && !isPaid) {
+        return (
+          <>
+            <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
+            <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={() => { addToCart('consultation', userInfo.id, work.id, null); }}>
+              <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
+              <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('add_to_cart')}</Text>
+            </TouchableOpacity>
+          </>
+        )
+
+      } else {
+        return '';
+      }
+    }
+  };
+
   return (
     <>
       {/* Header */}
@@ -210,8 +241,8 @@ const WorkDataScreen = ({ route, navigation }) => {
               {/* Editor */}
               {work.editor ? (
                 <>
-                  <View style={homeStyles.workDescBottom}>
-                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.editor')} : </Text>
+                  <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
+                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary, marginBottom: 1 }]}>{t('work.editor')} : </Text>
                     <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.editor ? work.editor : null}</Text>
                   </View>
                 </>
@@ -241,14 +272,12 @@ const WorkDataScreen = ({ route, navigation }) => {
               </View>
 
               {/* Consultation price */}
-              {work.is_public === 0 ? (
-                <>
-                  <View style={homeStyles.workDescBottom}>
-                    <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')} : </Text>
-                    <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.consultation_price ? price : null}</Text>
-                  </View>
-                </>
-              ) : ''}
+              {work.is_public === 0 && (
+                <View style={homeStyles.workDescBottom}>
+                  <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')} : </Text>
+                  <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.consultation_price ? price : null}</Text>
+                </View>
+              )}
 
               {/* Work files */}
               {userInfo.has_valid_subscription && (
@@ -346,27 +375,7 @@ const WorkDataScreen = ({ route, navigation }) => {
           </View>
           <View style={homeStyles.workCard}>
             <View style={homeStyles.workCmds}>
-              {/* Subscriptions link */}
-              {!userInfo.has_valid_subscription &&
-                <>
-                  <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
-                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { object: 'subscription', message: t('error_message.pending_after_payment') }) }}>
-                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='money-check-dollar' />
-                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('subscription.link')}</Text>
-                  </TouchableOpacity>
-                </>
-              }
-              {/* Adding conultation */}
-              {userInfo.has_valid_subscription && work.is_public === 0 && isPaid &&
-                <>
-                  <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
-                  {/* <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={addToCart}> */}
-                  <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]}>
-                    <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
-                    <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('add_to_cart')}</Text>
-                  </TouchableOpacity>
-                </>
-              }
+              <SubscribeLinks />
               {!userInfo.is_partner &&
                 <>
                   <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.warning }]} onPress={sendWhatsAppMessage}>
