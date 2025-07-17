@@ -4,16 +4,16 @@
  */
 import React, { useContext, useEffect, useState } from 'react'
 import { Text, TouchableOpacity, SafeAreaView, View, TextInput, ScrollView, Platform, Image } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
-import { useTranslation } from 'react-i18next';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { AuthContext } from '../../contexts/AuthContext';
 import { API, PADDING } from '../../tools/constants';
 import useColors from '../../hooks/useColors';

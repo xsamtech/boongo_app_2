@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Dimensions, Image, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,7 +22,7 @@ const WorkItemComponent = ({ item }) => {
     if (item.id === 'ad') {
         // If it is the "advertisement" object, we display the advertisement component
         if (item.has_promo_code) {
-            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                 <View>
                     <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
                 </View>
@@ -40,8 +40,8 @@ const WorkItemComponent = ({ item }) => {
         } else {
             if (item.website_url) {
                 return (
-                    <TouchableOpacity style={homeStyles.linkIcon} onPress={() => Linking.openURL(item.website_url)}>
-                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+                    <TouchableOpacity onPress={() => Linking.openURL(item.website_url)}>
+                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                             <View>
                                 <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                             </View>
@@ -49,17 +49,18 @@ const WorkItemComponent = ({ item }) => {
                                 <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
                                 <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
                             </View>
+                            <Icon name='earth' size={IMAGE_SIZE.s03} color={COLORS.dark_secondary} style={{ position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }} />
                         </SafeAreaView>
                     </TouchableOpacity>
                 );
 
             } else {
-                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                     <View>
                         <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                     </View>
                     <View style={homeStyles.workDescTop}>
-                        <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
+                        <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
                         <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
                     </View>
                 </SafeAreaView>
@@ -68,13 +69,13 @@ const WorkItemComponent = ({ item }) => {
     }
 
     return (
-        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, padding: PADDING.p03 }]}>
+        <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, padding: PADDING.p03 }]}>
             <View>
-                <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} />
+                <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} onPress={() => navigation.navigate('WorkData', { itemId: item.id })} />
             </View>
             <View style={homeStyles.workDescTop}>
-                <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={3}>{item.work_title}</Text>
-                <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3}>{item.work_content}</Text>
+                <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_title}</Text>
+                <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_content}</Text>
                 <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
                     <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
                     <Icon name='chevron-right' size={IMAGE_SIZE.s05} color={COLORS.link_color} />

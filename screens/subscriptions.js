@@ -2,21 +2,23 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TouchableHighlight } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TextInput } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import { Button } from 'react-native-paper';
+import { Divider } from 'react-native-paper';
+import { Dropdown } from 'react-native-element-dropdown';
+import { useTranslation } from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING, TEXT_SIZE } from '../tools/constants';
+import { API, PADDING } from '../tools/constants';
 import homeStyles from '../screens/style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
 import EmptyListComponent from '../components/empty_list';
-import { Divider } from 'react-native-paper';
 
 const SubscriptionScreen = ({ route }) => {
   // =============== Colors ===============
@@ -26,13 +28,49 @@ const SubscriptionScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get context ===============
-  const { userInfo, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
+  const { userInfo, activateSubscriptionByCode, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { message } = route.params;
   // =============== Get data ===============
   const [subscriptions, setSubscriptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState({});
+  const [code, setCode] = useState(null);
+
+  // PARTNER dropdown
+  const [partnerIsFocus, setPartnerIsFocus] = useState(false);
+  const [partner, setPartner] = useState(null);
+  const [partners, setPartners] = useState([]);
+
+  useEffect(() => {
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/partner/partners_with_activation_code/fr/Actif`,
+      headers: {
+        'X-localization': 'fr',
+        'X-user-id': userInfo.id,
+        Authorization: `Bearer ${userInfo.api_token}`,
+      }
+    };
+
+    axios(config)
+      .then(function (response) {
+        const count = Object.keys(response.data.data).length;
+        let partnerArray = [];
+
+        for (let i = 0; i < count; i++) {
+          partnerArray.push({
+            value: response.data.data[i].id,
+            label: response.data.data[i].name
+          })
+        }
+
+        setPartners(partnerArray);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
 
   // ================= Handlers =================
   const onRefresh = useCallback(() => {
@@ -155,7 +193,7 @@ const SubscriptionScreen = ({ route }) => {
   const SubscriptionItem = ({ item, categoryName, prices, getPrice, userInfo }) => {
     const subscriptionId = `${categoryName}-${item.id}`;
     const price = prices[subscriptionId];
-    // Check if user has added subscription in the 
+    // Check if user has added subscription in the cart
     const isInCart = userInfo.unpaid_subscriptions && userInfo.unpaid_subscriptions.some(subscription => subscription.id === item.id);
 
     useEffect(() => {
@@ -203,9 +241,52 @@ const SubscriptionScreen = ({ route }) => {
       <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
         <SafeAreaView style={{ padding: PADDING.p01 }}>
-          {/* Subscriptions list */}
+          {/* Activation code form */}
           <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('activation.title')}</Text>
-          <Text style={{ color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }}>{t('activation.description')}</Text>
+          <Text style={{ color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p04, paddingHorizontal: PADDING.p02 }}>{t('activation.description')}</Text>
+
+          {/* Partner  */}
+          {/* <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('activation.partner.label')}</Text> */}
+          <Dropdown
+            style={[homeStyles.authInput, { height: 50 }]}
+            borderColor={COLORS.dark_secondary}
+            textStyle={{ color: COLORS.black }}
+            selectedTextStyle={{ color: COLORS.black }}
+            placeholderStyle={{ color: COLORS.dark_secondary }}
+            arrowIconStyle={{ tintColor: COLORS.black }}
+            data={partners}
+            search
+            labelField='label'
+            valueField='value'
+            placeholder={!partnerIsFocus ? t('activation.partner.description') : '...'}
+            searchPlaceholder={t('search')}
+            maxHeight={300}
+            value={partner}
+            onFocus={() => setPartnerIsFocus(true)}
+            onBlur={() => setPartnerIsFocus(false)}
+            onChange={item => {
+              setPartner(item.value);
+              setPartnerIsFocus(false);
+            }} />
+
+          {/* Activation code */}
+          {/* <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('activation.code.label')}</Text> */}
+          <TextInput
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+            value={code}
+            placeholder={t('activation.code.placeholder')}
+            placeholderTextColor={COLORS.dark_secondary}
+            onChangeText={text => setCode(text)} />
+
+          {/* Submit */}
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary, marginTop: 16 }]}
+            onPress={() => {
+              console.log('Partenaire séléctionné:', partner);
+              activateSubscriptionByCode(userInfo.id, code, (partner ? partner : 0));
+            }}
+          >
+            <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
+          </Button>
 
           <Divider style={{ marginVertical: PADDING.p09, backgroundColor: COLORS.dark_secondary }} />
 

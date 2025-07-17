@@ -3,10 +3,10 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Dimensions, Image, Pressable, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Pressable, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/FontAwesome6';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IMAGE_SIZE, PADDING } from '../tools/constants';
 import useColors from '../hooks/useColors';
 import homeStyles from '../screens/style';
@@ -33,10 +33,10 @@ const NewsItemComponent = ({ item }) => {
 
     if (item.id === 'ad') {
         // If it is the "advertisement" object, we display the advertisement component
-        return (
-            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+        if (item.has_promo_code) {
+            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                 <View>
-                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
+                    <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
                     <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
@@ -48,7 +48,36 @@ const NewsItemComponent = ({ item }) => {
                     }
                 </View>
             </SafeAreaView>
-        );
+
+        } else {
+            if (item.website_url) {
+                return (
+                    <TouchableOpacity onPress={() => Linking.openURL(item.website_url)}>
+                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
+                            <View>
+                                <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
+                            </View>
+                            <View style={homeStyles.workDescTop}>
+                                <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
+                                <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                            </View>
+                            <Icon name='earth' size={IMAGE_SIZE.s03} color={COLORS.dark_secondary} style={{ position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }} />
+                        </SafeAreaView>
+                    </TouchableOpacity>
+                );
+
+            } else {
+                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
+                    <View>
+                        <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
+                    </View>
+                    <View style={homeStyles.workDescTop}>
+                        <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
+                        <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                    </View>
+                </SafeAreaView>
+            }
+        }
     }
 
     return (

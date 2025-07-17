@@ -390,11 +390,11 @@ const AddWorkScreen = () => {
         <RadioButton.Group onValueChange={(value) => setIsPublic(Number(value))} value={isPublic}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 16 }}>
-              <RadioButton value={1} />
+              <RadioButton value={0} />
               <Text style={{ color: COLORS.black }}>{t('yes')}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <RadioButton value={0} />
+              <RadioButton value={1} />
               <Text style={{ color: COLORS.black }}>{t('no')}</Text>
             </View>
           </View>

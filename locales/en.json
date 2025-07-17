@@ -177,6 +177,10 @@
         "partner": {
             "label": "Partner",
             "description": "Who gave you your code?"
+        },
+        "code": {
+            "label": "Code",
+            "placeholder": "Type the code"
         }
     },
     "subscription":  {

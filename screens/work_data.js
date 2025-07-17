@@ -2,7 +2,7 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, RefreshControl, Image, TouchableOpacity, FlatList, Linking, ToastAndroid, Dimensions } from 'react-native';
+import { View, Text, RefreshControl, Image, TouchableOpacity, FlatList, Linking, ToastAndroid, Dimensions, TouchableHighlight } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING, PHONE, TEXT_SIZE, WEB } from '../tools/constants';
+import { API, IMAGE_SIZE, PADDING, PHONE, TEXT_SIZE, WEB } from '../tools/constants';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
@@ -52,6 +52,8 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [price, setPrice] = useState('');
   // Check if user has valid consultation if the work is not public
   const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
+  // Check if user has added subscription in the 
+  const isInCart = userInfo.unpaid_consultations && userInfo.unpaid_consultations.some(consultation => consultation.id === work.id);
 
   // =============== Check if file is video ===============
   const isVideoFile = (url) => {
@@ -174,8 +176,208 @@ const WorkDataScreen = ({ route, navigation }) => {
   }, []);
 
   // Subscribe links component
+  const WorkFiles = () => {
+    if (userInfo.has_valid_subscription || userInfo.has_active_code) {
+      if (work.is_public === 0) {
+        if (isPaid) {
+          return (
+            <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
+              <Divider style={{ marginTop: PADDING.p01 }} />
+              {/* Documents */}
+              {Array.isArray(work.documents) && work.documents.length > 0 && (
+                <View style={{ padding: PADDING.p00 }}>
+                  <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
+
+                  {work.documents?.map((doc, idx) => (
+                    <FileThumbnail
+                      key={`doc-${idx}`}
+                      uri={null}
+                      type="document"
+                      title={`${t('file.document')} ${idx + 1}`}
+                      onPress={() => navigation.navigate('PDFViewer', {
+                        docTitle: work.work_title,
+                        docUri: doc.file_url,
+                        curPage: 1,
+                      })}
+                    />
+                  ))}
+                </View>
+              )}
+
+              {/* Audios */}
+              {Array.isArray(work.audios) && work.audios.length > 0 && (
+                <View style={{ padding: PADDING.p00 }}>
+                  <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
+
+                  {work.audios?.map((audio, idx) => (
+                    <FileThumbnail
+                      key={`audio-${idx}`}
+                      uri={null}
+                      type="audio"
+                      title={`${t('file.audio')} ${idx + 1}`}
+                      onPress={() => navigation.navigate('Audio', {
+                        audioTitle: work.work_title,
+                        audioUrl: audio.file_url,
+                        mediaCover: work.photo_url,
+                        mediaAuthor: work.author,
+                      })}
+                    />
+                  ))}
+                </View>
+              )}
+
+              {/* Gallery (Local photos/videos) */}
+              {Array.isArray(work.images) && work.images.length > 0 && (
+                <View style={{ padding: PADDING.p00 }}>
+                  <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {gallerySources.map((file, index) => (
+                      <FileThumbnail
+                        key={`media-${index}`}
+                        uri={file.uri}
+                        type={file.type}
+                        title={`${t('file.image')} ${index + 1}`}
+                        onPress={() => setImageModal({ visible: true, index })}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Remote video (YouTube or other) */}
+              {work.work_url && (
+                <View style={{ padding: PADDING.p00 }}>
+                  <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
+
+                  <FileThumbnail
+                    uri={work.work_url}
+                    type="video"
+                    title={t('file.video')}
+                    onPress={() => navigation.navigate('VideoPlayer', {
+                      videoTitle: work.work_title,
+                      videoUri: work.work_url,
+                    })}
+                  />
+                </View>
+              )}
+
+              {/* Modal */}
+              <GalleryModal
+                visible={imageModal.visible}
+                index={imageModal.index}
+                files={gallerySources}
+                onClose={() => setImageModal({ visible: false, index: 0 })}
+              />
+            </View>
+          );
+
+        } else {
+          '';
+        }
+
+      } else {
+        return (
+          <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
+            <Divider style={{ marginTop: PADDING.p01 }} />
+            {/* Documents */}
+            {Array.isArray(work.documents) && work.documents.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
+
+                {work.documents?.map((doc, idx) => (
+                  <FileThumbnail
+                    key={`doc-${idx}`}
+                    uri={null}
+                    type="document"
+                    title={`${t('file.document')} ${idx + 1}`}
+                    onPress={() => navigation.navigate('PDFViewer', {
+                      docTitle: work.work_title,
+                      docUri: doc.file_url,
+                      curPage: 1,
+                    })}
+                  />
+                ))}
+              </View>
+            )}
+
+            {/* Audios */}
+            {Array.isArray(work.audios) && work.audios.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
+
+                {work.audios?.map((audio, idx) => (
+                  <FileThumbnail
+                    key={`audio-${idx}`}
+                    uri={null}
+                    type="audio"
+                    title={`${t('file.audio')} ${idx + 1}`}
+                    onPress={() => navigation.navigate('Audio', {
+                      audioTitle: work.work_title,
+                      audioUrl: audio.file_url,
+                      mediaCover: work.photo_url,
+                      mediaAuthor: work.author,
+                    })}
+                  />
+                ))}
+              </View>
+            )}
+
+            {/* Gallery (Local photos/videos) */}
+            {Array.isArray(work.images) && work.images.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
+
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {gallerySources.map((file, index) => (
+                    <FileThumbnail
+                      key={`media-${index}`}
+                      uri={file.uri}
+                      type={file.type}
+                      title={`${t('file.image')} ${index + 1}`}
+                      onPress={() => setImageModal({ visible: true, index })}
+                    />
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Remote video (YouTube or other) */}
+            {work.work_url && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
+
+                <FileThumbnail
+                  uri={work.work_url}
+                  type="video"
+                  title={t('file.video')}
+                  onPress={() => navigation.navigate('VideoPlayer', {
+                    videoTitle: work.work_title,
+                    videoUri: work.work_url,
+                  })}
+                />
+              </View>
+            )}
+
+            {/* Modal */}
+            <GalleryModal
+              visible={imageModal.visible}
+              index={imageModal.index}
+              files={gallerySources}
+              onClose={() => setImageModal({ visible: false, index: 0 })}
+            />
+          </View>
+        );
+      }
+
+    } else {
+      return '';
+    }
+  };
+
+  // Subscribe links component
   const SubscribeLinks = () => {
-    if (!userInfo.has_valid_subscription) {
+    if (!userInfo.has_valid_subscription && !userInfo.has_active_code) {
       return (
         <>
           <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
@@ -187,16 +389,35 @@ const WorkDataScreen = ({ route, navigation }) => {
       );
 
     } else {
-      if (userInfo.has_valid_subscription && work.is_public === 0 && !isPaid) {
-        return (
-          <>
-            <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
-            <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={() => { addToCart('consultation', userInfo.id, work.id, null); }}>
-              <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
-              <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('add_to_cart')}</Text>
-            </TouchableOpacity>
-          </>
-        )
+      if (userInfo.has_valid_subscription && work.is_public === 0 && !isPaid || userInfo.has_active_code && work.is_public === 0 && !isPaid) {
+        if (isInCart) {
+          return (
+            <>
+              <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
+              <TouchableHighlight style={[homeStyles.workCmd, { borderWidth: 1, borderColor: COLORS.dark_secondary, marginBottom: 10 }]}>
+                <>
+                  <FontAwesome6 style={[homeStyles.workCmdIcon, { color: COLORS.dark_secondary }]} name='cart-shopping' />
+                  <Text style={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.dark_secondary }}>{t('already_ordered')}</Text>
+                </>
+              </TouchableHighlight>
+              <TouchableOpacity style={[homeStyles.linkIcon, { justifyContent: 'center', alignItems: 'flex-start' }]} onPress={() => navigation.navigate('Account', { initialIndex: 2 })}>
+                <Text style={{ marginBottom: 10, color: COLORS.link_color }}>{t('consultation.link')}</Text>
+                <FontAwesome6 name='angles-right' size={IMAGE_SIZE.s03} color={COLORS.link_color} style={{ marginLeft: PADDING.p01 }} />
+              </TouchableOpacity>
+            </>
+          );
+
+        } else {
+          return (
+            <>
+              <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('consultation.info')}</Text>
+              <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.success, marginBottom: 10 }]} onPress={() => { addToCart('consultation', userInfo.id, work.id, null); }}>
+                <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='eye' />
+                <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('add_to_cart')}</Text>
+              </TouchableOpacity>
+            </>
+          );
+        }
 
       } else {
         return '';
@@ -219,7 +440,7 @@ const WorkDataScreen = ({ route, navigation }) => {
           <View style={homeStyles.workCard}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', alignItems: 'flex-start' }]}>
               <View>
-                <Image source={{ uri: work.photo_url }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 50, height: mWidth * 1.6 }]} />
+                <Image source={{ uri: work.photo_url }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 50, height: mWidth * 2 }]} />
               </View>
               <View style={homeStyles.workDescTop}>
                 <Text style={[homeStyles.workTitle, { color: COLORS.black }]}>{work.work_title}</Text>
@@ -275,102 +496,12 @@ const WorkDataScreen = ({ route, navigation }) => {
               {work.is_public === 0 && (
                 <View style={homeStyles.workDescBottom}>
                   <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')} : </Text>
-                  <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{work.consultation_price ? price : null}</Text>
+                  <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{`${work.consultation_price} ${work.currency.currency_acronym}`}</Text>
                 </View>
               )}
 
               {/* Work files */}
-              {userInfo.has_valid_subscription && (
-                <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
-                  <Divider style={{ marginTop: PADDING.p01 }} />
-                  {/* Documents */}
-                  {Array.isArray(work.documents) && work.documents.length > 0 && (
-                    <View style={{ padding: PADDING.p00 }}>
-                      <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
-
-                      {work.documents?.map((doc, idx) => (
-                        <FileThumbnail
-                          key={`doc-${idx}`}
-                          uri={null}
-                          type="document"
-                          title={`${t('file.document')} ${idx + 1}`}
-                          onPress={() => navigation.navigate('PDFViewer', {
-                            docTitle: work.work_title,
-                            docUri: doc.file_url,
-                            curPage: 1,
-                          })}
-                        />
-                      ))}
-                    </View>
-                  )}
-
-                  {/* Audios */}
-                  {Array.isArray(work.audios) && work.audios.length > 0 && (
-                    <View style={{ padding: PADDING.p00 }}>
-                      <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
-
-                      {work.audios?.map((audio, idx) => (
-                        <FileThumbnail
-                          key={`audio-${idx}`}
-                          uri={null}
-                          type="audio"
-                          title={`${t('file.audio')} ${idx + 1}`}
-                          onPress={() => navigation.navigate('Audio', {
-                            audioTitle: work.work_title,
-                            audioUrl: audio.file_url,
-                            mediaCover: work.photo_url,
-                            mediaAuthor: work.author,
-                          })}
-                        />
-                      ))}
-                    </View>
-                  )}
-
-                  {/* Gallery (Local photos/videos) */}
-                  {Array.isArray(work.images) && work.images.length > 0 && (
-                    <View style={{ padding: PADDING.p00 }}>
-                      <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
-
-                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {gallerySources.map((file, index) => (
-                          <FileThumbnail
-                            key={`media-${index}`}
-                            uri={file.uri}
-                            type={file.type}
-                            title={`${t('file.image')} ${index + 1}`}
-                            onPress={() => setImageModal({ visible: true, index })}
-                          />
-                        ))}
-                      </View>
-                    </View>
-                  )}
-
-                  {/* Remote video (YouTube or other) */}
-                  {work.work_url && (
-                    <View style={{ padding: PADDING.p00 }}>
-                      <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
-
-                      <FileThumbnail
-                        uri={work.work_url}
-                        type="video"
-                        title={t('file.video')}
-                        onPress={() => navigation.navigate('VideoPlayer', {
-                          videoTitle: work.work_title,
-                          videoUri: work.work_url,
-                        })}
-                      />
-                    </View>
-                  )}
-
-                  {/* Modal */}
-                  <GalleryModal
-                    visible={imageModal.visible}
-                    index={imageModal.index}
-                    files={gallerySources}
-                    onClose={() => setImageModal({ visible: false, index: 0 })}
-                  />
-                </View>
-              )}
+              <WorkFiles />
             </View>
           </View>
           <View style={homeStyles.workCard}>

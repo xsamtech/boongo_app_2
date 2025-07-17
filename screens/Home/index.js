@@ -45,8 +45,8 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
 
     setIsLoading(true);
     const qs = require('qs');
-    const url = `${API.boongo_url}/work/filter_by_categories`;
-    const mParams = { type_id: 33, status_id: 17, page: pageToFetch };
+    const url = `${API.boongo_url}/work/filter_by_categories?page=${pageToFetch}`;
+    const mParams = { type_id: 33, status_id: 17 };
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -119,6 +119,7 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
             keyExtractor={item => item.id.toString()}
             renderItem={({ item }) => <NewsItemComponent item={item} />}
             showsVerticalScrollIndicator={false}
+            alwaysBounceVertical={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
@@ -132,8 +133,8 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
                 progressViewOffset={105}
               />
             }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
+            // contentInset={{ top: 105 }}
+            // contentOffset={{ y: -105 }}
             ListEmptyComponent={
               <EmptyListComponent
                 iconName='script-text-outline'
@@ -310,42 +311,46 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
-          {/* Categories */}
-          <FlatList
-            data={categories}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ height: 50, marginTop: 105, flexGrow: 0 }}
-            contentContainerStyle={{
-              alignItems: 'center',
-              paddingHorizontal: PADDING.p00,
-            }}
-            renderItem={({ item }) => <CategoryItem item={item} />}
-          />
-
-          {/* Books List */}
-          <Animated.FlatList
-            ref={flatListRef}
-            data={combinedData}
-            extraData={combinedData}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <WorkItemComponent item={item} />}
-            horizontal={false}
-            showsVerticalScrollIndicator={false}
-            onScroll={handleScroll}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.1}
-            scrollEventThrottle={16}
-            windowSize={10}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
-            ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
-            ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
-          />
-        </View>
+        {/* <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}> */}
+        {/* Books List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <WorkItemComponent item={item} />}
+          horizontal={false}
+          showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: 110,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
+          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
+          ListHeaderComponent={
+            <>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 40, flexGrow: 0 }}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: PADDING.p00,
+                }}
+                renderItem={({ item }) => <CategoryItem item={item} />}
+              />
+            </>
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
+        {/* </View> */}
       </SafeAreaView>
     </View>
   );

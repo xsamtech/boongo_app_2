@@ -177,6 +177,10 @@
         "partner": {
             "label": "Partenaire",
             "description": "Nani nde apesaki yo code na yo ?"
+        },
+        "code": {
+            "label": "Code",
+            "placeholder": "Koma code"
         }
     },
     "subscription":  {

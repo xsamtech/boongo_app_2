@@ -177,6 +177,10 @@
         "partner": {
             "label": "Partenaire",
             "description": "Qui vous a donné votre code ?"
+        },
+        "code": {
+            "label": "Code",
+            "placeholder": "Tapez le code"
         }
     },
     "subscription":  {

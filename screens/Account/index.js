@@ -83,10 +83,10 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
       'categories_ids[0]': idCat,
       user_id: userInfo.id,
     };
-
     const headers = {
       'X-localization': 'fr',
       Authorization: `Bearer ${userInfo.api_token}`,
+      'X-user-id': userInfo.id,
     };
 
     try {
@@ -189,6 +189,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
           horizontal={false}
           bounces={false}
           showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
           onScroll={handleScroll}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.1}
@@ -349,8 +350,8 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
     return (
       <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
-        <View style={{ flexDirection: 'column' }}>
-          <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={1}>
+        <View style={{ flexDirection: 'column', width: '70%' }}>
+          <Text style={{ flex: 2, color: COLORS.dark_secondary }} numberOfLines={2}>
             {item.item_type === 'subscription' ? item.type.type_name : item.work_title}
           </Text>
           {item.item_type === 'subscription' &&
@@ -405,11 +406,11 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
                 if (index === 0 || combinedData[index - 1].item_type !== item.item_type) {
                   return (
                     <View>
-                      {/* Titre de groupe */}
+                      {/* Group title */}
                       <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '400', color: COLORS.black, textAlign: 'center', marginTop: PADDING.p02, marginBottom: PADDING.p00 }}>
                         {item.item_type === 'consultation' ? t('unpaid.consultation') : t('unpaid.subscription')}
                       </Text>
-                      {/* Element de la liste */}
+                      {/* List element */}
                       <InnerItem item={item} />
                     </View>
                   );
@@ -419,6 +420,7 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               horizontal={false}
               bounces={false}
               showsVerticalScrollIndicator={false}
+              alwaysBounceVertical={false}
               onScroll={handleScroll}
               scrollEventThrottle={16}
               windowSize={10}
@@ -548,6 +550,7 @@ const MySubscribers = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 
             horizontal={false}
             bounces={false}
             showsVerticalScrollIndicator={false}
+            alwaysBounceVertical={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
@@ -566,7 +569,7 @@ const MySubscribers = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 
   );
 };
 
-const AccountScreen = () => {
+const AccountScreen = ({ route }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -580,6 +583,14 @@ const AccountScreen = () => {
   const [showBackToTopByTab, setShowBackToTopByTab] = useState({ my_works: false, my_cart: false, my_subscribers: false });
   const scrollY = useRef(new Animated.Value(0)).current;
   const savedScrollOffsets = useRef({ my_works: 0, my_cart: 0, my_subscribers: 0 });
+
+  // récupérer l'index initial du tab (ou 0 par défaut)
+  const initialIndex = route.params?.initialIndex || 0;
+
+  // Mettre à jour l'index au début
+  useEffect(() => {
+    setIndex(initialIndex);
+  }, [initialIndex]);
 
   // const headerTranslateY = scrollY.interpolate({
   const clampedScrollY = Animated.diffClamp(scrollY, 0, headerHeight);

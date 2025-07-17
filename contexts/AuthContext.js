@@ -480,8 +480,8 @@ export const AuthProvider = ({ children }) => {
     const activateSubscriptionByCode = (user_id, code, partner_id) => {
         setIsLoading(true);
 
-        axios.get(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, {
-            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
+        axios.put(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const message = res.data.message;
             const userData = res.data.data.user;
