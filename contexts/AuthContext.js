@@ -512,6 +512,41 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const disableSubscriptionByCode = (user_id) => {
+        setIsLoading(true);
+
+        axios.put(`${API.boongo_url}/activation_code/disable_subscription/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            const message = res.data.message;
+            const userData = res.data.data.user;
+
+            setUserInfo(userData);
+
+            AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+            console.log(`${message}`);
+
+            setIsLoading(false);
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
     const validateSubscription = (user_id) => {
         axios.put(`${API.boongo_url}/subscription/validate_subscription/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
@@ -544,6 +579,36 @@ export const AuthProvider = ({ children }) => {
 
     const invalidateSubscription = (user_id) => {
         axios.put(`${API.boongo_url}/subscription/invalidate_subscription/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
+                // console.log(`${error}`);
+            }
+        });
+    };
+
+    const validateConsultations = (user_id) => {
+        axios.put(`${API.boongo_url}/work/validate_consultations/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const success = res.data.success;
@@ -775,7 +840,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, validateSubscription, invalidateSubscription, invalidateConsultations, addToCart, removeFromCart }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart }}>
             {children}
         </AuthContext.Provider>
     );

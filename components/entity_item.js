@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { View, Text, Image, Pressable, SafeAreaView, Linking } from 'react-native';
+import { View, Text, Image, Pressable, SafeAreaView, Linking, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import useColors from '../hooks/useColors';
