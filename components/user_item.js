@@ -26,12 +26,12 @@ const UserItemComponent = ({ item }) => {
     if (item.id === 'ad') {
         // If it is the "advertisement" object, we display the advertisement component
         if (item.has_promo_code) {
-            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
+            <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.black, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                 <View>
                     <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
                 </View>
                 <View style={homeStyles.workDescTop}>
-                    <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                    <Text style={[homeStyles.newsContent, { color: COLORS.white }]} numberOfLines={4}>{item.message}</Text>
                     {item.website_url &&
                         <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('Subscription', { itemId: item.realId })}>
                             <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
@@ -45,13 +45,13 @@ const UserItemComponent = ({ item }) => {
             if (item.website_url) {
                 return (
                     <TouchableOpacity onPress={() => Linking.openURL(item.website_url)}>
-                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
+                        <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.black, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                             <View>
                                 <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                             </View>
                             <View style={homeStyles.workDescTop}>
-                                <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
-                                <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                                <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.white }]} numberOfLines={1}>{item.name}</Text>
+                                <Text style={[homeStyles.newsContent, { color: COLORS.white }]} numberOfLines={4}>{item.message}</Text>
                             </View>
                             <Icon name='earth' size={IMAGE_SIZE.s03} color={COLORS.dark_secondary} style={{ position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }} />
                         </SafeAreaView>
@@ -59,13 +59,13 @@ const UserItemComponent = ({ item }) => {
                 );
 
             } else {
-                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
+                <SafeAreaView style={[homeStyles.workTop, { backgroundColor: COLORS.black, marginBottom: PADDING.p00, paddingHorizontal: PADDING.p03 }]}>
                     <View>
                         <Image source={{ uri: item.image_url }} style={[homeStyles.newsImage, { marginLeft: 0, marginRight: 10, borderColor: COLORS.light_secondary }]} />
                     </View>
                     <View style={homeStyles.workDescTop}>
-                        <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.black }]} numberOfLines={1}>{item.name}</Text>
-                        <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={4}>{item.message}</Text>
+                        <Text style={[homeStyles.newsContent, { fontSize: 16, fontWeight: '700', color: COLORS.white }]} numberOfLines={1}>{item.name}</Text>
+                        <Text style={[homeStyles.newsContent, { color: COLORS.white }]} numberOfLines={4}>{item.message}</Text>
                     </View>
                 </SafeAreaView>
             }

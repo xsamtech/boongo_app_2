@@ -40,7 +40,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Authentication context ===============
-  const { userInfo, addToCart, validateSubscription, invalidateSubscription } = useContext(AuthContext);
+  const { userInfo, addToCart, validateSubscription, invalidateSubscription, disableSubscriptionByCode, validateConsultations, invalidateConsultations } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { itemId } = route.params;
   // =============== Get data ===============
@@ -85,6 +85,9 @@ const WorkDataScreen = ({ route, navigation }) => {
       const validationInterval = setInterval(() => {
         validateSubscription(userInfo.id);
         invalidateSubscription(userInfo.id);
+        disableSubscriptionByCode(userInfo.id);
+        validateConsultations(userInfo.id);
+        invalidateConsultations(userInfo.id);
       }, 1000);
 
       return () => clearInterval(validationInterval);

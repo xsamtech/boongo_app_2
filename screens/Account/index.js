@@ -433,9 +433,9 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
                 return (
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING.p01 }}>
                     <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.black }}>
-                      <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.grand_totals_unpaid, userInfo.currency.currency_acronym, 'fr')}`}</Text>
+                      <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.totals_unpaid.grand_totals, userInfo.currency.currency_acronym, 'fr')}`}</Text>
                     </Text>
-                    <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.grand_totals_unpaid })}>
+                    <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.totals_unpaid.grand_totals })}>
                       <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'black' }]}>{t('pay')}</Text>
                     </TouchableOpacity>
                   </View>
