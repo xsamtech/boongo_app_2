@@ -435,7 +435,7 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
                     <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.black }}>
                       <Text style={{ textDecorationLine: 'underline' }}>{t('total_price')}</Text>{` : `}<Text style={{ fontWeight: 'bold' }}>{`${getFormattedPrice(userInfo.totals_unpaid.grand_totals, userInfo.currency.currency_acronym, 'fr')}`}</Text>
                     </Text>
-                    <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.totals_unpaid.grand_totals })}>
+                    <TouchableOpacity style={[homeStyles.authButton, { width: 'auto', backgroundColor: COLORS.warning, marginVertical: PADDING.p00, paddingHorizontal: PADDING.p05 }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: userInfo.totals_unpaid.grand_totals, currency: userInfo.currency.currency_acronym })}>
                       <Text style={[homeStyles.authButtonText, { fontSize: TEXT_SIZE.label, color: 'black' }]}>{t('pay')}</Text>
                     </TouchableOpacity>
                   </View>

@@ -477,23 +477,30 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const activateSubscriptionByCode = (user_id, code, partner_id) => {
+    const activateSubscriptionByCode = async (user_id, code, partner_id) => {
         setIsLoading(true);
 
-        axios.put(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, null, {
+        // Retourne toujours une promesse
+        return axios.put(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
-        }).then(res => {
+        })
+        .then(res => {
             const message = res.data.message;
             const userData = res.data.data.user;
+            const isCodeActive = userData.has_active_code; // Check here if the code has been activated
 
-            setUserInfo(userData);
-
-            AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-            console.log(`${message}`);
+            if (isCodeActive) {
+                setUserInfo(userData);
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+                console.log(`${message}`);
+            }
 
             setIsLoading(false);
-        }).catch(error => {
+
+            return isCodeActive; // Return true if the code is active
+        })
+        .catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
                 ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
@@ -509,25 +516,28 @@ export const AuthProvider = ({ children }) => {
             }
 
             setIsLoading(false);
+
+            // If an error occurs, we return false
+            return false; 
         });
     };
 
     const disableSubscriptionByCode = (user_id) => {
-        setIsLoading(true);
+        // setIsLoading(true);
 
         axios.put(`${API.boongo_url}/activation_code/disable_subscription/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const message = res.data.message;
-            const userData = res.data.data.user;
+            const userData = res.data.data;
 
             setUserInfo(userData);
 
             AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-            ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+            // ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
-            setIsLoading(false);
+            // setIsLoading(false);
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
@@ -543,7 +553,7 @@ export const AuthProvider = ({ children }) => {
                 ToastAndroid.show(`${error}`, ToastAndroid.LONG);
             }
 
-            setIsLoading(false);
+            // setIsLoading(false);
         });
     };
 
@@ -747,6 +757,48 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const purchase = (user_id, transaction_type_id, other_phone, channel, app_url) => {
+        setIsLoading(true);
+
+        axios.put(`${API.boongo_url}/cart/purchase/${user_id}`, {
+            transaction_type_id, other_phone, channel, app_url
+        }, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
+        }).then(res => {
+            const success = res.data.success;
+
+            if (success) {
+                const message = res.data.message;
+                const userData = res.data.data.user;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                console.log(`${message}`);
+                setIsLoading(false);
+            }
+
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+            } else {
+                // An error occurred while configuring the query
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
     const login = (username, password) => {
         setIsLoading(true);
 
@@ -840,7 +892,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart }}>
+            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
             {children}
         </AuthContext.Provider>
     );

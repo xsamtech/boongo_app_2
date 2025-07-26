@@ -2,11 +2,10 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView, ScrollView, RefreshControl, TextInput, ToastAndroid } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from 'react-native-paper';
-import { Divider } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useTranslation } from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
@@ -14,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING } from '../tools/constants';
+import { API, PADDING, TEXT_SIZE } from '../tools/constants';
 import homeStyles from '../screens/style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
@@ -30,47 +29,11 @@ const SubscriptionScreen = ({ route }) => {
   // =============== Get context ===============
   const { userInfo, activateSubscriptionByCode, addToCart, removeFromCart, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
-  const { message } = route.params;
+  const { object, itemId } = route.params;
   // =============== Get data ===============
   const [subscriptions, setSubscriptions] = useState({});
   const [loading, setLoading] = useState(true);
   const [prices, setPrices] = useState({});
-  const [code, setCode] = useState(null);
-
-  // PARTNER dropdown
-  const [partnerIsFocus, setPartnerIsFocus] = useState(false);
-  const [partner, setPartner] = useState(null);
-  const [partners, setPartners] = useState([]);
-
-  useEffect(() => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/partner/partners_with_activation_code/fr/Actif`,
-      headers: {
-        'X-localization': 'fr',
-        'X-user-id': userInfo.id,
-        Authorization: `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(function (response) {
-        const count = Object.keys(response.data.data).length;
-        let partnerArray = [];
-
-        for (let i = 0; i < count; i++) {
-          partnerArray.push({
-            value: response.data.data[i].id,
-            label: response.data.data[i].name
-          })
-        }
-
-        setPartners(partnerArray);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, []);
 
   // ================= Handlers =================
   const onRefresh = useCallback(() => {
@@ -227,21 +190,95 @@ const SubscriptionScreen = ({ route }) => {
     );
   };
 
-  return (
-    <>
-      {/* Header */}
-      <View style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p01 }}>
-        <HeaderComponent />
-      </View>
+  const ObjectScreen = () => {
+    // If "object" parameter is "subscription", show subscriptions list
+    if (object == 'subscription') {
+      return (
+        <FlatList
+          style={{ marginBottom: PADDING.p04 }}
+          data={categories}
+          scrollEnabled={false}
+          nestedScrollEnabled
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderCategory}
+          ListHeaderComponent={() => {
+            return (
+              <>
+                <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('subscription.title')}</Text>
+                <TouchableOpacity style={[homeStyles.authButton, { width: 250, backgroundColor: COLORS.primary, alignSelf: 'center', marginBottom: 10 }]} onPress={() => navigation.navigate('Subscription', { object: 'activation', itemId: itemId })}>
+                  <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '300', color: 'white', textAlign: 'center' }}>{t('activation.link')}</Text>
+                </TouchableOpacity>
+              </>
+            );
+          }}
+          ListEmptyComponent={<EmptyListComponent iconName="credit-card-outline" title={t('empty_list.title')} description={t('empty_list.description_subscription')} />}
+        />
+      );
 
-      {/* Spinner (for AuthContext requests) */}
-      <Spinner visible={isLoading} />
+      // Otherwise, show activation code form
+    } else {
+      const [code, setCode] = useState('');
 
-      {/* Content */}
-      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
-        <SafeAreaView style={{ padding: PADDING.p01 }}>
-          {/* Activation code form */}
+      // PARTNER dropdown
+      const [partnerIsFocus, setPartnerIsFocus] = useState(false);
+      const [partner, setPartner] = useState(null);
+      const [partners, setPartners] = useState([]);
+
+      useEffect(() => {
+        const config = {
+          method: 'GET',
+          url: `${API.boongo_url}/partner/partners_with_activation_code/fr/Actif`,
+          headers: {
+            'X-localization': 'fr',
+            'X-user-id': userInfo.id,
+            Authorization: `Bearer ${userInfo.api_token}`,
+          }
+        };
+
+        axios(config)
+          .then(function (response) {
+            const count = Object.keys(response.data.data).length;
+            let partnerArray = [];
+
+            for (let i = 0; i < count; i++) {
+              partnerArray.push({
+                value: response.data.data[i].id,
+                label: response.data.data[i].name
+              })
+            }
+
+            setPartners(partnerArray);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      }, []);
+
+      // Subscribe by activation code
+      const handleActivateSubscription = async () => {
+        if (!code.trim()) {
+          ToastAndroid.show(t('activation.code.error'), ToastAndroid.LONG);
+
+          return;
+        }
+
+        console.log('Partenaire sélectionné :', partner);
+
+        // Call the activation function, with `await` to wait for the response
+        const success = await activateSubscriptionByCode(userInfo.id, code, partner ? partner : 0);
+
+        console.log(`User has activation code :`, success);
+
+        if (success) {
+          navigation.navigate('WorkData', { itemId: itemId }); // Redirect to "WorkData"
+
+        } else {
+          console.log(`Erreur lors de l’activation ou code inactif`);
+        }
+      };
+
+      return (
+        <>
           <Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('activation.title')}</Text>
           <Text style={{ color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p04, paddingHorizontal: PADDING.p02 }}>{t('activation.description')}</Text>
 
@@ -279,27 +316,34 @@ const SubscriptionScreen = ({ route }) => {
             onChangeText={text => setCode(text)} />
 
           {/* Submit */}
-          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary, marginTop: 16 }]}
-            onPress={() => {
-              console.log('Partenaire séléctionné:', partner);
-              activateSubscriptionByCode(userInfo.id, code, (partner ? partner : 0));
-            }}
-          >
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary, marginTop: 16 }]} onPress={handleActivateSubscription}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
           </Button>
 
-          <Divider style={{ marginVertical: PADDING.p09, backgroundColor: COLORS.dark_secondary }} />
+          {/* Return to subscriptions */}
+          <TouchableOpacity style={[homeStyles.authButton, { width: 250, backgroundColor: COLORS.success, alignSelf: 'center', marginBottom: 10 }]} onPress={() => navigation.navigate('Subscription', { object: 'subscription', itemId: itemId })}>
+            <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '300', color: 'white', textAlign: 'center' }}>{t('subscription.back')}</Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+  };
 
-          {/* Subscriptions list */}
-          <FlatList
-            data={categories}
-            scrollEnabled={false}
-            nestedScrollEnabled
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderCategory}
-            ListHeaderComponent={<Text style={[homeStyles.cardEmptyTitle, { color: COLORS.black, textAlign: 'center', paddingHorizontal: PADDING.p02 }]}>{t('subscription.title')}</Text>}
-            ListEmptyComponent={<EmptyListComponent iconName="credit-card-outline" title={t('empty_list.title')} description={t('empty_list.description_subscription')} />}
-          />
+  return (
+    <>
+      {/* Header */}
+      <View style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p01 }}>
+        <HeaderComponent />
+      </View>
+
+      {/* Spinner (for AuthContext requests) */}
+      <Spinner visible={isLoading} />
+
+      {/* Content */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: COLORS.white, paddingHorizontal: PADDING.p01 }}
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
+        <SafeAreaView style={{ padding: PADDING.p01 }}>
+          <ObjectScreen />
         </SafeAreaView>
       </ScrollView>
     </>

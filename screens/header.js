@@ -137,27 +137,31 @@ const HeaderComponent = ({ title }) => {
     );
   }
 
-  if (route.name === 'WorkData' || route.name === 'Audio' || route.name === 'Subscription') {
+  if (route.name === 'WorkData' ||
+    route.name === 'Audio' ||
+    route.name === 'Subscription' || 
+    route.name === 'MobileSubscribe' || 
+    route.name === 'BankCardSubscribe') {
     return (
-        <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
-          {/* Brand */}
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name='chevron-left' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
-            </TouchableOpacity>
-            <LogoText width={115} height={31} style={{ marginLeft: PADDING.p01 }} />
-            {title ?
-              <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
-              : ''}
-          </View>
-
-          {/* Right links */}
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-              <Icon name='magnify' size={28} color={COLORS.black} />
-            </TouchableOpacity>
-          </View>
+      <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
+        {/* Brand */}
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name='chevron-left' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
+          </TouchableOpacity>
+          <LogoText width={115} height={31} style={{ marginLeft: PADDING.p01 }} />
+          {title ?
+            <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
+            : ''}
         </View>
+
+        {/* Right links */}
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+            <Icon name='magnify' size={28} color={COLORS.black} />
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 };

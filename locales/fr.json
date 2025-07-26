@@ -172,6 +172,7 @@
     "personal_infos": "Infos personnelles",
     "change_password": "Modifier mot de passe",
     "activation":  {
+        "link": "S’abonner avec un code",
         "title": "Activer l’abonnement avec un code",
         "description": "L'un de nos partenaires peut vous avoir donné un code unique pour activer l’abonnement",
         "partner": {
@@ -180,7 +181,8 @@
         },
         "code": {
             "label": "Code",
-            "placeholder": "Tapez le code"
+            "placeholder": "Tapez le code",
+            "error": "Veuillez taper le code !"
         }
     },
     "subscription":  {
@@ -188,7 +190,8 @@
         "info": "Vous n'avez aucun un abonnement. Veuillez vous abonner pour consulter",
         "type": "Type d’abonnement",
         "price": "Prix",
-        "link": "S’abonner"
+        "link": "S’abonner",
+        "back": "Retourner aux abonnements"
     },
     "consultation":  {
         "info": "La consultation de cette œuvre n’est pas gratuite comme vous l'avez remarqué.",
@@ -199,6 +202,22 @@
     "already_ordered": "Déjà commandé",
     "withdraw": "Retirer",
     "pay": "Payer",
+    "amount_to_pay": "Montant à payer :",
+    "payment_method":  {
+        "mobile_money": {
+            "label": "Mobile money",
+            "title": "Paiement par mobile money",
+            "descrciption": "Choisissez votre opérateur et mettez le n° de téléphone associé.",
+            "go_bank_card": "Utiliser carte bancaire",
+            "operator": "Séléctionner votre opérateur"
+        },
+        "bank_card": {
+            "label": "Carte bancaire",
+            "title": "Paiement par carte bancaire",
+            "descrciption": "Mettez les informations de votre carte bancaire.",
+            "go_mobile_money": "Payer par mobile money"
+        }
+    },
 
     "navigation": {
         "home": {

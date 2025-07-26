@@ -83,11 +83,25 @@ const WorkDataScreen = ({ route, navigation }) => {
   useEffect(() => {
     if (userInfo.id) {
       const validationInterval = setInterval(() => {
-        validateSubscription(userInfo.id);
-        invalidateSubscription(userInfo.id);
-        disableSubscriptionByCode(userInfo.id);
-        validateConsultations(userInfo.id);
-        invalidateConsultations(userInfo.id);
+        if (userInfo.has_pending_subscription) {
+          validateSubscription(userInfo.id);
+        }
+
+        if (userInfo.has_valid_subscription) {
+          invalidateSubscription(userInfo.id);
+        }
+
+        if (userInfo.has_active_code) {
+          disableSubscriptionByCode(userInfo.id);
+        }
+
+        if (userInfo.has_pending_consultation) {
+          validateConsultations(userInfo.id);
+        }
+
+        if (userInfo.has_valid_consultation) {
+          invalidateConsultations(userInfo.id);
+        }
       }, 1000);
 
       return () => clearInterval(validationInterval);
@@ -384,7 +398,7 @@ const WorkDataScreen = ({ route, navigation }) => {
       return (
         <>
           <Text style={{ marginBottom: 10, textAlign: 'center', color: COLORS.black }}>{t('subscription.info')}</Text>
-          <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { object: 'subscription', message: t('error_message.pending_after_payment') }) }}>
+          <TouchableOpacity style={[homeStyles.workCmd, { backgroundColor: COLORS.primary, marginBottom: 10 }]} onPress={() => { navigation.navigate('Subscription', { object: 'subscription', itemId: work.id }) }}>
             <FontAwesome6 style={[homeStyles.workCmdIcon, { color: 'white' }]} name='money-check-dollar' />
             <Text style={{ fontSize: TEXT_SIZE.paragraph, color: 'white' }}>{t('subscription.link')}</Text>
           </TouchableOpacity>
@@ -403,10 +417,10 @@ const WorkDataScreen = ({ route, navigation }) => {
                   <Text style={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.dark_secondary }}>{t('already_ordered')}</Text>
                 </>
               </TouchableHighlight>
-              <TouchableOpacity style={[homeStyles.linkIcon, { justifyContent: 'center', alignItems: 'flex-start' }]} onPress={() => navigation.navigate('Account', { initialIndex: 2 })}>
+              {/* <TouchableOpacity style={[homeStyles.linkIcon, { justifyContent: 'center', alignItems: 'flex-start' }]} onPress={() => navigation.navigate('Account', { initialIndex: 2 })}>
                 <Text style={{ marginBottom: 10, color: COLORS.link_color }}>{t('consultation.link')}</Text>
                 <FontAwesome6 name='angles-right' size={IMAGE_SIZE.s03} color={COLORS.link_color} style={{ marginLeft: PADDING.p01 }} />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </>
           );
 

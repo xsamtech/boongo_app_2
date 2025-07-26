@@ -172,6 +172,7 @@
     "personal_infos": "Ba sango ya moto ye moko",
     "change_password": "Kobongola mot de passe",
     "activation":  {
+        "link": "S’abonner na nzela ya code",
         "title": "Activer abonnément na nzela ya code",
         "description": "Moko ya ba partenaires na biso akokaki kopesa yo code ya kosalela mbala moko pona ko activer abonnément.",
         "partner": {
@@ -180,7 +181,8 @@
         },
         "code": {
             "label": "Code",
-            "placeholder": "Koma code"
+            "placeholder": "Koma code",
+            "error": "Esengeli okoma code !"
         }
     },
     "subscription":  {
@@ -188,7 +190,8 @@
         "info": "Ozali na abonnément te. Banda ko s'abonner po otala.",
         "type": "Lolenge ya abonnément",
         "price": "Ntalo",
-        "link": "S’abonner"
+        "link": "S’abonner",
+        "back": "Zonga na ba abonnéments"
     },
     "consultation":  {
         "info": "Kotala mosala oyo eza ofele te, ndenge okoki komona yango.",
@@ -199,6 +202,22 @@
     "already_ordered": "Déjà commandé",
     "withdraw": "Longola",
     "pay": "Nafuta",
+    "amount_to_pay": "Mbongo ya kofuta :",
+    "payment_method":  {
+        "mobile_money": {
+            "label": "Mobile money",
+            "title": "Kofuta na mobile money",
+            "descrciption": "Pona opérateur na yo mpe tia nimero ya telefone oyo esangisi yango.",
+            "go_bank_card": "Nasalela carte ya bank",
+            "operator": "Pona opérateur na yo :"
+        },
+        "bank_card": {
+            "label": "Carte ya bank",
+            "title": "Kofuta na nzela ya karte ya kredi",
+            "descrciption": "Tyá makambo ya karte na yo ya bank.",
+            "go_mobile_money": "Nafuta na mobile money"
+        }
+    },
 
     "navigation": {
         "home": {

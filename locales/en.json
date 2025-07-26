@@ -172,6 +172,7 @@
     "personal_infos": "Personal infos",
     "change_password": "Change password",
     "activation":  {
+        "link": "Subscribe with a code",
         "title": "Activate the subscription with a code",
         "description": "One of our partners may have given you a unique code to activate the subscription",
         "partner": {
@@ -180,7 +181,8 @@
         },
         "code": {
             "label": "Code",
-            "placeholder": "Type the code"
+            "placeholder": "Type the code",
+            "error": "Please type the code!"
         }
     },
     "subscription":  {
@@ -188,7 +190,8 @@
         "info": "You do not have a subscription. Please subscribe to view.",
         "type": "Subscription type",
         "price": "Price",
-        "link": "Subscribe"
+        "link": "Subscribe",
+        "back": "Return to subscriptions"
     },
     "consultation":  {
         "info": "Consulting this work is not free, as you may have noticed.",
@@ -199,6 +202,22 @@
     "already_ordered": "Already ordered",
     "withdraw": "Withdraw",
     "pay": "Pay",
+    "amount_to_pay": "Amount to pay:",
+    "payment_method":  {
+        "mobile_money": {
+            "label": "Mobile money",
+            "title": "Payment by mobile money",
+            "descrciption": "Choose your operator and enter the associated phone number.",
+            "go_bank_card": "Use bank card",
+            "operator": "Select your operator"
+        },
+        "bank_card": {
+            "label": "Bank card",
+            "title": "Payment by credit card",
+            "descrciption": "Enter your bank card information.",
+            "go_mobile_money": "Pay by mobile money"
+        }
+    },
 
     "navigation": {
         "home": {
