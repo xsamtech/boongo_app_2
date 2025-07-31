@@ -771,13 +771,18 @@ export const AuthProvider = ({ children }) => {
             if (success) {
                 const message = res.data.message;
                 const userData = res.data.data.user;
-                const paymentURLData = res.data.data.result_response.url;
+
+                if (res.data.data.result_response.url) {
+                    const paymentURLData = res.data.data.result_response.url;
+
+                    setPaymentURL(paymentURLData);
+
+                    AsyncStorage.setItem('paymentURL', paymentURLData);
+                }
 
                 setUserInfo(userData);
-                setPaymentURL(paymentURLData);
 
                 AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-                AsyncStorage.setItem('paymentURL', paymentURLData);
                 ToastAndroid.show(`${message}`, ToastAndroid.LONG);
 
                 console.log(`${message}`);
