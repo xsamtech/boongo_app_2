@@ -14,6 +14,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     // =============== Get data ===============
     const [userInfo, setUserInfo] = useState({});
+    const [paymentURL, setPaymentURL] = useState({});
     const [startRegisterInfo, setStartRegisterInfo] = useState({});
     const [endRegisterInfo, setEndRegisterInfo] = useState({});
     const [registerError, setRegisterError] = useState(null);
@@ -770,10 +771,13 @@ export const AuthProvider = ({ children }) => {
             if (success) {
                 const message = res.data.message;
                 const userData = res.data.data.user;
+                const paymentURLData = res.data.data.result_response.url;
 
                 setUserInfo(userData);
+                setPaymentURL(paymentURLData);
 
                 AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                AsyncStorage.setItem('paymentURL', paymentURLData);
                 ToastAndroid.show(`${message}`, ToastAndroid.LONG);
 
                 console.log(`${message}`);
@@ -892,7 +896,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
+            value={{ isLoading, userInfo, paymentURL, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
             {children}
         </AuthContext.Provider>
     );
