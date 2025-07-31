@@ -3,11 +3,10 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext, useEffect, useState } from 'react'
-import { View, Text, ScrollView, SafeAreaView, Dimensions, TouchableOpacity, Image } from 'react-native'
+import { View, Text, ScrollView, SafeAreaView, Dimensions, TouchableOpacity, Image, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Button, Divider } from 'react-native-paper';
-import * as RNLocalize from 'react-native-localize';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
@@ -25,24 +24,28 @@ const MobileSubscribeScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get context ===============
-  const { userInfo, isLoading } = useContext(AuthContext);
+  const { userInfo, purchase, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { amount, currency, paid } = route.params;
   // =============== Get data ===============
+  const [phoneCode, setPhoneCode] = useState(null);
   const [phone, setPhone] = useState('');
   // Get type "Mobile money"
   const [mobileMoneyType, setMobileMoneyType] = useState(null);
-  const [bankCardType, setBankCardType] = useState(null);
 
   // OPERATOR dropdown
   const [channel, setChannel] = useState(null);
   const [channelOpen, setChannelOpen] = useState(false);
   const [channelItems, setChannelItems] = useState([
-    { label: 'M-Pesa', value: 'M-Pesa' },
-    { label: 'Orange money', value: 'Orange money' },
-    { label: 'Airtel money', value: 'Airtel money' },
-    { label: 'Afrimoney', value: 'Afrimoney' }
+    { operatorImage: require('../assets/img/operator-m-pesa.png'), label: 'M-PESA', value: 'M-Pesa' },
+    { operatorImage: require('../assets/img/operator-airtel-money.png'), label: 'Airtel money', value: 'Airtel money' },
+    { operatorImage: require('../assets/img/operator-orange-money.png'), label: 'Orange money', value: 'Orange money' },
+    { operatorImage: require('../assets/img/operator-afrimoney.png'), label: 'Afrimoney', value: 'Afrimoney' }
   ]);
+
+  const handleChannelChange = (item) => {
+    setChannel(item.value);
+  };
 
   useEffect(() => {
     axios({ method: 'GET', url: `${API.boongo_url}/type/search/fr/Mobile%20money` })
@@ -57,28 +60,49 @@ const MobileSubscribeScreen = ({ route }) => {
       });
   }, []);
 
-  useEffect(() => {
-    axios({ method: 'GET', url: `${API.boongo_url}/type/search/fr/Carte%20bancaire` })
-      .then(function (res) {
-        let typeData = res.data.data;
+  // COUNTRIES DATA dropdown
+  const [countriesData, setCountriesData] = useState([]);
+  const [open, setOpen] = useState(false);
 
-        setBankCardType(typeData);
-        console.log(`${JSON.stringify(typeData)}`);
+  useEffect(() => {
+    axios({ method: 'GET', url: 'https://restcountries.com/v3.1/all?fields=cca2,idd,flags,name' })
+      .then((res) => {
+        // On garde une trace des codes téléphoniques uniques
+        const phoneCodes = new Set();
+
+        const countryArray = res.data.map((country) => {
+          let phoneCodeData = country.idd && country.idd.root ? `${country.idd.root}${country.idd.suffixes ? `${country.idd.suffixes[0]}` : ''}` : '';
+          const fmtPhoneCodeData = phoneCodeData.replace('+', '');
+
+          // Vérifier si le code téléphonique existe déjà dans le Set
+          if (phoneCodes.has(fmtPhoneCodeData)) {
+            return null; // Si le code existe déjà, ignorer cet élément
+          }
+
+          console.log(`${country.cca2} (${fmtPhoneCodeData})`);
+
+          // Ajouter le code téléphonique dans le Set pour éviter les doublons
+          phoneCodes.add(fmtPhoneCodeData);
+
+          return {
+            value: fmtPhoneCodeData, // Le code téléphonique est unique
+            label: `${country.cca2} (${fmtPhoneCodeData})`, // Affichage "CD (+243)"
+            flag: country.flags.png
+          };
+        }).filter(item => item !== null); // Filtrer les éléments nulls
+
+        // Trie des pays par nom (A-Z)
+        countryArray.sort((a, b) => a.label.localeCompare(b.label));
+
+        setCountriesData(countryArray);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
   }, []);
 
-  // Get system language
-  const getLanguage = () => {
-    const locales = RNLocalize.getLocales();
-
-    if (locales && locales.length > 0) {
-      return locales[0].languageCode;
-    }
-
-    return 'fr';
+  const handleCountryChange = (item) => {
+    setPhoneCode(item.value);
   };
 
   return (
@@ -109,9 +133,25 @@ const MobileSubscribeScreen = ({ route }) => {
 
           {/* Operator */}
           <DropDownPicker
+            modalTitle={t('payment_method.mobile_money.operator')}
+            modalTitleStyle={{
+              color: COLORS.dark_secondary,
+              borderBottomColor: COLORS.dark_secondary
+            }}
+            modalProps={{
+              presentationStyle: 'fullScreen', // optional
+              animationType: 'slide',
+            }}
+            modalContentContainerStyle={{
+              backgroundColor: COLORS.white,
+              borderTopWidth: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: COLORS.light_secondary,
+            }}
+            closeIconStyle={{
+              tintColor: COLORS.black
+            }}
             style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-            listItemContainerStyle={{ backgroundColor: COLORS.white }}
-            containerStyle={{ backgroundColor: COLORS.white }}
             textStyle={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.black }}
             placeholderStyle={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.dark_secondary }}
             arrowIconStyle={{ tintColor: COLORS.dark_secondary }}
@@ -120,11 +160,81 @@ const MobileSubscribeScreen = ({ route }) => {
             value={channel}
             placeholder={t('payment_method.mobile_money.operator')}
             placeholderTextColor={COLORS.dark_secondary}
+            listMode='MODAL'
             items={channelItems}
             setOpen={setChannelOpen}
             setValue={setChannel}
             setItems={setChannelItems}
-            listMode="SCROLLVIEW" />
+            onChangeItem={handleChannelChange}
+            renderListItem={({ item }) => {
+              return (
+                <TouchableOpacity onPress={() => { handleChannelChange(item); setChannelOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                  {item.operatorImage ? (
+                    <Image source={item.operatorImage} style={{ width: 50, height: 50, marginRight: 10 }} />
+                  ) : null}
+                  <Text style={{ color: COLORS.black }}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+
+          <View style={{ flexDirection: 'row' }}>
+            {/* Phone code  */}
+            <DropDownPicker
+              modalTitle={t('auth.phone_code.title')}
+              disabled={countriesData.length === 0}
+              loading={countriesData.length === 0}
+              modalProps={{
+                presentationStyle: 'fullScreen', // optional
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: COLORS.white,
+                borderTopWidth: 0,
+                borderBottomWidth: 1,
+                borderBottomColor: COLORS.light_secondary,
+              }}
+              closeIconStyle={{
+                tintColor: COLORS.black
+              }}
+              textStyle={{ color: COLORS.black }}
+              placeholderStyle={{ color: COLORS.black }}
+              placeholder={t('auth.phone_code.label')}
+              arrowIconStyle={{ tintColor: COLORS.black }}
+              containerStyle={{ width: '50%', height: 50 }}
+              style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
+              listMode='MODAL'
+              open={open}
+              value={phoneCode}
+              items={countriesData}
+              setOpen={setOpen}
+              setValue={setPhoneCode}
+              onChangeItem={handleCountryChange}
+              renderListItem={({ item }) => {
+                return (
+                  <TouchableOpacity onPress={() => { handleCountryChange(item); setOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                    {item.flag ? (
+                      <Image source={{ uri: item.flag }} style={{ width: 20, height: 15, marginRight: 10 }} />
+                    ) : null}
+                    <Text style={{ color: COLORS.black }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+
+            {/* Phone number */}
+            <TextInput
+              style={[homeStyles.authInput, { color: COLORS.black, width: '50%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
+              keyboardType='phone-pad'
+              value={phone}
+              placeholder={t('auth.phone')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={text => setPhone(text)} />
+          </View>
 
           {/* Submit / Cancel */}
           <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}>

@@ -215,7 +215,19 @@
             "label": "Bank card",
             "title": "Payment by credit card",
             "descrciption": "Enter your bank card information.",
-            "go_mobile_money": "Pay by mobile money"
+            "go_mobile_money": "Pay by mobile money",
+            "use_card": "Use my card",
+            "operator": "Select your operator",
+            "name_on_card": "Name on the card",
+            "card_number": {
+                "label": "Card number",
+                "placeholder": "1234 1234 1234 1234"
+            },
+            "expiration":{
+                "label": "Expiration",
+                "placeholder": "MM/YY"
+            },
+            "cvc": "CVC"
         }
     },
 

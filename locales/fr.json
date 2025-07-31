@@ -215,7 +215,19 @@
             "label": "Carte bancaire",
             "title": "Paiement par carte bancaire",
             "descrciption": "Mettez les informations de votre carte bancaire.",
-            "go_mobile_money": "Payer par mobile money"
+            "go_mobile_money": "Payer par mobile money",
+            "use_card": "Utiliser ma carte",
+            "operator": "Séléctionner votre opérateur",
+            "name_on_card": "Nom sur la carte",
+            "card_number": {
+                "label": "Numéro de la carte",
+                "placeholder": "1234 1234 1234 1234"
+            },
+            "expiration":{
+                "label": "Expiration",
+                "placeholder": "MM/YY"
+            },
+            "cvc": "CVC"
         }
     },
 

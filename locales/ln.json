@@ -209,13 +209,25 @@
             "title": "Kofuta na mobile money",
             "descrciption": "Pona opérateur na yo mpe tia nimero ya telefone oyo esangisi yango.",
             "go_bank_card": "Nasalela carte ya bank",
-            "operator": "Pona opérateur na yo :"
+            "operator": "Pona opérateur na yo"
         },
         "bank_card": {
             "label": "Carte ya bank",
             "title": "Kofuta na nzela ya karte ya kredi",
             "descrciption": "Tyá makambo ya karte na yo ya bank.",
-            "go_mobile_money": "Nafuta na mobile money"
+            "go_mobile_money": "Nafuta na mobile money",
+            "use_card": "Nasalela Karte na nga",
+            "operator": "Pona opérateur na yo",
+            "name_on_card": "Kombo likolo ya karte",
+            "card_number": {
+                "label": "Nimero ya karte",
+                "placeholder": "1234 1234 1234 1234"
+            },
+            "expiration":{
+                "label": "Expiration",
+                "placeholder": "MM/YY"
+            },
+            "cvc": "CVC"
         }
     },
 
