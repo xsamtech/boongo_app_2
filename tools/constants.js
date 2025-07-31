@@ -57,14 +57,12 @@ export const PADDING = {
 };
 
 export const API = {
-    // url: 'http://boongo.cd/api'
-    boongo_url: 'http://192.168.65.238/boongo/public/api',
+    boongo_url: 'https://boongo7.com/api',
     open_emoji_key: 'c9e9a10792fc18040b51f71924c3f8e031711c95',
 };
 
 export const WEB = {
-    // boongo_url: 'https://boongo.cd'
-    boongo_url: 'http://192.168.65.238/boongo/public'
+    boongo_url: 'https://boongo7.com',
 };
 
 export const PHONE = {
