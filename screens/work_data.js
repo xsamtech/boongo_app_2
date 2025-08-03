@@ -40,7 +40,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Authentication context ===============
-  const { userInfo, addToCart, validateSubscription, invalidateSubscription, disableSubscriptionByCode, validateConsultations, invalidateConsultations } = useContext(AuthContext);
+  const { userInfo, addToCart, resetPaymentURL, validateSubscription, invalidateSubscription, disableSubscriptionByCode, validateConsultations, invalidateConsultations } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { itemId } = route.params;
   // =============== Get data ===============
@@ -66,7 +66,6 @@ const WorkDataScreen = ({ route, navigation }) => {
 
   // =============== Image mapping ===============
   const galleryFiles = work.images?.filter(image => { return image.type.alias === 'image_file'; });
-  // const galleryFiles = work.images?.filter(f => f.type.name === 'Image (Photo/Vidéo)') || [];
 
   const gallerySources = galleryFiles?.map(file => ({
     uri: file.file_url,
@@ -79,36 +78,36 @@ const WorkDataScreen = ({ route, navigation }) => {
     setTimeout(() => { setIsLoading(false); }, 2000);
   }, []);
 
+  useEffect(() => {
+    // Reset "paymentURL" when entering this screen
+    resetPaymentURL();
+  }, []);
+
   // =============== Get item API with effect hook ===============
   useEffect(() => {
-    if (userInfo.id) {
-      const validationInterval = setInterval(() => {
-        if (userInfo.has_pending_subscription) {
-          validateSubscription(userInfo.id);
-        }
+    const validationInterval = setInterval(() => {
+      if (userInfo.has_pending_subscription) {
+        validateSubscription(userInfo.id);
+      }
 
-        if (userInfo.has_valid_subscription) {
-          invalidateSubscription(userInfo.id);
-        }
+      if (userInfo.has_valid_subscription) {
+        invalidateSubscription(userInfo.id);
+      }
 
-        if (userInfo.has_active_code) {
-          disableSubscriptionByCode(userInfo.id);
-        }
+      if (userInfo.has_active_code) {
+        disableSubscriptionByCode(userInfo.id);
+      }
 
-        if (userInfo.has_pending_consultation) {
-          validateConsultations(userInfo.id);
-        }
+      if (userInfo.has_pending_consultation) {
+        validateConsultations(userInfo.id);
+      }
 
-        if (userInfo.has_valid_consultation) {
-          invalidateConsultations(userInfo.id);
-        }
-      }, 1000);
+      if (userInfo.has_valid_consultation) {
+        invalidateConsultations(userInfo.id);
+      }
+    }, 1000);
 
-      return () => clearInterval(validationInterval);
-
-    } else {
-      console.log('Utilisateur non connecté');
-    }
+    return () => clearInterval(validationInterval);
   }, []);
 
   useEffect(() => {

@@ -24,9 +24,9 @@ const MobileSubscribeScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get context ===============
-  const { userInfo, purchase, isLoading } = useContext(AuthContext);
+  const { isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
-  const { amount, currency, paid } = route.params;
+  const { amount, currency } = route.params;
   // =============== Get data ===============
   const [phoneCode, setPhoneCode] = useState(null);
   const [phone, setPhone] = useState('');
@@ -78,8 +78,6 @@ const MobileSubscribeScreen = ({ route }) => {
           if (phoneCodes.has(fmtPhoneCodeData)) {
             return null; // Si le code existe déjà, ignorer cet élément
           }
-
-          console.log(`${country.cca2} (${fmtPhoneCodeData})`);
 
           // Ajouter le code téléphonique dans le Set pour éviter les doublons
           phoneCodes.add(fmtPhoneCodeData);
@@ -240,7 +238,8 @@ const MobileSubscribeScreen = ({ route }) => {
           <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
           </Button>
-          <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]} onPress={() => navigation.navigate('BankCardSubscribe', { amount: amount, currency: currency })}>
+          <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]}
+            onPress={() => { navigation.navigate('BankCardSubscribe', { amount: amount, currency: currency }); }}>
             <Text style={[homeStyles.authButtonText, { color: COLORS.black }]}>{t('payment_method.mobile_money.go_bank_card')}</Text>
           </TouchableOpacity>
         </SafeAreaView>

@@ -14,7 +14,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     // =============== Get data ===============
     const [userInfo, setUserInfo] = useState({});
-    const [paymentURL, setPaymentURL] = useState({});
+    const [paymentURL, setPaymentURL] = useState('');
     const [startRegisterInfo, setStartRegisterInfo] = useState({});
     const [endRegisterInfo, setEndRegisterInfo] = useState({});
     const [registerError, setRegisterError] = useState(null);
@@ -524,8 +524,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     const disableSubscriptionByCode = (user_id) => {
-        // setIsLoading(true);
-
         axios.put(`${API.boongo_url}/activation_code/disable_subscription/${user_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
@@ -535,26 +533,21 @@ export const AuthProvider = ({ children }) => {
             setUserInfo(userData);
 
             AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-            // ToastAndroid.show(`${message}`, ToastAndroid.LONG);
             console.log(`${message}`);
 
-            // setIsLoading(false);
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
-                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
                 console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
-                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
 
             } else {
                 // An error occurred while configuring the query
-                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+                console.log(`${error}`);
             }
-
-            // setIsLoading(false);
         });
     };
 
@@ -575,7 +568,7 @@ export const AuthProvider = ({ children }) => {
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
-                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
@@ -583,7 +576,7 @@ export const AuthProvider = ({ children }) => {
 
             } else {
                 // An error occurred while configuring the query
-                // console.log(`${error}`);
+                console.log(`${error}`);
             }
         });
     };
@@ -605,7 +598,7 @@ export const AuthProvider = ({ children }) => {
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
-                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
@@ -613,7 +606,7 @@ export const AuthProvider = ({ children }) => {
 
             } else {
                 // An error occurred while configuring the query
-                // console.log(`${error}`);
+                console.log(`${error}`);
             }
         });
     };
@@ -635,7 +628,7 @@ export const AuthProvider = ({ children }) => {
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
-                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
@@ -643,7 +636,7 @@ export const AuthProvider = ({ children }) => {
 
             } else {
                 // An error occurred while configuring the query
-                // console.log(`${error}`);
+                console.log(`${error}`);
             }
         });
     };
@@ -665,7 +658,7 @@ export const AuthProvider = ({ children }) => {
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
-                // console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
             } else if (error.request) {
                 // The request was made but no response was received
@@ -673,7 +666,7 @@ export const AuthProvider = ({ children }) => {
 
             } else {
                 // An error occurred while configuring the query
-                // console.log(`${error}`);
+                console.log(`${error}`);
             }
         });
     };
@@ -761,7 +754,7 @@ export const AuthProvider = ({ children }) => {
     const purchase = (user_id, transaction_type_id, other_phone, channel, app_url) => {
         setIsLoading(true);
 
-        axios.put(`${API.boongo_url}/cart/purchase/${user_id}`, {
+        axios.post(`${API.boongo_url}/cart/purchase/${user_id}`, {
             transaction_type_id, other_phone, channel, app_url
         }, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
@@ -849,10 +842,18 @@ export const AuthProvider = ({ children }) => {
 
         AsyncStorage.removeItem('userInfo');
         AsyncStorage.removeItem('pushToken');
+        AsyncStorage.removeItem('paymentURL');
 
         setUserInfo({});
+        setPaymentURL('');
         setPushToken(null);
         setIsLoading(false);
+    };
+
+    const resetPaymentURL = () => {
+        AsyncStorage.removeItem('paymentURL');
+
+        setPaymentURL('');
     };
 
     const isLoggedIn = async () => {
@@ -901,7 +902,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, paymentURL, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
+            value={{ isLoading, userInfo, paymentURL, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, resetPaymentURL, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
             {children}
         </AuthContext.Provider>
     );

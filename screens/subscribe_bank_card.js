@@ -6,12 +6,13 @@ import React, { useContext, useEffect, useState } from 'react'
 import { View, Text, ScrollView, SafeAreaView, Dimensions, TouchableOpacity, Image, TextInput } from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { WebView } from 'react-native-webview';
 import { Button, Divider } from 'react-native-paper';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING, TEXT_SIZE } from '../tools/constants';
+import { API, PADDING, TEXT_SIZE, WEB } from '../tools/constants';
 import HeaderComponent from './header';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
@@ -24,19 +25,20 @@ const BankCardSubscribeScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get context ===============
-  const { userInfo, purchase, isLoading } = useContext(AuthContext);
+  const { userInfo, paymentURL, purchase, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
-  const { amount, currency, paid } = route.params;
+  const { amount, currency } = route.params;
 
   const ObjectScreen = () => {
-    // If "object" parameter is "subscription", show subscriptions list
-    if (paid) {
+    // If payment is performed, show webview
+    if (paymentURL !== '' && typeof paymentURL === 'string') {
       return (
-        <>
-        </>
+        <SafeAreaView style={{ flex: 1 }}>
+          <WebView source={{ uri: paymentURL }} />
+        </SafeAreaView>
       );
 
-      // Otherwise, show activation code form
+    // Otherwise, show bank card form
     } else {
       // =============== Get data ===============
       const [cardNumber, setCardNumber] = useState(null);
@@ -59,17 +61,19 @@ const BankCardSubscribeScreen = ({ route }) => {
       ]);
 
       const handlePay = (user_id, transaction_type_id, channel, app_url) => {
-        if (item.value === 'PayPal') {
+        if (channel === 'PayPal') {
           return;
 
-        } else if (item.value === t('payment_method.bank_card.use_card')) {
+        } else if (channel === t('payment_method.bank_card.use_card')) {
           return;
 
         } else {
-          purchase(user_id, transaction_type_id, null, null, app_url);
+          purchase(user_id, transaction_type_id, null, channel, app_url);
         }
 
-        navigation.navigate('BankCardSubscribe', { amount: amount, currency: currency, paid: paid })
+        if (!paymentURL) {
+          navigation.navigate('BankCardSubscribe', { amount: amount, currency: currency });
+        }
       };
 
       const handleChannelChange = (item) => {
@@ -231,7 +235,8 @@ const BankCardSubscribeScreen = ({ route }) => {
           )}
 
           {/* Submit / Cancel */}
-          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}>
+          <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}
+            onPress={() => { handlePay(userInfo.id, bankCardType.id, channel, WEB.boongo_url); }}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
           </Button>
           <TouchableOpacity style={[homeStyles.authCancel, { borderColor: COLORS.black }]} onPress={() => navigation.navigate('MobileSubscribe', { amount: amount, currency: currency })}>
