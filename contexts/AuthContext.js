@@ -536,21 +536,18 @@ export const AuthProvider = ({ children }) => {
             console.log(`${message}`);
 
         }).catch(error => {
-            if (!error.response && !error.request) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
                 console.log(`${error}`);
             }
-            // if (error.response) {
-            //     // The request was made and the server responded with a status code
-            //     console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-            // } else if (error.request) {
-            //     // The request was made but no response was received
-            //     console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-            // } else {
-            //     // An error occurred while configuring the query
-            //     console.log(`${error}`);
-            // }
         });
     };
 
@@ -569,21 +566,18 @@ export const AuthProvider = ({ children }) => {
             }
 
         }).catch(error => {
-            if (!error.response && !error.request) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
                 console.log(`${error}`);
             }
-            // if (error.response) {
-            //     // The request was made and the server responded with a status code
-            //     console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-            // } else if (error.request) {
-            //     // The request was made but no response was received
-            //     console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-            // } else {
-            //     // An error occurred while configuring the query
-            //     console.log(`${error}`);
-            // }
         });
     };
 
@@ -602,21 +596,18 @@ export const AuthProvider = ({ children }) => {
             }
 
         }).catch(error => {
-            if (!error.response && !error.request) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
                 console.log(`${error}`);
             }
-            // if (error.response) {
-            //     // The request was made and the server responded with a status code
-            //     console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-            // } else if (error.request) {
-            //     // The request was made but no response was received
-            //     console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-            // } else {
-            //     // An error occurred while configuring the query
-            //     console.log(`${error}`);
-            // }
         });
     };
 
@@ -635,21 +626,18 @@ export const AuthProvider = ({ children }) => {
             }
 
         }).catch(error => {
-            if (!error.response && !error.request) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
                 console.log(`${error}`);
             }
-            // if (error.response) {
-            //     // The request was made and the server responded with a status code
-            //     console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-            // } else if (error.request) {
-            //     // The request was made but no response was received
-            //     console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-            // } else {
-            //     // An error occurred while configuring the query
-            //     console.log(`${error}`);
-            // }
         });
     };
 
@@ -668,21 +656,18 @@ export const AuthProvider = ({ children }) => {
             }
 
         }).catch(error => {
-            if (!error.response && !error.request) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.log(t('error') + ' ' + t('error_message.no_server_response'));
+
+            } else {
+                // An error occurred while configuring the query
                 console.log(`${error}`);
             }
-            // if (error.response) {
-            //     // The request was made and the server responded with a status code
-            //     console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-            // } else if (error.request) {
-            //     // The request was made but no response was received
-            //     console.log(t('error') + ' ' + t('error_message.no_server_response'));
-
-            // } else {
-            //     // An error occurred while configuring the query
-            //     console.log(`${error}`);
-            // }
         });
     };
 
