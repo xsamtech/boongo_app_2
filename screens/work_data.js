@@ -105,7 +105,7 @@ const WorkDataScreen = ({ route, navigation }) => {
       if (userInfo.has_valid_consultation) {
         invalidateConsultations(userInfo.id);
       }
-    }, 1000);
+    }, 60000);
 
     return () => clearInterval(validationInterval);
   }, []);
@@ -225,20 +225,26 @@ const WorkDataScreen = ({ route, navigation }) => {
                 <View style={{ padding: PADDING.p00 }}>
                   <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
 
-                  {work.audios?.map((audio, idx) => (
-                    <FileThumbnail
-                      key={`audio-${idx}`}
-                      uri={null}
-                      type="audio"
-                      title={`${t('file.audio')} ${idx + 1}`}
-                      onPress={() => navigation.navigate('Audio', {
-                        audioTitle: work.work_title,
-                        audioUrl: audio.file_url,
-                        mediaCover: work.photo_url,
-                        mediaAuthor: work.author,
-                      })}
-                    />
-                  ))}
+                  <FlatList
+                    data={work.audios}
+                    keyExtractor={(item, idx) => `audio-${idx}`}
+                    horizontal
+                    style={{ height: 120, flexGrow: 0 }}
+                    renderItem={({ item, index }) => (
+                      <FileThumbnail
+                        key={`audio-${index}`}
+                        uri={null}
+                        type="audio"
+                        title={`${t('file.audio')} ${index + 1}`}
+                        onPress={() => navigation.navigate('Audio', {
+                          audioTitle: work.work_title,
+                          audioUrl: item.file_url,
+                          mediaCover: work.photo_url,
+                          mediaAuthor: work.author,
+                        })}
+                      />
+                    )}
+                  />
                 </View>
               )}
 

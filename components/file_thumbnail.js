@@ -33,7 +33,7 @@ const FileThumbnail = ({ uri, type, title, onPress }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { marginTop: 10, marginBottom: 0, marginLeft: 0, marginRight: 20, width: 80, borderRadius: 8, overflow: 'hidden', alignItems: 'center' },
+    container: { height: 107, marginTop: 10, marginBottom: 0, marginLeft: 0, marginRight: 20, width: 80, borderRadius: 8, overflow: 'hidden', alignItems: 'center' },
     thumbnail: {
         width: 80, height: 80,
     },
