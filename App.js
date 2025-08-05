@@ -50,7 +50,7 @@ import JournalScreen from './screens/Organization/journal';
 import MappingScreen from './screens/Organization/mapping';
 import MediaScreen from './screens/Organization/media';
 import PDFViewerScreen from './screens/pdf_viewer';
-import YouTubePlayerScreen from './screens/youtube_screen';
+import VideoPlayerScreen from './screens/video_screen';
 import OrganizationDataScreen from './screens/Organization/organization_data';
 import GovernmentScreen from './screens/Organization/Government';
 import AddGovernmentScreen from './screens/Organization/Government/add_government';
@@ -314,7 +314,7 @@ const HomeStackNav = () => {
       <Stack.Screen name='WorkData' component={WorkDataScreen} />
       <Stack.Screen name='PDFViewer' component={PDFViewerScreen} />
       <Stack.Screen name='Audio' component={AudioScreen} />
-      <Stack.Screen name='VideoPlayer' component={YouTubePlayerScreen} />
+      <Stack.Screen name='VideoPlayer' component={VideoPlayerScreen} />
       <Stack.Screen name='Subscription' component={SubscriptionScreen} />
       <Stack.Screen name='MobileSubscribe' component={MobileSubscribeScreen} />
       <Stack.Screen name='BankCardSubscribe' component={BankCardSubscribeScreen} />

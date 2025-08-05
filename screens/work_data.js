@@ -49,7 +49,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const mWidth = Dimensions.get('window').width / 1.7;
   const [imageModal, setImageModal] = useState({ visible: false, index: 0 });
-  const [price, setPrice] = useState('');
+  // const [price, setPrice] = useState('');
   // Check if user has valid consultation if the work is not public
   const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
   // Check if user has added subscription in the 
@@ -68,6 +68,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   const galleryFiles = work.images?.filter(image => { return image.type.alias === 'image_file'; });
 
   const gallerySources = galleryFiles?.map(file => ({
+    id: file.id,
     uri: file.file_url,
     type: isVideoFile(file.file_url) ? 'video' : 'image',
   }));
@@ -78,8 +79,8 @@ const WorkDataScreen = ({ route, navigation }) => {
     setTimeout(() => { setIsLoading(false); }, 2000);
   }, []);
 
+  // Reset "paymentURL" when entering this screen
   useEffect(() => {
-    // Reset "paymentURL" when entering this screen
     resetPaymentURL();
   }, []);
 
@@ -109,6 +110,27 @@ const WorkDataScreen = ({ route, navigation }) => {
 
     return () => clearInterval(validationInterval);
   }, []);
+  // useEffect(() => {
+  //   if (userInfo.has_pending_subscription) {
+  //     validateSubscription(userInfo.id);
+  //   }
+
+  //   if (userInfo.has_valid_subscription) {
+  //     invalidateSubscription(userInfo.id);
+  //   }
+
+  //   if (userInfo.has_active_code) {
+  //     disableSubscriptionByCode(userInfo.id);
+  //   }
+
+  //   if (userInfo.has_pending_consultation) {
+  //     validateConsultations(userInfo.id);
+  //   }
+
+  //   if (userInfo.has_valid_consultation) {
+  //     invalidateConsultations(userInfo.id);
+  //   }
+  // }, [userInfo.has_pending_subscription, userInfo.has_valid_subscription, userInfo.has_active_code, userInfo.has_pending_consultation, userInfo.has_valid_consultation]);
 
   useEffect(() => {
     getWork();
@@ -145,51 +167,51 @@ const WorkDataScreen = ({ route, navigation }) => {
     })
   };
 
-  const getPrice = () => {
-    if (!work.consultation_price) return;
+  // const getPrice = () => {
+  //   if (!work.consultation_price) return;
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    if (work.currency.currency_acronym === userInfo.currency.currency_acronym) {
-      setPrice(work.consultation_price + ' ' + userInfo.currency.currency_acronym);
-      setIsLoading(false);
+  //   if (work.currency.currency_acronym === userInfo.currency.currency_acronym) {
+  //     setPrice(work.consultation_price + ' ' + userInfo.currency.currency_acronym);
+  //     setIsLoading(false);
 
-    } else {
-      const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${work.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
-      const mHeaders = {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`
-      };
+  //   } else {
+  //     const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${work.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
+  //     const mHeaders = {
+  //       'X-localization': 'fr',
+  //       'Authorization': `Bearer ${userInfo.api_token}`
+  //     };
 
-      axios.get(url, { headers: mHeaders })
-        .then(response => {
-          // Vérifie si la réponse contient les données nécessaires
-          if (response && response.data && response.data.success && response.data.data) {
-            const responseData = response.data.data;
-            const userPrice = work.consultation_price * responseData.rate;
-            setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
-          } else {
-            console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-          }
-        })
-        .catch(error => {
-          // Gère les erreurs liées à la requête
-          if (error.response?.status === 429) {
-            console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-          } else {
-            console.error('Erreur lors de la récupération du taux de change', error);
-          }
-        })
-        .finally(() => {
-          // Enfin, on met à jour l'état de chargement
-          setIsLoading(false);
-        });
-    }
-  };
+  //     axios.get(url, { headers: mHeaders })
+  //       .then(response => {
+  //         // Vérifie si la réponse contient les données nécessaires
+  //         if (response && response.data && response.data.success && response.data.data) {
+  //           const responseData = response.data.data;
+  //           const userPrice = work.consultation_price * responseData.rate;
+  //           setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
+  //         } else {
+  //           console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         // Gère les erreurs liées à la requête
+  //         if (error.response?.status === 429) {
+  //           console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+  //         } else {
+  //           console.error('Erreur lors de la récupération du taux de change', error);
+  //         }
+  //       })
+  //       .finally(() => {
+  //         // Enfin, on met à jour l'état de chargement
+  //         setIsLoading(false);
+  //       });
+  //   }
+  // };
 
-  useEffect(() => {
-    getPrice();
-  }, []);
+  // useEffect(() => {
+  //   getPrice();
+  // }, []);
 
   // Subscribe links component
   const WorkFiles = () => {
@@ -199,24 +221,49 @@ const WorkDataScreen = ({ route, navigation }) => {
           return (
             <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
               <Divider style={{ marginTop: PADDING.p01 }} />
+              {/* Remote video (YouTube or other) */}
+              {work.work_url && (
+                <View style={{ padding: PADDING.p00 }}>
+                  <Text style={{ color: COLORS.black }}>{t('file.external_videos')}</Text>
+
+                  <FileThumbnail
+                    uri={work.work_url}
+                    type="video"
+                    title={t('file.video')}
+                    onPress={() => navigation.navigate('VideoPlayer', {
+                      videoTitle: work.work_title,
+                      videoUri: work.work_url,
+                    })}
+                  />
+                </View>
+              )}
+
               {/* Documents */}
               {Array.isArray(work.documents) && work.documents.length > 0 && (
                 <View style={{ padding: PADDING.p00 }}>
                   <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
 
-                  {work.documents?.map((doc, idx) => (
-                    <FileThumbnail
-                      key={`doc-${idx}`}
-                      uri={null}
-                      type="document"
-                      title={`${t('file.document')} ${idx + 1}`}
-                      onPress={() => navigation.navigate('PDFViewer', {
-                        docTitle: work.work_title,
-                        docUri: doc.file_url,
-                        curPage: 1,
-                      })}
-                    />
-                  ))}
+                  <FlatList
+                    data={work.documents}
+                    keyExtractor={(item, idx) => `doc-${idx}`}
+                    scrollEnabled={false}
+                    horizontal={false}
+                    numColumns={3}
+                    style={{ flexGrow: 0 }}
+                    renderItem={({ item, index }) => (
+                      <FileThumbnail
+                        key={`doc-${index}`}
+                        uri={null}
+                        type="document"
+                        title={`${t('file.document')} ${index + 1}`}
+                        onPress={() => navigation.navigate('PDFViewer', {
+                          docTitle: work.work_title,
+                          docUri: item.file_url,
+                          curPage: 1,
+                        })}
+                      />
+                    )}
+                  />
                 </View>
               )}
 
@@ -227,9 +274,11 @@ const WorkDataScreen = ({ route, navigation }) => {
 
                   <FlatList
                     data={work.audios}
-                    keyExtractor={(item, idx) => `audio-${idx}`}
-                    horizontal
-                    style={{ height: 120, flexGrow: 0 }}
+                    keyExtractor={(item) => `audio-${item.id.toString()}`}
+                    scrollEnabled={false}
+                    horizontal={false}
+                    numColumns={3}
+                    style={{ flexGrow: 0 }}
                     renderItem={({ item, index }) => (
                       <FileThumbnail
                         key={`audio-${index}`}
@@ -253,44 +302,28 @@ const WorkDataScreen = ({ route, navigation }) => {
                 <View style={{ padding: PADDING.p00 }}>
                   <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
 
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {gallerySources.map((file, index) => (
+                  <FlatList
+                    data={gallerySources}
+                    keyExtractor={(item) => `media-${item.id.toString()}`}
+                    scrollEnabled={false}
+                    horizontal={false}
+                    numColumns={3}
+                    style={{ flexGrow: 0 }}
+                    renderItem={({ item, index }) => (
                       <FileThumbnail
                         key={`media-${index}`}
-                        uri={file.uri}
-                        type={file.type}
+                        uri={item.uri}
+                        type={item.type}
                         title={`${t('file.image')} ${index + 1}`}
-                        onPress={() => setImageModal({ visible: true, index })}
+                        onPress={() => navigation.navigate('VideoPlayer', {
+                          videoTitle: work.work_title,
+                          videoUri: item.uri,
+                        })}
                       />
-                    ))}
-                  </View>
-                </View>
-              )}
-
-              {/* Remote video (YouTube or other) */}
-              {work.work_url && (
-                <View style={{ padding: PADDING.p00 }}>
-                  <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
-
-                  <FileThumbnail
-                    uri={work.work_url}
-                    type="video"
-                    title={t('file.video')}
-                    onPress={() => navigation.navigate('VideoPlayer', {
-                      videoTitle: work.work_title,
-                      videoUri: work.work_url,
-                    })}
+                    )}
                   />
                 </View>
               )}
-
-              {/* Modal */}
-              <GalleryModal
-                visible={imageModal.visible}
-                index={imageModal.index}
-                files={gallerySources}
-                onClose={() => setImageModal({ visible: false, index: 0 })}
-              />
             </View>
           );
 
@@ -302,72 +335,10 @@ const WorkDataScreen = ({ route, navigation }) => {
         return (
           <View style={[homeStyles.workDescBottom, { flexDirection: 'column' }]}>
             <Divider style={{ marginTop: PADDING.p01 }} />
-            {/* Documents */}
-            {Array.isArray(work.documents) && work.documents.length > 0 && (
-              <View style={{ padding: PADDING.p00 }}>
-                <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
-
-                {work.documents?.map((doc, idx) => (
-                  <FileThumbnail
-                    key={`doc-${idx}`}
-                    uri={null}
-                    type="document"
-                    title={`${t('file.document')} ${idx + 1}`}
-                    onPress={() => navigation.navigate('PDFViewer', {
-                      docTitle: work.work_title,
-                      docUri: doc.file_url,
-                      curPage: 1,
-                    })}
-                  />
-                ))}
-              </View>
-            )}
-
-            {/* Audios */}
-            {Array.isArray(work.audios) && work.audios.length > 0 && (
-              <View style={{ padding: PADDING.p00 }}>
-                <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
-
-                {work.audios?.map((audio, idx) => (
-                  <FileThumbnail
-                    key={`audio-${idx}`}
-                    uri={null}
-                    type="audio"
-                    title={`${t('file.audio')} ${idx + 1}`}
-                    onPress={() => navigation.navigate('Audio', {
-                      audioTitle: work.work_title,
-                      audioUrl: audio.file_url,
-                      mediaCover: work.photo_url,
-                      mediaAuthor: work.author,
-                    })}
-                  />
-                ))}
-              </View>
-            )}
-
-            {/* Gallery (Local photos/videos) */}
-            {Array.isArray(work.images) && work.images.length > 0 && (
-              <View style={{ padding: PADDING.p00 }}>
-                <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
-
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {gallerySources.map((file, index) => (
-                    <FileThumbnail
-                      key={`media-${index}`}
-                      uri={file.uri}
-                      type={file.type}
-                      title={`${t('file.image')} ${index + 1}`}
-                      onPress={() => setImageModal({ visible: true, index })}
-                    />
-                  ))}
-                </View>
-              </View>
-            )}
-
             {/* Remote video (YouTube or other) */}
             {work.work_url && (
               <View style={{ padding: PADDING.p00 }}>
-                <Text style={{ color: COLORS.black }}>{t('file.videos')}</Text>
+                <Text style={{ color: COLORS.black }}>{t('file.external_videos')}</Text>
 
                 <FileThumbnail
                   uri={work.work_url}
@@ -381,13 +352,92 @@ const WorkDataScreen = ({ route, navigation }) => {
               </View>
             )}
 
-            {/* Modal */}
-            <GalleryModal
-              visible={imageModal.visible}
-              index={imageModal.index}
-              files={gallerySources}
-              onClose={() => setImageModal({ visible: false, index: 0 })}
-            />
+            {/* Documents */}
+            {Array.isArray(work.documents) && work.documents.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.documents')}</Text>
+
+                <FlatList
+                  data={work.documents}
+                  keyExtractor={(item, idx) => `doc-${idx}`}
+                  scrollEnabled={false}
+                  horizontal={false}
+                  numColumns={3}
+                  style={{ flexGrow: 0 }}
+                  renderItem={({ item, index }) => (
+                    <FileThumbnail
+                      key={`doc-${index}`}
+                      uri={null}
+                      type="document"
+                      title={`${t('file.document')} ${index + 1}`}
+                      onPress={() => navigation.navigate('PDFViewer', {
+                        docTitle: work.work_title,
+                        docUri: item.file_url,
+                        curPage: 1,
+                      })}
+                    />
+                  )}
+                />
+              </View>
+            )}
+
+            {/* Audios */}
+            {Array.isArray(work.audios) && work.audios.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.audios')}</Text>
+
+                <FlatList
+                  data={work.audios}
+                  keyExtractor={(item) => `audio-${item.id.toString()}`}
+                  scrollEnabled={false}
+                  horizontal={false}
+                  numColumns={3}
+                  style={{ flexGrow: 0 }}
+                  renderItem={({ item, index }) => (
+                    <FileThumbnail
+                      key={`audio-${index}`}
+                      uri={null}
+                      type="audio"
+                      title={`${t('file.audio')} ${index + 1}`}
+                      onPress={() => navigation.navigate('Audio', {
+                        audioTitle: work.work_title,
+                        audioUrl: item.file_url,
+                        mediaCover: work.photo_url,
+                        mediaAuthor: work.author,
+                      })}
+                    />
+                  )}
+                />
+              </View>
+            )}
+
+            {/* Gallery (Local photos/videos) */}
+            {Array.isArray(work.images) && work.images.length > 0 && (
+              <View style={{ padding: PADDING.p00 }}>
+                <Text style={{ color: COLORS.black }}>{t('file.photos')} / {t('file.videos')}</Text>
+
+                <FlatList
+                  data={gallerySources}
+                  keyExtractor={(item) => `media-${item.id.toString()}`}
+                  scrollEnabled={false}
+                  horizontal={false}
+                  numColumns={3}
+                  style={{ flexGrow: 0 }}
+                  renderItem={({ item, index }) => (
+                    <FileThumbnail
+                      key={`media-${index}`}
+                      uri={item.uri}
+                      type={item.type}
+                      title={`${t('file.image')} ${index + 1}`}
+                      onPress={() => navigation.navigate('VideoPlayer', {
+                        videoTitle: work.work_title,
+                        videoUri: item.uri,
+                      })}
+                    />
+                  )}
+                />
+              </View>
+            )}
           </View>
         );
       }
@@ -455,8 +505,7 @@ const WorkDataScreen = ({ route, navigation }) => {
       </View>
 
       {/* Content */}
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.white }}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.white }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
         <View style={[homeStyles.workBody, { paddingTop: 0, paddingBottom: PADDING.p01 }]}>
           <View style={homeStyles.workCard}>

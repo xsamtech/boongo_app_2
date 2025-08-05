@@ -33,7 +33,8 @@
         "photo": "Photo",
         "photos": "Photos",
         "video": "Vidéo",
-        "videos": "Vidéos"
+        "videos": "Vidéos",
+        "external_videos": "Vidéos externes"
     },
     "page": "Page",
     "yes": "Oui",
@@ -64,6 +65,7 @@
         "no_server_response": "Aucune réponse reçue du serveur.",
         "missing_parameters": "Il y a des paramètres qui manquent.",
         "word_not_found": "Mot non trouvé",
+        "image_not_loaded": "Image non chargée correctement",
         "cannot_be_empty": "Ceci ne peut pas être vide.",
         "cannot_switch_like": "Impossible de mettre à jour votre like. Essayez à nouveau.",
         "report_reason_empty": "Veuillez sélectionner un motif !",
@@ -315,6 +317,8 @@
                 "link" : "Fermer mon compte"
             }
         },
+        "reading": "Lecture",
+        "summary": "Résumés",
         "media": "Médias",
         "notification": "Notifications",
         "about": "A propos",

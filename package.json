@@ -51,6 +51,7 @@
     "react-native-gesture-handler": "^2.25.0",
     "react-native-image-crop-picker": "^0.42.0",
     "react-native-image-generator": "^0.3.1",
+    "react-native-image-pan-zoom": "^2.1.12",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-language-select": "^1.1.1",
     "react-native-loading-spinner-overlay": "^3.0.1",

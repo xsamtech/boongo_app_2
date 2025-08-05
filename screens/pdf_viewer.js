@@ -2,19 +2,16 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Dimensions, Alert, Text, TextInput, FlatList, SafeAreaView, Modal } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useEffect, useState } from 'react'
+import { View, TouchableOpacity, SafeAreaView, Dimensions, FlatList, Text, ScrollView, TextInput, Modal } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import Octicons from 'react-native-vector-icons/Octicons';
+import { useTranslation } from 'react-i18next';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Pdf from 'react-native-pdf';
 import Spinner from 'react-native-loading-spinner-overlay';
 import SQLite from 'react-native-sqlite-storage';
-import { IMAGE_SIZE } from '../tools/constants';
-import LogoText from '../assets/img/brand.svg';
+import { IMAGE_SIZE, PADDING } from '../tools/constants';
+import HeaderComponent from './header';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 
@@ -203,58 +200,55 @@ const SummaryScreenContent = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView contentContainerStyle={{ flex: 1, paddingBottom: 50 }}>
+    <>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-        <TouchableOpacity style={{ width: 40, height: 40, backgroundColor: 'rgba(219, 51, 55, 0.5)', margin: 10, paddingVertical: 7, paddingHorizontal: 11, borderRadius: 40 / 2 }} onPress={() => navigation.goBack()}>
-          <FontAwesome6 style={{ fontSize: 25, color: COLORS.black }} name='angle-left' />
-        </TouchableOpacity>
-      </View>
-      <View style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('window').width, paddingVertical: 7 }}>
-        <LogoText width={188} height={45} style={{ alignSelf: 'center' }} />
+      <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
+        <HeaderComponent />
       </View>
 
       {/* Content */}
-      <View style={{ marginTop: 5 }}>
-        <Text style={homeStyles.noteTitle}>{t('notepad.title')}</Text>
-        <View style={homeStyles.noteForm}>
-          <TextInput keyboardType="numeric" style={homeStyles.noteInput} placeholder={t('notepad.page_number')} value={page} onChangeText={text => setPage(text)} />
-          <TextInput multiline={true} numberOfLines={5} style={[homeStyles.noteInput, { height: 80, textAlignVertical: 'top' }]} placeholder={t('notepad.enter_note')} value={noteText} onChangeText={setNoteText} />
-          <TouchableOpacity style={homeStyles.noteSubmit} onPress={addNote}>
-            <Text style={{ textAlign: 'center', fontSize: 15, color: COLORS.white }}>{t('save')}</Text>
-          </TouchableOpacity>
-        </View>
+      <SafeAreaView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.white }}>
+        <View style={{ marginTop: 5 }}>
+          <Text style={homeStyles.noteTitle}>{t('notepad.title')}</Text>
+          <View style={homeStyles.noteForm}>
+            <TextInput keyboardType="numeric" style={homeStyles.noteInput} placeholder={t('notepad.page_number')} value={page} onChangeText={text => setPage(text)} />
+            <TextInput multiline={true} numberOfLines={5} style={[homeStyles.noteInput, { height: 80, textAlignVertical: 'top' }]} placeholder={t('notepad.enter_note')} value={noteText} onChangeText={setNoteText} />
+            <TouchableOpacity style={homeStyles.noteSubmit} onPress={addNote}>
+              <Text style={{ textAlign: 'center', fontSize: 15, color: COLORS.white }}>{t('save')}</Text>
+            </TouchableOpacity>
+          </View>
 
-        {noteItem.id ? (
-          <>
-            <Modal animationType='slide' transparent={true} visible={modalVisible} onRequestClose={() => { setModalVisible(!modalVisible); }}>
-              <View style={homeStyles.modalBackground}>
-                <View style={homeStyles.modalContainer}>
-                  <TouchableOpacity style={homeStyles.modalCloseButton} onPress={() => setModalVisible(false)}>
-                    <Octicons style={homeStyles.noteButtonIcon} name='x' />
-                  </TouchableOpacity>
-                  <Text style={homeStyles.noteTitle}>{t('notepad.title_edit')}</Text>
-                  <View style={homeStyles.noteForm}>
-                    <TextInput keyboardType="numeric" style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100 }]} placeholder={t('notepad.page_number')} value={noteItem.page.toString()} onChangeText={(text) => setNoteItem({ ...noteItem, page: text })} />
-                    <TextInput multiline={true} numberOfLines={5} style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100, height: 80, textAlignVertical: 'top' }]} placeholder={t('notepad.enter_note')} value={noteItem.noteText} onChangeText={(text) => setNoteItem({ ...noteItem, noteText: text })} />
-                    <TouchableOpacity style={[homeStyles.noteSubmit, { width: Dimensions.get('window').width - 100, backgroundColor: COLORS.warning }]} onPress={() => editNote(noteItem.id)}>
-                      <Text style={{ textAlign: 'center', fontSize: 15, color: COLORS.black }}>{t('update')}</Text>
+          {noteItem.id ? (
+            <>
+              <Modal animationType='slide' transparent={true} visible={modalVisible} onRequestClose={() => { setModalVisible(!modalVisible); }}>
+                <View style={homeStyles.modalBackground}>
+                  <View style={homeStyles.modalContainer}>
+                    <TouchableOpacity style={[homeStyles.modalClose, { backgroundColor: 'rgba(255, 255, 255, 0)', }]} onPress={() => setModalVisible(false)}>
+                      <Icon style={homeStyles.noteButtonIcon} name='close' />
                     </TouchableOpacity>
+                    <Text style={homeStyles.noteTitle}>{t('notepad.title_edit')}</Text>
+                    <View style={homeStyles.noteForm}>
+                      <TextInput keyboardType="numeric" style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100 }]} placeholder={t('notepad.page_number')} value={noteItem.page.toString()} onChangeText={(text) => setNoteItem({ ...noteItem, page: text })} />
+                      <TextInput multiline={true} numberOfLines={5} style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100, height: 80, textAlignVertical: 'top' }]} placeholder={t('notepad.enter_note')} value={noteItem.noteText} onChangeText={(text) => setNoteItem({ ...noteItem, noteText: text })} />
+                      <TouchableOpacity style={[homeStyles.noteSubmit, { width: Dimensions.get('window').width - 100, backgroundColor: COLORS.warning }]} onPress={() => editNote(noteItem.id)}>
+                        <Text style={{ textAlign: 'center', fontSize: 15, color: COLORS.black }}>{t('update')}</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </Modal>
-          </>
-        ) : ''}
+              </Modal>
+            </>
+          ) : ''}
 
-        <FlatList
-          data={notes}
-          keyExtractor={item => item.id}
-          style={{ marginTop: 16 }}
-          renderItem={renderNoteItem}
-        />
-      </View>
-    </SafeAreaView>
+          <FlatList
+            data={notes}
+            keyExtractor={item => item.id}
+            style={{ marginTop: 16 }}
+            renderItem={renderNoteItem}
+          />
+        </View>
+      </SafeAreaView>
+    </>
   );
 };
 
@@ -268,44 +262,43 @@ const PDFViewerScreenContent = ({ route, navigation }) => {
   const source = { uri: docUri, cache: true };
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1, paddingBottom: 1 }}>
+    <>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-        <TouchableOpacity style={{ width: 40, height: 40, backgroundColor: 'rgba(219, 51, 55, 0.5)', margin: 10, paddingVertical: 7, paddingHorizontal: 11, borderRadius: 40 / 2 }} onPress={() => navigation.goBack()}>
-          <FontAwesome6 style={{ fontSize: 25, color: COLORS.black }} name='angle-left' />
-        </TouchableOpacity>
-      </View>
-      <View style={{ position: 'absolute', top: 0, left: 0, width: Dimensions.get('window').width, paddingVertical: 7 }}>
-        <LogoText width={188} height={45} style={{ alignSelf: 'center' }} />
+      <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
+        <HeaderComponent />
       </View>
 
       {/* Content */}
-      <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 5, }}>
-        <Spinner visible={isLoading} />
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.dark_secondary }}>
+        <View style={{ justifyContent: 'flex-start', alignItems: 'center', marginTop: 5, }}>
+          <Spinner visible={isLoading} />
 
-        <Pdf
-          trustAllCerts={false}
-          source={source}
-          onLoadComplete={(numberOfPages, filePath) => {
-            console.log(`Number of pages: ${numberOfPages}`);
-          }}
-          onPageChanged={(page, numberOfPages) => {
-            console.log(`Current page: ${page}`);
-          }}
-          onError={(error) => {
-            console.log(error);
-          }}
-          onPressLink={(uri) => {
-            console.log(`Link pressed: ${uri}`);
-          }}
-          page={curPage}
-          style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height, }} />
-      </View>
-    </ScrollView>
+          <Pdf
+            trustAllCerts={false}
+            source={source}
+            onLoadComplete={(numberOfPages, filePath) => {
+              console.log(`Number of pages: ${numberOfPages}`);
+            }}
+            onPageChanged={(page, numberOfPages) => {
+              console.log(`Current page: ${page}`);
+            }}
+            onError={(error) => {
+              console.log(error);
+            }}
+            onPressLink={(uri) => {
+              console.log(`Link pressed: ${uri}`);
+            }}
+            page={curPage}
+            style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height, }} />
+        </View>
+      </ScrollView>
+    </>
   );
 };
 
 const PDFViewerScreen = ({ route }) => {
+  // =============== Colors ===============
+  const COLORS = useColors();
   // =============== Get parameters ===============
   const { docTitle, docUri } = route.params;
 
@@ -316,9 +309,20 @@ const PDFViewerScreen = ({ route }) => {
     <Tab.Navigator
       initialRouteName='PDFViewerContent'
       screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
+        headerShown: false,
+        tabBarActiveTintColor: COLORS.black,
+        tabBarStyle: {
+          backgroundColor: COLORS.white,
+          paddingTop: PADDING.p00,
+        },
+        tabBarShowLabel: false,
+        headerStyle: {
+          backgroundColor: COLORS.white,
+        },
+        headerTitleStyle: {
+          color: COLORS.black,
+        },
       }}
-      barStyle={{ backgroundColor: '#ccccee' }}
     >
       <Tab.Screen
         name='PDFViewerContent' component={PDFViewerScreenContent}
@@ -327,7 +331,7 @@ const PDFViewerScreen = ({ route }) => {
           title: t('navigation.reading'),
           tabBarLabel: t('navigation.reading'),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name='book-open-page-variant-outline' color={color} size={IMAGE_SIZE.s06} />
+            <Icon name='book-open-page-variant-outline' color={color} size={IMAGE_SIZE.s06} />
           )
         }}
       />
@@ -338,7 +342,7 @@ const PDFViewerScreen = ({ route }) => {
           title: t('navigation.summary'),
           tabBarLabel: t('navigation.summary'),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name='lead-pencil' color={color} size={IMAGE_SIZE.s06} />
+            <Icon name='lead-pencil' color={color} size={IMAGE_SIZE.s06} />
           )
         }}
       />

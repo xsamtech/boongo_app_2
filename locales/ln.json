@@ -33,7 +33,8 @@
         "photo": "Photo",
         "photos": "Photos",
         "video": "Vidéo",
-        "videos": "Vidéos"
+        "videos": "Vidéos",
+        "external_videos": "Vidéos ya libanda"
     },
     "page": "Lokasa",
     "yes": "Iyo",
@@ -64,6 +65,7 @@
         "no_server_response": "Eyano moko te ezwami uta na serveur.",
         "missing_parameters": "Ba paramètres misusu ez’ozanga.",
         "word_not_found": "Oyo oluki emonani te",
+        "image_not_loaded": "Elilingi e chargé malamu te",
         "cannot_be_empty": "Oyo ekoki kozala mpamba te.",
         "cannot_switch_like": "Incapable ya ko bongola like na yo. Meká lisusu.",
         "report_reason_empty": "Poná tina moko !",
@@ -315,6 +317,8 @@
                 "link" : "Kanga compte na nga"
             }
         },
+        "reading": "Lecture",
+        "summary": "Résumés",
         "media": "Ba imaje",
         "notification": "Notifications",
         "about": "Oyo etali",

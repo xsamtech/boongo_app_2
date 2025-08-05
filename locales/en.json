@@ -33,7 +33,8 @@
         "photo": "Photo",
         "photos": "Photos",
         "video": "Video",
-        "videos": "Videos"
+        "videos": "Videos",
+        "external_videos": "External videos"
     },
     "page": "Page",
     "yes": "Yes",
@@ -64,6 +65,7 @@
         "no_server_response": "No response received from the server.",
         "missing_parameters": "There are missing parameters.",
         "word_not_found": "Word not found",
+        "image_not_loaded": "Image not loaded correctly",
         "cannot_be_empty": "This cannot be empty.",
         "cannot_switch_like": "Unable to update your like. Try again.",
         "report_reason_empty": "Please select a reason!",
@@ -315,6 +317,8 @@
                 "link" : "Close account"
             }
         },
+        "reading": "Reading",
+        "summary": "Summaries",
         "media": "Medias",
         "notification": "Notifications",
         "about": "About",
