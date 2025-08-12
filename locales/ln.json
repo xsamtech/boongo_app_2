@@ -4,7 +4,7 @@
     "welcome_title": "Boyeyi malamu {{ firstname }}",
     "welcome_description": {
         "work": "Bimisa misala na yo ya ndenge nionso (buku, Zulunalo to Karte ya mokili) mpo ete bato nyonso bákoka komona yango, mpe solola na ba oyo basali abonemá ya misala na yo.",
-        "school": "Komisa eteyelo na yo (école, université, to mosusu), solola na balakisi to bayekoli, mpe kabola ba programmes mpe ba événements na yo.",
+        "establishment": "Komisa etablisséman na yo (école, université, to mosusu), solola na balakisi to bayekoli, mpe kabola ba programmes mpe ba événements na yo.",
         "government": "Komisa institution ya gouvernement na yo (ministère, entreprise publique, to mosusu) po okoka kokabola ba événements na yo, pe okoka kosolola na public."
     },
     "slogan": "Motambwisi na boyebi!",
@@ -82,10 +82,10 @@
         "description_subscribers": "Awa okomona bato oyo bafutaki mpo na kotala misala na yo.",
         "description_chat_user": "Awa okomona ba membres oyo okoki ko solola na bango.",
         "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
-        "description_chat_organization": "Awa ekomona ba échanges na yo na ba eteyelo mpe/to ba institutions.",
+        "description_chat_organization": "Awa ekomona ba échanges na yo na ba etablisséman mpe/to ba institutions.",
         "description_chat_event": "Awa ekolakisama ba échanges na yo na ba événements oyo babengi yo.",
         "description_subscription": "Awa ekolakisama ba abonnéments oyo okoki kobakisa na kitunga na yo.",
-        "description_news": "Awa, ba sango etali ba organisations (eteyelo to institution ya gouvernement) oyo ezali na plateforme ekolakisama.",
+        "description_news": "Awa, ba sango etali ba organisations (etablisséman to institution ya gouvernement) oyo ezali na plateforme ekolakisama.",
         "description_popular": "Awa, misala oyo ba membres ba consulté mingi ekolakisama.",
         "description_books": "Awa, misala mikolakisama miye mikoki kozala consulte na ba membres.",
         "description_mags": "Awa, eko lakisama ba journals, ba journaux to ba magazines oyo ba membres bakoki ko consulte.",
@@ -253,9 +253,9 @@
             "subscribers": "Ba abonné",
             "subscriptions": "Ba abonema"
         },
-        "school": {
-            "title": "Eteyelo",
-            "new": "Nakomisa eteyelo",
+        "establishment": {
+            "title": "Etablisséman",
+            "new": "Nakomisa etablisséman",
             "course_schedule": "Programme",
             "event": "Milulu",
             "authors": {
@@ -263,8 +263,8 @@
                 "books": "Ba buku"
             },
             "data": {
-                "name": "Kombo ya eteyelo",
-                "description": "Lobelá eteyelo na yo",
+                "name": "Kombo ya etablisséman",
+                "description": "Lobelá etablisséman na yo",
                 "id_number": "Nimero ya identification",
                 "address": "Adresi",
                 "phone": "Nimero ya téléfon",
@@ -336,7 +336,7 @@
         "organization": {
             "title": "Pona organisation",
             "new": "Bakisa organisation",
-            "label": "Eteyelo / Institution"
+            "label": "Etablisséman / Institution"
         },
         "firstname": "Prénom",
         "lastname": "Nom",

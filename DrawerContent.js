@@ -19,7 +19,7 @@ import useColors from './hooks/useColors';
 const DrawerList = [
     { icon: 'home-outline', label: 'navigation.home.title', navigateTo: 'HomeStack', toScreen: null },
     { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Account', toScreen: null },
-    { icon: 'bank-outline', label: 'navigation.school.title', navigateTo: 'School', toScreen: null },
+    { icon: 'bank-outline', label: 'navigation.establishment.title', navigateTo: 'Establishment', toScreen: null },
     { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Government', toScreen: null },
     { icon: 'image-multiple-outline', label: 'navigation.media', navigateTo: 'Media', toScreen: null },
     { icon: 'cog-outline', label: 'navigation.settings.title', navigateTo: 'Settings', toScreen: null },

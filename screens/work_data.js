@@ -12,12 +12,11 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, IMAGE_SIZE, PADDING, PHONE, TEXT_SIZE, WEB } from '../tools/constants';
+import { API, PADDING, PHONE, TEXT_SIZE } from '../tools/constants';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 import HeaderComponent from './header';
 import FileThumbnail from '../components/file_thumbnail';
-import GalleryModal from '../components/gallery_modal';
 
 const sendWhatsAppMessage = async () => {
   const phoneNumber = PHONE.admin;

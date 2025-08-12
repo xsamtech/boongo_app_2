@@ -41,8 +41,8 @@ import NotificationsScreen from './screens/Account/notifications';
 import SearchScreen from './screens/search';
 import NewChatScreen from './screens/Chat/new_chat';
 import BlockedContactsScreen from './screens/Chat/blocked_contacts';
-import SchoolScreen from './screens/Organization/School';
-import AddSchoolScreen from './screens/Organization/School/add_school';
+import EstablishmentScreen from './screens/Organization/Establishment';
+import AddEstablishmentScreen from './screens/Organization/Establishment/add_establishment';
 import WorkDataScreen from './screens/work_data';
 import AddWorkScreen from './screens/add_work';
 import BookScreen from './screens/Organization/book';
@@ -294,8 +294,8 @@ const HomeStackNav = () => {
       <Stack.Screen name='ChatEntity' component={ChatEntityScreen} />
       <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} />
       <Stack.Screen name='OrganizationData' component={OrganizationDataScreen} />
-      <Stack.Screen name='School' component={SchoolScreen} />
-      <Stack.Screen name='AddSchool' component={AddSchoolScreen} />
+      <Stack.Screen name='Establishment' component={EstablishmentScreen} />
+      <Stack.Screen name='AddEstablishment' component={AddEstablishmentScreen} />
       <Stack.Screen name='Government' component={GovernmentScreen} />
       <Stack.Screen name='AddGovernment' component={AddGovernmentScreen} />
       <Stack.Screen name='AddWork' component={AddWorkScreen} />

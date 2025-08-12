@@ -5,12 +5,12 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 
-const SchoolScreen = () => {
+const AddEstablishmentScreen = () => {
   return (
     <View>
-      <Text>School</Text>
+      <Text>Add establishment</Text>
     </View>
   )
 }
 
-export default SchoolScreen
+export default AddEstablishmentScreen

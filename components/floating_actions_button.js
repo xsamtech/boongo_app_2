@@ -195,13 +195,13 @@ const FloatingActionsButton = () => {
                 </TouchableOpacity>
             </Animated.View>
 
-            {/* Add a school */}
+            {/* Add a establishment */}
             <Animated.View style={[styles.contentContainer, secondIcon, secondWidthStyle, { backgroundColor: COLORS.warning }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddSchool'); handlePress(); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddEstablishment'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='bank' size={IMAGE_SIZE.s06} color='white' />
                     </View>
-                    <Animated.Text style={[styles.text, opacityText]}>{t('navigation.school.new')}</Animated.Text>
+                    <Animated.Text style={[styles.text, opacityText]}>{t('navigation.establishment.new')}</Animated.Text>
                 </TouchableOpacity>
             </Animated.View>
 

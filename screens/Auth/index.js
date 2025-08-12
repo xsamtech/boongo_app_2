@@ -30,12 +30,12 @@ const OnboardScreen = () => {
   }, []);
   // =============== Get data ===============
   const [isLoading, setIsLoading] = useState(false);
-  const slides = [{ id: 1, entity: 'work' }, { id: 2, entity: 'school' }, { id: 3, entity: 'government' }];
+  const slides = [{ id: 1, entity: 'work' }, { id: 2, entity: 'establishment' }, { id: 3, entity: 'government' }];
 
   const getImageSlide = (work) => {
     switch (work) {
-      case 'school':
-        return (<Image style={{ width: 282, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-school.png')} />);
+      case 'establishment':
+        return (<Image style={{ width: 282, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-establishment.png')} />);
         break;
       case 'government':
         return (<Image style={{ width: 231, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-government.png')} />);
