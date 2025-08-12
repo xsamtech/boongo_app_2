@@ -85,31 +85,52 @@ const WorkDataScreen = ({ route, navigation }) => {
   }, []);
 
   // =============== Get item API with effect hook ===============
+  // useEffect(() => {
+  //   const validationInterval = setInterval(() => {
+  //     if (userInfo.has_pending_subscription) {
+  //       validateSubscription(userInfo.id);
+  //     }
+
+  //     if (userInfo.has_valid_subscription) {
+  //       invalidateSubscription(userInfo.id);
+  //     }
+
+  //     if (userInfo.has_active_code) {
+  //       disableSubscriptionByCode(userInfo.id);
+  //     }
+
+  //     if (userInfo.has_pending_consultation) {
+  //       validateConsultations(userInfo.id);
+  //     }
+
+  //     if (userInfo.has_valid_consultation) {
+  //       invalidateConsultations(userInfo.id);
+  //     }
+  //   }, 60000);
+
+  //   return () => clearInterval(validationInterval);
+  // }, []);
   useEffect(() => {
-    const validationInterval = setInterval(() => {
-      if (userInfo.has_pending_subscription) {
-        validateSubscription(userInfo.id);
-      }
+    if (userInfo.has_pending_subscription) {
+      validateSubscription(userInfo.id);
+    }
 
-      if (userInfo.has_valid_subscription) {
-        invalidateSubscription(userInfo.id);
-      }
+    if (userInfo.has_valid_subscription) {
+      invalidateSubscription(userInfo.id);
+    }
 
-      if (userInfo.has_active_code) {
-        disableSubscriptionByCode(userInfo.id);
-      }
+    if (userInfo.has_active_code) {
+      disableSubscriptionByCode(userInfo.id);
+    }
 
-      if (userInfo.has_pending_consultation) {
-        validateConsultations(userInfo.id);
-      }
+    if (userInfo.has_pending_consultation) {
+      validateConsultations(userInfo.id);
+    }
 
-      if (userInfo.has_valid_consultation) {
-        invalidateConsultations(userInfo.id);
-      }
-    }, 60000);
-
-    return () => clearInterval(validationInterval);
-  }, []);
+    if (userInfo.has_valid_consultation) {
+      invalidateConsultations(userInfo.id);
+    }
+  }, [userInfo.has_pending_subscription, userInfo.has_valid_subscription, userInfo.has_active_code, userInfo.has_pending_consultation, userInfo.has_valid_consultation]);
 
   useEffect(() => {
     getWork();
