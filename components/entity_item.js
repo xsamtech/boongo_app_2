@@ -11,7 +11,7 @@ import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import homeStyles from '../screens/style';
 
-const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_profile }) => {
+const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_profile, doc_title, doc_page, doc_note }) => {
     // =============== Colors ===============
     const COLORS = useColors();
     // =============== Navigation ===============
@@ -20,7 +20,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
     const { t } = useTranslation();
 
     const handlePress = () => {
-        navigation.navigate('NewChat', { chat_entity: entity, chat_entity_id: entity_id, chat_entity_name: entity_name, chat_entity_profile: entity_profile });
+        navigation.navigate('NewChat', { chat_entity: entity, chat_entity_id: entity_id, chat_entity_name: entity_name, chat_entity_profile: entity_profile, doc_title: doc_title, doc_page: doc_page, doc_note: doc_note });
     };
 
     if (item.id === 'ad') {

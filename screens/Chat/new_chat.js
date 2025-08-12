@@ -18,7 +18,7 @@ import Pusher from 'pusher-js/react-native';
 
 const NewChatScreen = ({ route }) => {
   // =============== Get parameters ===============
-  const { chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile } = route.params || {};
+  const { chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile, doc_title, doc_page, doc_note } = route.params || {};
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -37,6 +37,10 @@ const NewChatScreen = ({ route }) => {
   const [inputHeight, setInputHeight] = useState(44);
   const [isLoading, setIsLoading] = useState(false);
   const endpoint = `${API.boongo_url}/message/selected_chat/fr/Discussion/${userInfo.id}/${chat_entity}/${chat_entity_id}`;
+
+  console.log(`Document title: ${doc_title}`);
+  console.log(`Document page: ${doc_page}`);
+  console.log(`My note: ${doc_note}`);
 
   // Fixing the error is often related to using LayoutAnimation or Keyboard.scheduleLayoutAnimation()
   useEffect(() => {

@@ -372,6 +372,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
                                     style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
                                     <Text style={{ fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>{item.doc_title}</Text>
                                     <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
+                                    <Text style={{ fontSize: TEXT_SIZE.label }}>{item.doc_note}</Text>
                                 </Pressable>
                             )}
 

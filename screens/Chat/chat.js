@@ -5,7 +5,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, RefreshControl, Animated, Dimensions, SafeAreaView, TextInput } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import useColors from '../../hooks/useColors';
 import { useTranslation } from 'react-i18next';
 import HeaderComponent from '../header';
@@ -18,7 +18,7 @@ import { API, IMAGE_SIZE, PADDING } from '../../tools/constants';
 import EntityItemComponent from '../../components/entity_item';
 import EmptyListComponent from '../../components/empty_list';
 
-const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
+const MembersTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page, doc_note }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -181,7 +181,11 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
                 entity='user'
                 entity_id={item.id}
                 entity_name={`${item.firstname} ${item.lastname}`}
-                entity_profile={item.avatar_url} />
+                entity_profile={item.avatar_url}
+                doc_title={doc_title}
+                doc_page={doc_page}
+                doc_note={doc_note}
+              />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -218,7 +222,7 @@ const MembersTab = ({ handleScroll, showBackToTop, listRef }) => {
   );
 };
 
-const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
+const CirclesTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page, doc_note }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -385,7 +389,11 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
                 entity='circle'
                 entity_id={item.id}
                 entity_name={item.circle_name}
-                entity_profile={item.profile_url} />
+                entity_profile={item.profile_url}
+                doc_title={doc_title}
+                doc_page={doc_page}
+                doc_note={doc_note}
+              />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -422,7 +430,7 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef }) => {
   );
 };
 
-const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
+const OrganizationsTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page, doc_note }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -583,7 +591,11 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
                 entity='organization'
                 entity_id={item.id}
                 entity_name={item.org_name}
-                entity_profile={item.cover_url} />
+                entity_profile={item.cover_url}
+                doc_title={doc_title}
+                doc_page={doc_page}
+                doc_note={doc_note}
+              />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -620,7 +632,7 @@ const OrganizationsTab = ({ handleScroll, showBackToTop, listRef }) => {
   );
 };
 
-const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
+const EventsTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page, doc_note }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -719,6 +731,7 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
       )}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Events List */}
           <Animated.FlatList
             ref={flatListRef}
             data={combinedData}
@@ -729,7 +742,11 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
                 entity='event'
                 entity_id={item.id}
                 entity_name={item.event_title}
-                entity_profile={item.cover_url} />
+                entity_profile={item.cover_url}
+                doc_title={doc_title}
+                doc_page={doc_page}
+                doc_note={doc_note}
+              />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -767,9 +784,14 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef }) => {
 };
 
 const ChatEntityScreen = () => {
-  const { t } = useTranslation();
+  // =============== Get parameters ===============
+  const route = useRoute();
+  // =============== Colors ===============
   const COLORS = useColors();
-
+  // =============== Language ===============
+  const { t } = useTranslation();
+  // =============== Get data ===============
+  const { doc_title, doc_page, doc_note } = route.params || {};
   const membersListRef = useRef(null);
   const orgsListRef = useRef(null);
   const circlesListRef = useRef(null);
@@ -798,15 +820,23 @@ const ChatEntityScreen = () => {
   ]);
 
   const renderScene = ({ route }) => {
+    const commonProps = {
+      handleScroll,
+      showBackToTop: showBackToTopByTab[route.key],
+      doc_title,
+      doc_page,
+      doc_note,
+    };
+
     switch (route.key) {
       case 'members':
-        return <MembersTab handleScroll={handleScroll} showBackToTop={showBackToTopByTab.members} listRef={membersListRef} />;
+        return <MembersTab {...commonProps} listRef={membersListRef} />;
       case 'circles':
-        return <CirclesTab handleScroll={handleScroll} showBackToTop={showBackToTopByTab.circles} listRef={circlesListRef} />;
+        return <CirclesTab {...commonProps} listRef={circlesListRef} />;
       case 'organizations':
-        return <OrganizationsTab handleScroll={handleScroll} showBackToTop={showBackToTopByTab.organizations} listRef={orgsListRef} />;
+        return <OrganizationsTab {...commonProps} listRef={orgsListRef} />;
       case 'events':
-        return <EventsTab handleScroll={handleScroll} showBackToTop={showBackToTopByTab.events} listRef={eventsListRef} />;
+        return <EventsTab {...commonProps} listRef={eventsListRef} />;
       default:
         return null;
     }

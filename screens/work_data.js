@@ -110,27 +110,6 @@ const WorkDataScreen = ({ route, navigation }) => {
 
     return () => clearInterval(validationInterval);
   }, []);
-  // useEffect(() => {
-  //   if (userInfo.has_pending_subscription) {
-  //     validateSubscription(userInfo.id);
-  //   }
-
-  //   if (userInfo.has_valid_subscription) {
-  //     invalidateSubscription(userInfo.id);
-  //   }
-
-  //   if (userInfo.has_active_code) {
-  //     disableSubscriptionByCode(userInfo.id);
-  //   }
-
-  //   if (userInfo.has_pending_consultation) {
-  //     validateConsultations(userInfo.id);
-  //   }
-
-  //   if (userInfo.has_valid_consultation) {
-  //     invalidateConsultations(userInfo.id);
-  //   }
-  // }, [userInfo.has_pending_subscription, userInfo.has_valid_subscription, userInfo.has_active_code, userInfo.has_pending_consultation, userInfo.has_valid_consultation]);
 
   useEffect(() => {
     getWork();

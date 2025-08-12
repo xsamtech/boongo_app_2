@@ -812,8 +812,9 @@ const homeStyles = StyleSheet.create({
 
     // Notepad
     noteTitle: {
-        marginVertical: PADDING.p00,
-        fontSize: TEXT_SIZE.paragraph,
+        marginVertical: PADDING.p05,
+        fontSize: TEXT_SIZE.title,
+        fontWeight: '500',
         textAlign: 'center',
     },
 
@@ -825,7 +826,6 @@ const homeStyles = StyleSheet.create({
 
     noteInput: {
         width: Dimensions.get('window').width - 20,
-        borderColor: '#ddd',
         borderWidth: 1,
         borderBottomWidth: 0,
         paddingHorizontal: 14,
@@ -842,11 +842,9 @@ const homeStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        width: Dimensions.get('window').width - 33,
+        width: Dimensions.get('window').width - 20,
         marginHorizontal: 20,
-        paddingVertical: 10,
-        // paddingRight: 20,
-        borderBottomColor: '#ddd',
+        padding: 8,
         borderBottomWidth: 1
     },
 
@@ -858,8 +856,6 @@ const homeStyles = StyleSheet.create({
     },
 
     noteTextContainer: {
-        backgroundColor: 'rgba(255, 255, 255, 0)',
-        padding: 8,
         borderRadius: 4
     },
 
@@ -868,26 +864,27 @@ const homeStyles = StyleSheet.create({
     },
 
     noteSeeTextButton: {
-        width: 100,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-        marginTop: 10,
-        paddingTop: 3,
-        paddingBottom: 4,
-        paddingHorizontal: 8,
-        borderRadius: 4
+        alignSelf: 'center',
+        marginTop: 8
     },
 
     noteSeeText: {
         fontSize: 14,
-        fontStyle: 'italic',
-        textAlign: 'center'
+        textAlign: 'center',
+    },
+
+    noteShareButton: {
+        position: 'absolute',
+        right: 1,
+        top: 55,
+        padding: 8,
+        borderRadius: 4
     },
 
     noteEditButton: {
         position: 'absolute',
         right: 0,
-        top: 40,
-        backgroundColor: 'rgba(255, 255, 255, 0)',
+        top: 30,
         padding: 8,
         borderRadius: 4
     },
@@ -895,7 +892,7 @@ const homeStyles = StyleSheet.create({
     noteDeleteButton: {
         position: 'absolute',
         right: 3,
-        top: 15,
+        top: 5,
         backgroundColor: 'rgba(255, 255, 255, 0)',
         padding: 8,
         borderRadius: 4

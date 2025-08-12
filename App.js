@@ -207,14 +207,6 @@ const HomeStackNav = () => {
     setSearchQuery('');        // Reset the search text
   };
 
-  useEffect(() => {
-    const validationInterval = setInterval(() => {
-      invalidateConsultations(userInfo.id);
-    }, 1000);
-
-    return () => clearInterval(validationInterval);
-  }, []);
-
   return (
     <Stack.Navigator
       initialRouteName='HomeStack'
