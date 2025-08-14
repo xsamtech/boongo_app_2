@@ -2,8 +2,8 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { View, Text, RefreshControl, Image, TouchableOpacity, FlatList, Linking, ToastAndroid, Dimensions, TouchableHighlight } from 'react-native';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, RefreshControl, Image, TouchableOpacity, FlatList, Linking, ToastAndroid, Dimensions, TouchableHighlight } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { Divider } from 'react-native-paper';
