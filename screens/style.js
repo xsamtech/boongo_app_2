@@ -537,7 +537,6 @@ const homeStyles = StyleSheet.create({
 
     workDescBadge: {
         fontSize: 16,
-        backgroundColor: '#d3d3d3',
         marginBottom: 10,
         marginRight: 7,
         paddingTop: 3,

@@ -15,6 +15,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { forbid } from 'react-native-secure-screen';
 import Orientation from 'react-native-orientation-locker';
+import TrackPlayer, { Capability, Event } from 'react-native-track-player';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
@@ -343,6 +344,49 @@ const App = () => {
 
   //   applySecurity();
   // }, []);
+
+  // =============== Setup Track Player ===============
+  useEffect(() => {
+    setupPlayer();
+
+    return () => {
+        TrackPlayer.reset(); // Cleaning when the component is disassembled
+    };
+  }, []);
+
+  const setupPlayer = async () => {
+    await TrackPlayer.setupPlayer();
+    console.log('Track player setup success!');
+
+    // Configure notification options to allow background playback
+    await TrackPlayer.updateOptions({
+      stopWithAppPause: true, // Stop playback when the app is paused
+      capabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop,
+        Capability.SeekTo
+      ],
+      compactCapabilities: [
+        Capability.Play,
+        Capability.Pause,
+        Capability.Stop
+      ],
+    });
+
+    // Add the event to handle actions on the notification
+    TrackPlayer.addEventListener(Event.RemotePlay, async () => {
+      await TrackPlayer.play();
+    });
+
+    TrackPlayer.addEventListener(Event.RemotePause, async () => {
+      await TrackPlayer.pause();
+    });
+
+    TrackPlayer.addEventListener(Event.RemoteStop, async () => {
+      await TrackPlayer.stop();
+    });
+  };
 
   if (splashLoading) {
     return <SplashScreen />;

@@ -92,7 +92,7 @@ const SubscriptionScreen = ({ route }) => {
     const userLang = getLanguage();
 
     // Apply language-specific formatting
-    let formattedPrice = price.toLocaleString(userLang, {
+    const formattedPrice = price.toLocaleString(userLang, {
       style: 'decimal',
       useGrouping: true,
       minimumFractionDigits: 0, // No digits after the decimal point

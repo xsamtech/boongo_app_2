@@ -211,7 +211,8 @@
             "title": "Paiement par mobile money",
             "descrciption": "Choisissez votre opérateur et mettez le n° de téléphone associé.",
             "go_bank_card": "Utiliser carte bancaire",
-            "operator": "Séléctionner votre opérateur"
+            "operator": "Séléctionner votre opérateur",
+            "submitted": "Veuillez confirmer votre transaction et cliquer sur le bouton ci-dessous"
         },
         "bank_card": {
             "label": "Carte bancaire",

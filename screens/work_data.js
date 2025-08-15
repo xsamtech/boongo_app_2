@@ -8,6 +8,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { Divider } from 'react-native-paper';
 import { NetworkInfo } from 'react-native-network-info';
+import * as RNLocalize from 'react-native-localize';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
@@ -48,7 +49,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const mWidth = Dimensions.get('window').width / 1.7;
   const [imageModal, setImageModal] = useState({ visible: false, index: 0 });
-  // const [price, setPrice] = useState('');
+  const [price, setPrice] = useState('');
   // Check if user has valid consultation if the work is not public
   const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
   // Check if user has added subscription in the 
@@ -71,6 +72,17 @@ const WorkDataScreen = ({ route, navigation }) => {
     uri: file.file_url,
     type: isVideoFile(file.file_url) ? 'video' : 'image',
   }));
+
+  // =============== Get system language ===============
+  const getLanguage = () => {
+    const locales = RNLocalize.getLocales();
+
+    if (locales && locales.length > 0) {
+      return locales[0].languageCode;
+    }
+
+    return 'fr';
+  };
 
   // =============== Refresh control ===============
   const onRefresh = useCallback(() => {
@@ -133,7 +145,7 @@ const WorkDataScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     getWork();
-  }, []);
+  }, [work]);
 
   const getWork = () => {
     NetworkInfo.getIPAddress().then(ip_address => {
@@ -166,51 +178,92 @@ const WorkDataScreen = ({ route, navigation }) => {
     })
   };
 
-  // const getPrice = () => {
-  //   if (!work.consultation_price) return;
+  useEffect(() => {
+    getPrice();
+  }, []);
 
-  //   setIsLoading(true);
+  const getPrice = () => {
+    setIsLoading(true);
 
-  //   if (work.currency.currency_acronym === userInfo.currency.currency_acronym) {
-  //     setPrice(work.consultation_price + ' ' + userInfo.currency.currency_acronym);
-  //     setIsLoading(false);
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/work/${itemId}`,
+      headers: {
+        'X-localization': 'fr',
+        'Authorization': `Bearer ${userInfo.api_token}`,
+      }
+    };
 
-  //   } else {
-  //     const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${work.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
-  //     const mHeaders = {
-  //       'X-localization': 'fr',
-  //       'Authorization': `Bearer ${userInfo.api_token}`
-  //     };
+    axios(config)
+      .then(res => {
+        const workData = res.data.data;
 
-  //     axios.get(url, { headers: mHeaders })
-  //       .then(response => {
-  //         // Vérifie si la réponse contient les données nécessaires
-  //         if (response && response.data && response.data.success && response.data.data) {
-  //           const responseData = response.data.data;
-  //           const userPrice = work.consultation_price * responseData.rate;
-  //           setPrice(userPrice + ' ' + userInfo.currency.currency_acronym);
-  //         } else {
-  //           console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
-  //         }
-  //       })
-  //       .catch(error => {
-  //         // Gère les erreurs liées à la requête
-  //         if (error.response?.status === 429) {
-  //           console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-  //         } else {
-  //           console.error('Erreur lors de la récupération du taux de change', error);
-  //         }
-  //       })
-  //       .finally(() => {
-  //         // Enfin, on met à jour l'état de chargement
-  //         setIsLoading(false);
-  //       });
-  //   }
-  // };
+        if (workData.consultation_price) {
+          const userLang = getLanguage();
 
-  // useEffect(() => {
-  //   getPrice();
-  // }, []);
+          if (workData.currency.currency_acronym === userInfo.currency.currency_acronym) {
+            // Apply language-specific formatting
+            const formattedPrice = workData.consultation_price.toLocaleString(userLang, {
+              style: 'decimal',
+              useGrouping: true,
+              minimumFractionDigits: 0, // No digits after the decimal point
+              maximumFractionDigits: 0, // No digits after the decimal point
+            });
+
+            console.log(formattedPrice);
+
+            setPrice(`${formattedPrice} ${userInfo.currency.currency_acronym}`);
+            setIsLoading(false);
+
+          } else {
+            const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${workData.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
+            const mHeaders = {
+              'X-localization': 'fr',
+              'Authorization': `Bearer ${userInfo.api_token}`
+            };
+
+            axios.get(url, { headers: mHeaders })
+              .then(response => {
+                // Vérifie si la réponse contient les données nécessaires
+                if (response && response.data && response.data.success && response.data.data) {
+                  const responseData = response.data.data;
+                  let userPrice = workData.consultation_price * responseData.rate;
+
+                  // Apply language-specific formatting
+                  const formattedPrice = userPrice.toLocaleString(userLang, {
+                    style: 'decimal',
+                    useGrouping: true,
+                    minimumFractionDigits: 0, // No digits after the decimal point
+                    maximumFractionDigits: 0, // No digits after the decimal point
+                  });
+
+                  console.log(formattedPrice);
+
+                  setPrice(`${formattedPrice} ${userInfo.currency.currency_acronym}`);
+
+                } else {
+                  console.error('Erreur : Données manquantes ou format incorrect', response.data.message);
+                }
+              })
+              .catch(error => {
+                // Gère les erreurs liées à la requête
+                if (error.response?.status === 429) {
+                  console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+                } else {
+                  console.error('Erreur lors de la récupération du taux de change', error);
+                }
+              })
+              .finally(() => {
+                // Enfin, on met à jour l'état de chargement
+                setIsLoading(false);
+              });
+          }
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
 
   // Subscribe links component
   const WorkFiles = () => {
@@ -558,7 +611,7 @@ const WorkDataScreen = ({ route, navigation }) => {
                   style={homeStyles.workDescBadgesList}
                   contentContainerStyle={homeStyles.workDescBadgesListContents}
                   renderItem={({ item }) => {
-                    return (<Text style={homeStyles.workDescBadge}>{item.category_name}</Text>);
+                    return (<Text style={[homeStyles.workDescBadge, { backgroundColor: COLORS.black, color: COLORS.white }]}>{item.category_name}</Text>);
                   }} />
               </View>
 
@@ -566,7 +619,8 @@ const WorkDataScreen = ({ route, navigation }) => {
               {work.is_public === 0 && (
                 <View style={homeStyles.workDescBottom}>
                   <Text style={[homeStyles.workDescText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')} : </Text>
-                  <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{`${work.consultation_price} ${work.currency.currency_acronym}`}</Text>
+                  {/* <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{`${work.consultation_price} ${work.currency.currency_acronym}`}</Text> */}
+                  <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{price ? price : `${work.consultation_price} ${work.currency.currency_acronym}`}</Text>
                 </View>
               )}
 

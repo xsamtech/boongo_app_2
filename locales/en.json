@@ -211,7 +211,8 @@
             "title": "Payment by mobile money",
             "descrciption": "Choose your operator and enter the associated phone number.",
             "go_bank_card": "Use bank card",
-            "operator": "Select your operator"
+            "operator": "Select your operator",
+            "submitted": "Please confirm your transaction and click the button below"
         },
         "bank_card": {
             "label": "Bank card",

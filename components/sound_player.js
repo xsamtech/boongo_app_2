@@ -4,151 +4,129 @@
  */
 import React, { useState, useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import Sound from 'react-native-sound';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
+import TrackPlayer, { Capability, Event, useTrackPlayerEvents } from 'react-native-track-player';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING, TEXT_SIZE } from '../tools/constants';
 import useColors from '../hooks/useColors';
 
-const SoundPlayer = ({ audioUrl, color }) => {
+const SoundPlayer = ({ audioUrl, title, artist, artwork, color }) => {
     // =============== Colors ===============
     const COLORS = useColors();
-    // =============== Language ===============
-    const { t } = useTranslation();
     // =============== Get data ===============
     const [isPlaying, setIsPlaying] = useState(false); // Player state
-    const [duration, setDuration] = useState(0); // Total duration
-    const [currentTime, setCurrentTime] = useState(0); // Current playing time
-    const [volume, setVolume] = useState(1); // Volume (from 0 to 1)
-    const [sound, setSound] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [position, setPosition] = useState(0);
+    const [duration, setDuration] = useState(0);
 
-    // =============== Create audio object only once on audioUrl change ===============
+    // =============== Initializing the player and notifications ===============
     useEffect(() => {
-        if (audioUrl) {
-            const decodedAudioUrl = decodeURIComponent(audioUrl);
-            console.log('Audio URL décodée:', decodedAudioUrl);
+        // Configure the player when the app starts
+        const setupPlayer = async () => {
+            await TrackPlayer.setupPlayer();
+            console.log('Player is ready!');
 
-            // Set the category for playback (optional but recommended)
-            Sound.setCategory('Playback');
-
-            // Create a new audio instance
-            const newSound = new Sound(decodedAudioUrl, null, (error) => {
-                if (error) {
-                    console.log('Erreur de lecture audio:', error);
-                    return;
-                }
-
-                setIsLoaded(true);
-                // Set audio instance in state
-                setSound(newSound);
-
-                // Successfully loaded, get duration
-                newSound.getDuration((duration) => {
-                    setDuration(duration);
-                    console.log('Duration:', duration);
-                });
+            // Add capabilities to the player to control buttons in the notification
+            await TrackPlayer.updateOptions({
+                stopWithAppPause: true,
+                capabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.Stop,
+                    Capability.SeekTo
+                ],
+                compactCapabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.Stop
+                ],
             });
+        };
 
-            // Cleanup function to release the audio when the component is unmounted
-            return () => {
-                if (sound) {
-                    sound.release();
-                }
-            };
-        } else {
-            console.log('Aucune URL audio fournie.');
-        }
-    }, [audioUrl]);
+        setupPlayer();
 
-    // =============== Play or Pause functionality ===============
-    const togglePlayPause = () => {
-        if (!sound) {
-      return;
-    }
+        return () => {
+            TrackPlayer.reset(); // Cleaning when the component is disassembled
+        };
+    }, []);
 
-    if (isPlaying) {
-      sound.pause(() => {
-        setIsPlaying(false);
-      });
-    } else {
-      sound.play((success) => {
-        if (success) {
-          console.log('successfully finished playing');
-          setIsPlaying(false); // Reset play state when finished
-        } else {
-          console.log('playback failed due to audio decoding errors');
-          setIsPlaying(false);
-        }
-      });
-      setIsPlaying(true);
-    }
-    };
-
-    // =============== Update the progress bar every second while playing ===============
+    // =============== Progress bar handling ===============
     useEffect(() => {
-        if (isPlaying && audio) {
-            const intervalId = setInterval(() => {
-                audio.getCurrentTime((currentTime) => {
-                    setCurrentTime(currentTime);
-                });
-            }, 1000);
+        const interval = setInterval(async () => {
+            const progress = await TrackPlayer.getProgress();
 
-            return () => clearInterval(intervalId);  // Cleanup the interval on unmount or when paused
+            setPosition(progress.position);
+            setDuration(progress.duration);
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // =============== Function to start reading ===============
+    const playAudio = async () => {
+        const decodedAudioUrl = decodeURIComponent(audioUrl);
+
+        await TrackPlayer.add({
+            id: 'trackId',
+            url: decodedAudioUrl,
+            title: title,
+            artist: artist,
+            artwork: artwork, // Image for notification
+        });
+
+        await TrackPlayer.play();
+        setIsPlaying(true);
+    };
+
+    // =============== Pause function ===============
+    const pauseAudio = async () => {
+        await TrackPlayer.pause();
+        setIsPlaying(false);
+    };
+
+    // =============== Function to format duration ===============
+    const formatDuration = (seconds) => {
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let sec = Math.floor(seconds % 60);
+
+        if (hours > 0) {
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; // hh:mm:ss
+        } else if (minutes > 0) {
+            return `${String(minutes).padStart(2, '0')}:${String(sec).padStart(2, '0')}`; // mm:ss
+        } else {
+            return `00:${String(sec).padStart(2, '0')}`; // ss
         }
-    }, [isPlaying, audio]);
-
-    // =============== Handle progress change ===============
-    const handleProgress = (time) => {
-        if (!audio) return;
-        setCurrentTime(time);
-        audio.setCurrentTime(time);
     };
 
-    // =============== Handle volume change ===============
-    const handleVolumeChange = (newVolume) => {
-        if (!audio) return;
-        setVolume(newVolume);
-        audio.setVolume(newVolume);
-    };
-
-    // =============== Format time in minutes:seconds ===============
-    const formatTime = (timeInSeconds) => {
-        const minutes = Math.floor(timeInSeconds / 60);
-        const seconds = Math.floor(timeInSeconds % 60);
-        return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    // =============== Progress bar change handler ===============
+    const onSliderChange = async (value) => {
+        await TrackPlayer.seekTo(value);
+        setPosition(value);
     };
 
     return (
-        <View style={{ backgroundColor: COLORS.light_secondary, padding: PADDING.p02, marginTop: 10, borderRadius: 10, flexDirection: 'row', alignItems: 'center' }}>
-            {/* 1️⃣ Play/Pause button */}
-            <Pressable onPress={togglePlayPause}>
-                <Icon name={isPlaying ? 'play' : 'pause'} size={40} color={color} />
-            </Pressable>
+        <View style={{ flexDirection: 'column', backgroundColor: COLORS.black, paddingVertical: PADDING.p00, paddingHorizontal: PADDING.p02 }}>
+            {/* Track title */}
+            <Text style={{ fontSize: TEXT_SIZE.label, color: color }} numberOfLines={1}>{title}</Text>
 
-            {/* 2️⃣ Progress bar */}
-            <View style={{ flex: 1, marginHorizontal: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* Play/Pause button */}
+                <Pressable onPress={isPlaying ? pauseAudio : playAudio} style={{ marginLeft: -10, marginRight: -10 }}>
+                    <Icon name={isPlaying ? 'pause' : 'play'} size={40} color={COLORS.white} />
+                </Pressable>
+
+                {/* Progress Slider */}
                 <Slider
-                    style={{ height: 40 }}
-                    value={currentTime}  // Bind currentTime to Slider
+                    value={position}
                     minimumValue={0}
                     maximumValue={duration}
-                    minimumTrackTintColor={COLORS.success}
-                    maximumTrackTintColor={COLORS.link_color}
-                    onValueChange={handleProgress}
-                />
+                    onValueChange={onSliderChange}
+                    minimumTrackTintColor={COLORS.warning}
+                    maximumTrackTintColor={COLORS.light_secondary}
+                    thumbTintColor={color}
+                    style={{ width: '65%' }} />
+                <Text style={{ color: color }}>{`${formatDuration(position)} / ${formatDuration(duration)}`}</Text>
             </View>
-
-            {/* 3️⃣ Elapsed time / Total time */}
-            <Text style={{ color: COLORS.black, fontSize: TEXT_SIZE.normal }}>
-                {`${formatTime(currentTime)} / ${formatTime(duration)}`}
-            </Text>
-
-            {/* 4️⃣ Volume control */}
-            <Pressable onPress={() => handleVolumeChange(volume === 0 ? 1 : 0)}>
-                <Icon name={volume === 0 ? 'volume-off' : 'volume-high'} size={25} color={COLORS.primary} />
-            </Pressable>
         </View>
     );
 };

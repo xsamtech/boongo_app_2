@@ -2,8 +2,8 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useCallback, useState } from 'react';
-import { Dimensions, Image, RefreshControl, ScrollView, Text, View } from 'react-native';
+import React from 'react';
+import { Dimensions, Image, ScrollView, Text, View } from 'react-native';
 import { PADDING } from '../tools/constants';
 import HeaderComponent from './header';
 import useColors from '../hooks/useColors';
@@ -14,7 +14,7 @@ const AudioScreen = ({ route }) => {
     // =============== Colors ===============
     const COLORS = useColors();
     // =============== Get parameters ===============
-    const { audioTitle, audioUrl, mediaCover } = route.params;
+    const { audioTitle, audioAuthor, audioUrl, mediaCover } = route.params;
     // =============== Get data ===============
     const mWidth = Dimensions.get('window').width / 1.7;
 
@@ -39,7 +39,7 @@ const AudioScreen = ({ route }) => {
 
                 {/* Audio player */}
                 <View style={{ paddingHorizontal: PADDING.p05 }}>
-                    <SoundPlayer audioUrl={audioUrl} color={COLORS.black} />
+                    <SoundPlayer audioUrl={audioUrl} title={audioTitle} artist={audioAuthor} artwork={mediaCover} color={COLORS.dark_secondary} />
                 </View>
             </ScrollView>
         </>

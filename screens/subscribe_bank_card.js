@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { WebView } from 'react-native-webview';
 import { Button, Divider } from 'react-native-paper';
+import * as RNLocalize from 'react-native-localize';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
@@ -28,6 +29,33 @@ const BankCardSubscribeScreen = ({ route }) => {
   const { userInfo, paymentURL, purchase, isLoading } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { amount, currency } = route.params;
+  // =============== Get data ===============
+  const [formattedAmount, setFormattedAmount] = useState(amount);
+
+  // =============== Get system language ===============
+  const getLanguage = () => {
+    const locales = RNLocalize.getLocales();
+
+    if (locales && locales.length > 0) {
+      return locales[0].languageCode;
+    }
+
+    return 'fr';
+  };
+
+  useEffect(() => {
+    const userLang = getLanguage();
+
+    // Apply language-specific formatting
+    const readableAmount = formattedAmount.toLocaleString(userLang, {
+      style: 'decimal',
+      useGrouping: true,
+      minimumFractionDigits: 0, // No digits after the decimal point
+      maximumFractionDigits: 0, // No digits after the decimal point
+    });
+
+    setFormattedAmount(readableAmount);
+  }, []);
 
   const ObjectScreen = () => {
     // If payment is performed, show webview
@@ -117,7 +145,7 @@ const BankCardSubscribeScreen = ({ route }) => {
           {/* Amount */}
           <Divider style={{ width: '100%', backgroundColor: COLORS.light_secondary, marginBottom: PADDING.p07 }} />
           <Text style={{ fontSize: TEXT_SIZE.normal, color: COLORS.dark_secondary, textAlign: 'center', marginBottom: PADDING.p00 }}>{t('amount_to_pay')}</Text>
-          <Text style={{ fontSize: TEXT_SIZE.header, fontWeight: '700', color: COLORS.link_color, textAlign: 'center' }}>{`${amount} ${currency}`}</Text>
+          <Text style={{ fontSize: TEXT_SIZE.header, fontWeight: '700', color: COLORS.link_color, textAlign: 'center' }}>{`${formattedAmount} ${currency}`}</Text>
           <Divider style={[homeStyles.authDivider, { width: '100%', backgroundColor: COLORS.light_secondary }]} />
 
           {/* Operator */}
