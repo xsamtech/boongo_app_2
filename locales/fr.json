@@ -233,6 +233,10 @@
             "cvc": "CVC"
         }
     },
+    "media":  {
+        "title": "Lecture média",
+        "description": "En cours..."
+    },
 
     "navigation": {
         "home": {

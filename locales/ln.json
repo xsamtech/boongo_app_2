@@ -233,6 +233,10 @@
             "cvc": "CVC"
         }
     },
+    "media":  {
+        "title": "Kotanga média",
+        "description": "Ez’otanga..."
+    },
 
     "navigation": {
         "home": {

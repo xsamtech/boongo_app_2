@@ -233,6 +233,10 @@
             "cvc": "CVC"
         }
     },
+    "media":  {
+        "title": "Media reading",
+        "description": "In progress..."
+    },
 
     "navigation": {
         "home": {

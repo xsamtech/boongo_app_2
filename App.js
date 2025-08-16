@@ -324,6 +324,8 @@ const DrawerNav = () => {
 };
 
 const App = () => {
+  // =============== Language ===============
+  const { t } = useTranslation();
   // =============== Get data ===============
   const { userInfo, splashLoading } = useContext(AuthContext);
 
@@ -350,7 +352,7 @@ const App = () => {
     setupPlayer();
 
     return () => {
-        TrackPlayer.reset(); // Cleaning when the component is disassembled
+      TrackPlayer.reset(); // Cleaning when the component is disassembled
     };
   }, []);
 
@@ -372,6 +374,12 @@ const App = () => {
         Capability.Pause,
         Capability.Stop
       ],
+      notification: { // Notification options
+        icon: 'ic_notification',
+        title: t('media.title'),
+        text: t('media.description'),
+        largeIcon: 'ic_notification',
+      }
     });
 
     // Add the event to handle actions on the notification
