@@ -8,8 +8,10 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { useTranslation } from 'react-i18next';
 import { Divider } from 'react-native-paper';
 import { NetworkInfo } from 'react-native-network-info';
+import Spinner from 'react-native-loading-spinner-overlay';
 import * as RNLocalize from 'react-native-localize';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import UserAgent from 'react-native-user-agent';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
@@ -39,16 +41,17 @@ const WorkDataScreen = ({ route, navigation }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Authentication context ===============
-  const { userInfo, addToCart, resetPaymentURL, validateSubscription, invalidateSubscription, disableSubscriptionByCode, validateConsultations, invalidateConsultations } = useContext(AuthContext);
+  // =============== Get contexts ===============
+  const { userInfo, isLoading, addToCart, resetPaymentURL, validateSubscription, invalidateSubscription, disableSubscriptionByCode, validateConsultations, invalidateConsultations } = useContext(AuthContext);
   // =============== Get parameters ===============
   const { itemId } = route.params;
   // =============== Get data ===============
   const [work, setWork] = useState({});
   const [categoryCount, setCategoryCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const mWidth = Dimensions.get('window').width / 1.7;
-  const [imageModal, setImageModal] = useState({ visible: false, index: 0 });
   const [price, setPrice] = useState('');
   // Check if user has valid consultation if the work is not public
   const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
@@ -86,14 +89,77 @@ const WorkDataScreen = ({ route, navigation }) => {
 
   // =============== Refresh control ===============
   const onRefresh = useCallback(() => {
-    setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); }, 2000);
+    setLoading(true);
+    setTimeout(() => { setLoading(false); }, 2000);
   }, []);
 
   // Reset "paymentURL" when entering this screen
   useEffect(() => {
     resetPaymentURL();
   }, []);
+
+  // =============== Like/Unlike work ===============
+  const handleLikeToggle = (user_id, work_id) => {
+    setLoading(true);
+
+    if (hasLiked) {
+      // If the work is already liked, we cancel the like
+      axios.delete(`${API.boongo_url}/like/unlike_entity/${user_id}/work/${work_id}`, {
+        headers: {
+          'Authorization': `Bearer ${userInfo.api_token}`,
+          'X-localization': getLanguage(),
+        }
+      }).then(res => {
+        const message = res.data.message;
+
+        ToastAndroid.show(message, ToastAndroid.LONG);
+        console.log(message);
+
+        // Update likes counter and status
+        setLikeCount(likeCount - 1); // Decrement
+        setHasLiked(false); // User no longer likes
+        setLoading(false);
+      }).catch(error => {
+        handleApiError(error);
+      });
+
+    } else {
+      // If the work is not yet liked, we love it
+      axios.post(`${API.boongo_url}/like`, { user_id: user_id, for_work_id: work_id }, {
+        headers: {
+          'Authorization': `Bearer ${userInfo.api_token}`,
+          'X-localization': getLanguage(),
+        }
+      }).then(res => {
+        const message = res.data.message;
+
+        ToastAndroid.show(message, ToastAndroid.LONG);
+        console.log(message);
+
+        // Update likes counter and status
+        setLikeCount(likeCount + 1); // Increment
+        setHasLiked(true); // The user likes the work
+        setLoading(false);
+      }).catch(error => {
+        handleApiError(error);
+      });
+    }
+  };
+
+  const handleApiError = (error) => {
+    if (error.response) {
+      ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+      console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+    } else if (error.request) {
+      ToastAndroid.show('Erreur de connexion au serveur', ToastAndroid.LONG);
+
+    } else {
+      ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+    }
+
+    setLoading(false);
+  };
 
   // =============== Get item API with effect hook ===============
   // useEffect(() => {
@@ -168,7 +234,16 @@ const WorkDataScreen = ({ route, navigation }) => {
 
           setWork(workData);
           setCategoryCount(workCategories);
-          setIsLoading(false);
+
+          // Update "likeCount" and "hasLiked"
+          const isAlreadyLiked = workData.likes.some(like => like.user.id === userInfo.id);
+
+          setLikeCount(workData.likes.length);
+          setHasLiked(isAlreadyLiked);
+
+          console.log(`${userInfo.firstname} a aimé cette œuvre : ${hasLiked}`);
+
+          setLoading(false);
 
           return workData;
         })
@@ -183,7 +258,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   }, []);
 
   const getPrice = () => {
-    setIsLoading(true);
+    setLoading(true);
 
     const config = {
       method: 'GET',
@@ -213,7 +288,7 @@ const WorkDataScreen = ({ route, navigation }) => {
             console.log(formattedPrice);
 
             setPrice(`${formattedPrice} ${userInfo.currency.currency_acronym}`);
-            setIsLoading(false);
+            setLoading(false);
 
           } else {
             const url = `${API.boongo_url}/currencies_rate/find_currency_rate/${workData.currency.currency_acronym}/${userInfo.currency.currency_acronym}`;
@@ -255,7 +330,7 @@ const WorkDataScreen = ({ route, navigation }) => {
               })
               .finally(() => {
                 // Enfin, on met à jour l'état de chargement
-                setIsLoading(false);
+                setLoading(false);
               });
           }
         }
@@ -552,13 +627,16 @@ const WorkDataScreen = ({ route, navigation }) => {
   return (
     <>
       {/* Header */}
+      <Spinner visible={isLoading} />
+
+      {/* Header */}
       <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
         <HeaderComponent />
       </View>
 
       {/* Content */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, backgroundColor: COLORS.white }}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}>
+        refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
         <View style={[homeStyles.workBody, { paddingTop: 0, paddingBottom: PADDING.p01 }]}>
           <View style={homeStyles.workCard}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', alignItems: 'flex-start' }]}>
@@ -623,6 +701,14 @@ const WorkDataScreen = ({ route, navigation }) => {
                   <Text style={[homeStyles.workDescText, { fontWeight: '600', color: COLORS.black }]}>{price ? price : `${work.consultation_price} ${work.currency.currency_acronym}`}</Text>
                 </View>
               )}
+
+              {/* Like work button */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: Dimensions.get('window').width - 50, paddingVertical: PADDING.p01, borderTopWidth: 1, borderTopColor: COLORS.light_secondary, borderBottomWidth: 1, borderBottomColor: COLORS.light_secondary }}>
+                <TouchableOpacity style={{ width: 30, height: 30, backgroundColor: (hasLiked ? COLORS.danger : 'rgba(250, 250, 250, 0)'), marginRight: PADDING.p03, paddingVertical: 4, paddingHorizontal: 3.5, borderRadius: 30 / 2, borderWidth: 2, borderColor: (hasLiked ? COLORS.danger : COLORS.dark_secondary) }} onPress={() => handleLikeToggle(userInfo.id, work.id)} disabled={loading}>
+                  <Icon size={19} name={hasLiked ? 'heart' : 'heart-outline'} color={hasLiked ? COLORS.light_danger : COLORS.dark_secondary} />
+                </TouchableOpacity>
+                <Text style={{ fontWeight: '400', color: COLORS.black }}>{`${likeCount} ${likeCount > 1 ? t('likes') : t('like')}`}</Text>
+              </View>
 
               {/* Work files */}
               <WorkFiles />

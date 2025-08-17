@@ -200,8 +200,15 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
   };
 
   // ================= Fetch books when idCat or page changes =================
+  // useEffect(() => {
+  //   fetchBooks();
+  // }, [page, idCat]);
   useEffect(() => {
-    fetchBooks();
+    const intervalId = setInterval(() => {
+      fetchBooks();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, [page, idCat]);
 
   const fetchBooks = async () => {
@@ -230,7 +237,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
       setLastPage(response.data.lastPage || page);
       setCount(response.data.count || 0);
 
-      console.log(response.data);
+      // console.log(response.data);
 
     } catch (error) {
       console.error('Erreur fetchBooks', error);

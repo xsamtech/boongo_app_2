@@ -257,7 +257,7 @@ const homeStyles = StyleSheet.create({
     linkIcon: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: PADDING.p01
+        marginTop: PADDING.p01
     },
 
     // Floating button

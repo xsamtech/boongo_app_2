@@ -8,6 +8,7 @@ import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import * as RNLocalize from 'react-native-localize';
+import Spinner from 'react-native-loading-spinner-overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
@@ -19,7 +20,6 @@ import FloatingActionsButton from '../../components/floating_actions_button';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
 import UserItemComponent from '../../components/user_item';
-import Spinner from 'react-native-loading-spinner-overlay';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -69,8 +69,15 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
   };
 
   // ================= Fetch works when idCat or page changes =================
+  // useEffect(() => {
+  //   fetchWorks();
+  // }, [page, idCat]);
   useEffect(() => {
-    fetchWorks();
+    const intervalId = setInterval(() => {
+      fetchWorks();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, [page, idCat]);
 
   const fetchWorks = async () => {
@@ -98,7 +105,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
       setLastPage(response.data.lastPage || page);
       setCount(response.data.count || 0);
 
-      console.log(response.data);
+      // console.log(response.data);
 
     } catch (error) {
       console.error('Erreur fetchWorks', error);
@@ -198,7 +205,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
           contentContainerStyle={{
             paddingTop: headerHeight + TAB_BAR_HEIGHT,
           }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
           ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
           ListHeaderComponent={
             <>
@@ -427,7 +434,7 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               contentContainerStyle={{
                 paddingTop: headerHeight + TAB_BAR_HEIGHT,
               }}
-              refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}
+              refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
               ListEmptyComponent={<EmptyListComponent iconName="cart-outline" title={t('empty_list.title')} description={t('empty_list.description_cart')} />}
               ListHeaderComponent={() => {
                 return (
@@ -559,7 +566,7 @@ const MySubscribers = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 
             contentContainerStyle={{
               paddingTop: headerHeight + TAB_BAR_HEIGHT,
             }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
             ListEmptyComponent={<EmptyListComponent iconName="book-search-outline" title={t('empty_list.title')} description={t('empty_list.description_subscribers')} />}
             ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
           />

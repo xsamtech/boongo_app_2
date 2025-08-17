@@ -245,20 +245,17 @@ const CirclesTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page,
   // Fetch data from API
   const fetchSearchData = async (searchTerm) => {
     if (isLoading) return;
+
     setIsLoading(true);
 
     const qs = require('qs');
-
     const params = {
-      data: searchTerm,
-      'categories_ids[0]': 2,
-      'categories_ids[1]': 4,
-      'categories_ids[2]': 5,
+      data: searchTerm
     };
 
     try {
       const response = await axios.post(
-        `${API.boongo_url}/user/search`,
+        `${API.boongo_url}/circle/search`,
         qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
         {
           headers: {

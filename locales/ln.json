@@ -22,6 +22,8 @@
     "see_more": "Tala misusu",
     "see_less": "Tala moke",
     "dark_theme": "Mode ya molili",
+    "like": "J’aime",
+    "likes": "J’aimes",
     "file": {
         "title": "Fichier",
         "document": "Document",
@@ -80,6 +82,7 @@
         "description_unpaid_consultation": "Awa ekolakisama misala oyo ofuti naino te mpo na kotala.",
         "description_unpaid_subscription": "Ozali nanu na abonnement o commander te.",
         "description_subscribers": "Awa okomona bato oyo bafutaki mpo na kotala misala na yo.",
+        "description_subscriptions": "Awa okomona misala oyo ofuti pona kotala mpe ba abonnéma oyo o commander.",
         "description_chat_user": "Awa okomona ba membres oyo okoki ko solola na bango.",
         "description_chat_circle": "Awa ekomona ba cercles ya chat na yo na ba membres misusu.",
         "description_chat_organization": "Awa ekomona ba échanges na yo na ba etablisséman mpe/to ba institutions.",
@@ -90,7 +93,10 @@
         "description_books": "Awa, misala mikolakisama miye mikoki kozala consulte na ba membres.",
         "description_mags": "Awa, eko lakisama ba journals, ba journaux to ba magazines oyo ba membres bakoki ko consulte.",
         "description_medias": "Awa, eko lakisama ba médias oyo ba membres bakoki ko consulte.",
-        "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte."
+        "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte.",
+        "description_user_works": "Membre oyo a publier nanu mosala moko te.",
+        "description_user_circles": "Membre oyo azali na kati ya cercle moko te ya masolo.",
+        "description_user_consultations": "Membre oyo afuti nanu te pona kotala mosala moko."
     },
     "unpaid": {
         "consultation": "Ba consultations o commander",
@@ -189,7 +195,7 @@
     },
     "subscription":  {
         "title": "Bakisa ba abonnéments na kitunga na yo",
-        "info": "Ozali na abonnément te. Banda ko s'abonner po otala.",
+        "info": "Ozali na abonnément te. Banda ko s’abonner po otala.",
         "type": "Lolenge ya abonnément",
         "price": "Ntalo",
         "link": "S’abonner",
@@ -245,10 +251,10 @@
             "books": "Ba buku"
         },
         "chat": {
-            "members": "Membres",
-            "organizations": "Organisations",
-            "circles": "Cercles",
-            "events": "Événements"
+            "members": "Ba membres",
+            "organizations": "Ba organisations",
+            "circles": "Ba cercles",
+            "events": "Ba événema"
         },
         "account": {
             "title": "Compte",
@@ -257,6 +263,11 @@
             "my_cart": "Kitunga na nga",
             "subscribers": "Ba abonné",
             "subscriptions": "Ba abonema"
+        },
+        "profile": {
+            "works": "Misala",
+            "circles": "Ba cercles",
+            "consultations": "Ba consultations"
         },
         "establishment": {
             "title": "Etablisséman",

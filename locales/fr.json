@@ -22,6 +22,8 @@
     "see_more": "Voir plus",
     "see_less": "Voir moins",
     "dark_theme": "Mode sombre",
+    "like": "J’aime",
+    "likes": "J’aimes",
     "file": {
         "title": "Fichier",
         "document": "Document",
@@ -76,12 +78,13 @@
     },
     "empty_list": {
         "title": "La liste est vide",
-        "description_cart": "Vous n'avez encore rien ajouté au panier",
-        "description_unpaid_consultation": "Ici seront affichées les oeuvres dont vous n'avez pas encore payées la consultation.",
-        "description_unpaid_subscription": "Vous n'avez aucun abonnement non payé.",
+        "description_cart": "Vous n’avez encore rien ajouté au panier",
+        "description_unpaid_consultation": "Ici seront affichées les oeuvres dont vous n’avez pas encore payées la consultation.",
+        "description_unpaid_subscription": "Vous n’avez aucun abonnement non payé.",
         "description_subscribers": "Ici seront affichés les personnes qui ont payé pour consulter vos œuvres.",
+        "description_subscriptions": "Ici seront affichés les œuvres pour lesquelles vous avez payé la consultation et les abonnements que vous avez commandés.",
         "description_chat_user": "Ici seront affichées les membres avec qui vous pouvez échanger.",
-        "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d'autres membres.",
+        "description_chat_circle": "Ici seront affichées vos cercles de discussion avec d’autres membres.",
         "description_chat_organization": "Ici seront affichées vos échanges dans les établissements et/ou institutions.",
         "description_chat_event": "Ici seront affichées vos échanges dans les événements dans lesquels vous êtes invités.",
         "description_subscription": "Ici, seront affichés les abonnements que vous pourrez ajouter à votre panier.",
@@ -90,7 +93,10 @@
         "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
         "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",
         "description_medias": "Ici, seront affichés les médias qui pourront être consultés par les membres.",
-        "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres."
+        "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres.",
+        "description_user_works": "Ce membre n’a pas encore publié d’œuvre pour le moment.",
+        "description_user_circles": "Ce membre ne fait partie d’aucun cercle de discussion.",
+        "description_user_consultations": "Ce membre n’a pas encore payé pour consulter une œuvre."
     },
     "unpaid": {
         "consultation": "Consultations commandées",
@@ -110,8 +116,8 @@
         "editor": "Editeur / Réalisateur / Producteur",
         "is_public": {
             "title": "Consultation payante",
-            "description": "Pour les médias, la consultation coûtera 2$ ; et pour les autres type d’œuvres c'est 1$. Boongo a droit à 20% de chaque paiement de consultation.",
-            "consult_price": "Prix de la consulation"
+            "description": "Pour les médias, la consultation coûtera 2$ ; et pour les autres type d’œuvres c’est 1$. Boongo a droit à 20% de chaque paiement de consultation.",
+            "consult_price": "Prix de la consultation"
         },
         "currency": {
             "title": "Devise : ",
@@ -176,7 +182,7 @@
     "activation":  {
         "link": "S’abonner avec un code",
         "title": "Activer l’abonnement avec un code",
-        "description": "L'un de nos partenaires peut vous avoir donné un code unique pour activer l’abonnement",
+        "description": "L’un de nos partenaires peut vous avoir donné un code unique pour activer l’abonnement",
         "partner": {
             "label": "Partenaire",
             "description": "Qui vous a donné votre code ?"
@@ -189,14 +195,14 @@
     },
     "subscription":  {
         "title": "Ajouter des abonnements à votre panier",
-        "info": "Vous n'avez aucun un abonnement. Veuillez vous abonner pour consulter",
+        "info": "Vous n’avez aucun un abonnement. Veuillez vous abonner pour consulter",
         "type": "Type d’abonnement",
         "price": "Prix",
         "link": "S’abonner",
         "back": "Retourner aux abonnements"
     },
     "consultation":  {
-        "info": "La consultation de cette œuvre n’est pas gratuite comme vous l'avez remarqué.",
+        "info": "La consultation de cette œuvre n’est pas gratuite comme vous l’avez remarqué.",
         "link": "Payer pour consulter"
     },
     "add_to_cart": "Ajouter au panier",
@@ -258,6 +264,11 @@
             "subscribers": "Abonnés",
             "subscriptions": "Abonnements"
         },
+        "profile": {
+            "works": "Œuvres",
+            "circles": "Cercles",
+            "consultations": "Consultations"
+        },
         "establishment": {
             "title": "Établissements",
             "new": "Ajouter établissement",
@@ -317,7 +328,7 @@
             },
             "close_account" : {
                 "title" : "Fermeture de compte",
-                "description" : "Votre compte sera récupérable pendant 30 jours. Assurez-vous d'enregistrer vos données personnelles avant de fermer votre compte.",
+                "description" : "Votre compte sera récupérable pendant 30 jours. Assurez-vous d’enregistrer vos données personnelles avant de fermer votre compte.",
                 "save_perso_data" : "Enregistrer mes données personnelles",
                 "link" : "Fermer mon compte"
             }
@@ -402,7 +413,7 @@
             },
             "blocked": {
                 "title": "Compte bloqué",
-                "description": "Votre compte est bloqué pour l'instant parce que vous ne respectez pas nos conditions d’utilisation. Veuillez nous contacter en cliquant sur le bouton ci-dessous.",
+                "description": "Votre compte est bloqué pour l’instant parce que vous ne respectez pas nos conditions d’utilisation. Veuillez nous contacter en cliquant sur le bouton ci-dessous.",
                 "link1": "Réclamer mon déblocage"
             }
         },
@@ -415,7 +426,7 @@
             "warning": "Le code deviendra invalide après 15 minutes"
         },
         "my_works": {
-            "description": "Devenez un de nos partenaires pour pouvoir publier vos ouvrages qui seront visibles par tous. Et cela vous donnera l'avantage d'acquérir de l'argent selon les consultations du public.",
+            "description": "Devenez un de nos partenaires pour pouvoir publier vos ouvrages qui seront visibles par tous. Et cela vous donnera l’avantage d’acquérir de l’argent selon les consultations du public.",
             "terms_link": "Veuillez cliquer ci-dessous pour voir nos conditions.",
             "start_button": "Devenir partenaire"
         }

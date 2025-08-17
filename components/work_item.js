@@ -74,8 +74,12 @@ const WorkItemComponent = ({ item }) => {
                 <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} onPress={() => navigation.navigate('WorkData', { itemId: item.id })} />
             </View>
             <View style={homeStyles.workDescTop}>
-                <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_title}</Text>
+                <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={2} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_title}</Text>
                 <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_content}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: PADDING.p00 }}>
+                    <Icon name='heart-outline' size={IMAGE_SIZE.s04} color={COLORS.dark_secondary} style={{ marginRight: PADDING.p00 }} />
+                    <Text style={{ fontWeight: '400', color: COLORS.dark_secondary }}>{`${item.likes ? item.likes.length : 0 } ${item.likes ? (item.likes.length > 1 ? t('likes') : t('like')) : t('like')}`}</Text>
+                </View>
                 <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
                     <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
                     <Icon name='chevron-right' size={IMAGE_SIZE.s05} color={COLORS.link_color} />

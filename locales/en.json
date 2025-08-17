@@ -22,6 +22,8 @@
     "see_more": "See more",
     "see_less": "See less",
     "dark_theme": "Dark mode",
+    "like": "Like",
+    "likes": "Likes",
     "file": {
         "title": "File",
         "document": "Document",
@@ -76,10 +78,11 @@
     },
     "empty_list": {
         "title": "The list is empty",
-        "description_cart": "You haven't added anything to your cart yet.",
+        "description_cart": "You haven’t added anything to your cart yet.",
         "description_unpaid_consultation": "Here will be displayed the works for which you have not yet paid to view.",
         "description_unpaid_subscription": "You have no unpaid subscriptions.",
         "description_subscribers": "Here you will see people who have paid to view your works.",
+        "description_subscriptions": "Here you will see the works you have paid for and the subscriptions you have ordered.",
         "description_chat_user": "Here you will see the members you can communicate with.",
         "description_chat_circle": "Here will be displayed your chat circles with other members.",
         "description_chat_organization": "Your exchanges in establishments and/or institutions will be displayed here.",
@@ -90,7 +93,10 @@
         "description_books": "Here, the books will be displayed which can be consulted by members.",
         "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
         "description_medias": "Here, the medias will be displayed which can be consulted by members.",
-        "description_maps": "Here, geographic maps will be displayed which can be consulted by members."
+        "description_maps": "Here, geographic maps will be displayed which can be consulted by members.",
+        "description_user_works": "This member has not yet published any work.",
+        "description_user_circles": "This member is not part of any discussion circle.",
+        "description_user_consultations": "This member has not yet paid to view a work."
     },
     "unpaid": {
         "consultation": "Ordered consultations",
@@ -110,7 +116,7 @@
         "editor": "Editor / Director / Producer",
         "is_public": {
             "title": "Paid consultation",
-            "description": "For medias, viewing cost $2; and for other types of works, it's $1. Boongo is entitled to 20% of each viewing payment.",
+            "description": "For medias, viewing cost $2; and for other types of works, it’s $1. Boongo is entitled to 20% of each viewing payment.",
             "consult_price": "Consultation price"
         },
         "currency": {
@@ -258,6 +264,11 @@
             "subscribers": "Subscribers",
             "subscriptions": "Subscriptions"
         },
+        "profile": {
+            "works": "Works",
+            "circles": "Circles",
+            "consultations": "Consultations"
+        },
         "establishment": {
             "title": "Establishment",
             "new": "Add my establishment",
@@ -386,7 +397,7 @@
         "confirm_password": {
             "label": "Confirm password",
             "new": "Confirm new password",
-            "error": "The confirmation didn't match"
+            "error": "The confirmation didn’t match"
         },
         "avatar": {
             "label": "Change your avatar",
