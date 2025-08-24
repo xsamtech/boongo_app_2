@@ -634,7 +634,7 @@ const ProfileScreen = () => {
       case 'cercles':
         return <Cercles {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.cercles} listRef={cerclesListRef} />;
       case 'consultations':
-        return <Consultations {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.consultations} listRef={cerclesListRef} />;
+        return <Consultations {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.consultations} listRef={consultationsListRef} />;
       default:
         return null;
     }
@@ -679,7 +679,7 @@ const ProfileScreen = () => {
     } else if (newIndex === 1 && cerclesListRef.current) {
       cerclesListRef.current.scrollToOffset({ offset, animated: true });
 
-    } else if (newIndex === 1 && consultationsListRef.current) {
+    } else if (newIndex === 2 && consultationsListRef.current) {
       consultationsListRef.current.scrollToOffset({ offset, animated: true });
     }
 
@@ -736,6 +736,11 @@ const ProfileScreen = () => {
               <Icon name='chevron-left' size={37} color={COLORS.black} />
             </TouchableOpacity>
             <Text style={{ width: '100%', fontSize: 16, fontWeight: '400', textAlign: 'center', color: COLORS.success }}>{`@${selectedUser.username || '...'}`}</Text>
+            <View style={{ flexDirection: 'row', position: 'absolute', right: 10, top: 3, zIndex: 10 }}>
+              <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+                <Icon name='magnify' size={28} color={COLORS.black} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Profile */}
@@ -812,4 +817,4 @@ const ProfileScreen = () => {
   );
 };
 
-export default ProfileScreen
+export default ProfileScreen;

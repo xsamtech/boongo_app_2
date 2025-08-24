@@ -96,7 +96,14 @@
         "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres.",
         "description_user_works": "Ce membre n’a pas encore publié d’œuvre pour le moment.",
         "description_user_circles": "Ce membre ne fait partie d’aucun cercle de discussion.",
-        "description_user_consultations": "Ce membre n’a pas encore payé pour consulter une œuvre."
+        "description_user_consultations": "Ce membre n’a pas encore payé pour consulter une œuvre.",
+        "description_establishments": "Ici seront affichés les établissements auxquels appartiendront les membres.",
+        "description_establishment_programs": "Cet établissement n’a pas encore publié de programme.",
+        "description_establishment_events": "Cet établissement n’a pas encore publié d’événement.",
+        "description_establishment_books": "Cet établissement n’a pas encore publié d’ouvrage.",
+        "description_establishment_teach": "Il n’y a pas encore de cours en ligne pour cet établissement.",
+        "description_governments": "Ici seront affichés les institutions auxquelles appartiendront les membres.",
+        "description_government_events": "Cette institution n’a pas encore publié d’événement."
     },
     "unpaid": {
         "consultation": "Consultations commandées",
@@ -108,6 +115,7 @@
         "title": "Détails sur l’œuvre",
         "publish_new": "Publier une œuvre",
         "publishing_info": "Votre œuvre sera examinée avant de devenir visible sur la plateforme.",
+        "publication_date": "Date de publication :",
         "work_title": "Titre de l’œuvre",
         "work_content": "Description",
         "work_url": "URL YouTube",
@@ -147,6 +155,7 @@
     "search_filter_apply": "Appliquer les filtres",
     "reading": "Lecture",
     "summary": "Résumés",
+    "add": "Ajouter",
     "show": "Afficher",
     "hide": "Cacher",
     "all_m": "Tous",
@@ -156,6 +165,7 @@
     "expand": "Etendre",
     "cut": "Couper",
     "report": "Signaler",
+    "change_organization": "Modifier organization",
     "select_report_reason": "Choisir un motif de signalement",
     "explanation_optional": "Explication (Facultatif)",
     "delete": {
@@ -179,7 +189,7 @@
     "logout": "Déconnexion",
     "personal_infos": "Infos personnelles",
     "change_password": "Modifier mot de passe",
-    "activation":  {
+    "activation": {
         "link": "S’abonner avec un code",
         "title": "Activer l’abonnement avec un code",
         "description": "L’un de nos partenaires peut vous avoir donné un code unique pour activer l’abonnement",
@@ -193,7 +203,7 @@
             "error": "Veuillez taper le code !"
         }
     },
-    "subscription":  {
+    "subscription": {
         "title": "Ajouter des abonnements à votre panier",
         "info": "Vous n’avez aucun un abonnement. Veuillez vous abonner pour consulter",
         "type": "Type d’abonnement",
@@ -201,7 +211,7 @@
         "link": "S’abonner",
         "back": "Retourner aux abonnements"
     },
-    "consultation":  {
+    "consultation": {
         "info": "La consultation de cette œuvre n’est pas gratuite comme vous l’avez remarqué.",
         "link": "Payer pour consulter"
     },
@@ -211,7 +221,7 @@
     "withdraw": "Retirer",
     "pay": "Payer",
     "amount_to_pay": "Montant à payer :",
-    "payment_method":  {
+    "payment_method": {
         "mobile_money": {
             "label": "Mobile money",
             "title": "Paiement par mobile money",
@@ -232,18 +242,17 @@
                 "label": "Numéro de la carte",
                 "placeholder": "1234 1234 1234 1234"
             },
-            "expiration":{
+            "expiration": {
                 "label": "Expiration",
                 "placeholder": "MM/YY"
             },
             "cvc": "CVC"
         }
     },
-    "media":  {
+    "media": {
         "title": "Lecture média",
         "description": "En cours..."
     },
-
     "navigation": {
         "home": {
             "title": "Accueil",
@@ -272,6 +281,7 @@
         "establishment": {
             "title": "Établissements",
             "new": "Ajouter établissement",
+            "publishing_info": "Votre établissement ne sera visible par tous qu’après l’approbation de l’administrateur de la plateforme.",
             "course_schedule": "Programme",
             "event": "Événements",
             "authors": {
@@ -279,14 +289,16 @@
                 "books": "Ouvrages"
             },
             "data": {
+                "upload_photo": "Uploader le logo",
                 "name": "Nom de l’établissement",
+                "acronym": "Acronyme (Sigle)",
+                "legal_status": "Statut juridique (ex: SARL, ASBL, SA, ...)",
                 "description": "Décrivez votre établissement",
                 "id_number": "Numéro d’identification",
                 "address": "Adresse",
                 "phone": "N° de téléphone",
                 "email": "E-mail",
                 "p_o_box": "Boite Postale",
-                "legal_status": "Statut juridique",
                 "year_of_creation": "Année de création",
                 "website_url": "URL du site web",
                 "choose_type": "Choisir le type"
@@ -295,10 +307,15 @@
         "government": {
             "title": "Institutions",
             "new": "Ajouter institution",
+            "publishing_info": "Votre institution ne sera visible par tous qu’après l’approbation de l’administrateur de la plateforme.",
             "event": "Événements",
             "data": {
+                "upload_photo": "Uploader le logo",
                 "name": "Nom de l’institution",
+                "acronym": "Acronyme (Sigle)",
+                "legal_status": "Statut juridique (ex: SARL, ASBL, SA, ...)",
                 "description": "Décrivez l’institution",
+                "id_number": "Numéro d’identification",
                 "address": "Adresse",
                 "phone": "N° de téléphone",
                 "email": "E-mail",
@@ -308,29 +325,29 @@
             }
         },
         "settings": {
-            "title" : "Paramètres",
+            "title": "Paramètres",
             "update_account": {
-                "title" : "Éditer compte",
-                "description" : "Informations concernant votre compte. Vous pouvez téléchargez une archive de vos données personnelles."
+                "title": "Éditer compte",
+                "description": "Informations concernant votre compte. Vous pouvez téléchargez une archive de vos données personnelles."
             },
-            "privacy_and_safety" : {
-                "title" : "Confidentialité et sécurité",
-                "description" : "Gérez vos accès et votre visibilité (celles de vos informations) vis-à-vis des autres membres.",
-                "blocked_accounts" : {
-                    "title" : "Membres bloqués",
-                    "description" : "Afficher tous les membres que vous avez bloqués."
+            "privacy_and_safety": {
+                "title": "Confidentialité et sécurité",
+                "description": "Gérez vos accès et votre visibilité (celles de vos informations) vis-à-vis des autres membres.",
+                "blocked_accounts": {
+                    "title": "Membres bloqués",
+                    "description": "Afficher tous les membres que vous avez bloqués."
                 },
-                "2fa_login" : {
-                    "title" : "Connexion en 2 étapes",
-                    "by_mail" : "Par mail",
-                    "by_phone" : "Par SMS"
+                "2fa_login": {
+                    "title": "Connexion en 2 étapes",
+                    "by_mail": "Par mail",
+                    "by_phone": "Par SMS"
                 }
             },
-            "close_account" : {
-                "title" : "Fermeture de compte",
-                "description" : "Votre compte sera récupérable pendant 30 jours. Assurez-vous d’enregistrer vos données personnelles avant de fermer votre compte.",
-                "save_perso_data" : "Enregistrer mes données personnelles",
-                "link" : "Fermer mon compte"
+            "close_account": {
+                "title": "Fermeture de compte",
+                "description": "Votre compte sera récupérable pendant 30 jours. Assurez-vous d’enregistrer vos données personnelles avant de fermer votre compte.",
+                "save_perso_data": "Enregistrer mes données personnelles",
+                "link": "Fermer mon compte"
             }
         },
         "reading": "Lecture",
@@ -347,7 +364,6 @@
         "dictionary": "Dictionnaire",
         "cart": "Mon panier"
     },
-
     "auth": {
         "organization": {
             "title": "Choisir une organisation",

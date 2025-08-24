@@ -32,6 +32,7 @@ const RegisterScreen = () => {
   const [email, setEmail] = useState(null);
   const [phoneCode, setPhoneCode] = useState(null);
   const [phone, setPhone] = useState(null);
+  const [city, setCity] = useState(null);
   const [username, setUsername] = useState(null);
   // Get role "Membre"
   const [role, setRole] = useState(null);
@@ -192,10 +193,18 @@ const RegisterScreen = () => {
             onChangeText={text => setPhone(text)} />
         </View>
 
+        {/* City  */}
+        <TextInput
+          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+          value={city}
+          placeholder={t('auth.city')}
+          placeholderTextColor={COLORS.dark_secondary}
+          onChangeText={text => setCity(text)} />
+
         {/* Submit / Cancel */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}
           onPress={() => {
-            startRegister(firstname, lastname, null, null, null, null, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
+            startRegister(firstname, lastname, null, null, null, city, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
 
             if (!registerError) {
               navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: (phoneCode && phone ? `${phoneCode}${phone}` : null) });

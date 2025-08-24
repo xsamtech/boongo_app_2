@@ -114,7 +114,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
                         style={{
                             width: IMAGE_SIZE.s13,
                             height: IMAGE_SIZE.s13,
-                            borderRadius: IMAGE_SIZE.s13 / 2,
+                            borderRadius: PADDING.p00,
                             marginRight: PADDING.p03,
                             borderWidth: 1,
                             borderColor: COLORS.light_secondary
@@ -141,7 +141,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
                         style={{
                             width: IMAGE_SIZE.s13,
                             height: IMAGE_SIZE.s13,
-                            borderRadius: IMAGE_SIZE.s13 / 2,
+                            borderRadius: PADDING.p00,
                             marginRight: PADDING.p03,
                             borderWidth: 1,
                             borderColor: COLORS.light_secondary
@@ -169,7 +169,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
                         style={{
                             width: IMAGE_SIZE.s13,
                             height: IMAGE_SIZE.s13,
-                            borderRadius: IMAGE_SIZE.s13 / 2,
+                            borderRadius: PADDING.p00,
                             marginRight: PADDING.p03,
                             borderWidth: 1,
                             borderColor: COLORS.light_secondary

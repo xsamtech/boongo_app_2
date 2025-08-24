@@ -4,16 +4,16 @@
  */
 import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, StatusBar, Image, Dimensions } from 'react-native';
+import { t } from 'i18next';
 import { DrawerActions, useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import { PADDING, TEXT_SIZE } from '../tools/constants';
-import Logo from '../assets/img/logo.svg';
+import Logo from '../assets/img/icon.svg';
 import LogoText from '../assets/img/text.svg';
 import homeStyles from './style';
 import useColors from '../hooks/useColors';
 import { AuthContext } from '../contexts/AuthContext';
-import { t } from 'i18next';
 
 const HeaderComponent = ({ title }) => {
   // =============== Colors ===============
@@ -46,6 +46,36 @@ const HeaderComponent = ({ title }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Search')}>
               <Icon name='magnify' size={28} color={COLORS.black} />
             </TouchableOpacity>
+            <TouchableOpacity style={{ marginLeft: PADDING.p03 }} onPress={() => navigation.navigate('Dictionary')}>
+              <Icon name='book-open-blank-variant' size={28} color={COLORS.black} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </>
+    );
+  }
+
+  if (route.name === 'Establishment' || route.name === 'Government') {
+    return (
+      <>
+        {/* Status bar */}
+        <StatusBar barStyle='light-content' backgroundColor={COLORS.danger} />
+
+        {/* Content */}
+        <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
+          {/* Brand */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name='chevron-left' size={37} color={COLORS.black} />
+            </TouchableOpacity>
+            <Logo width={30} height={30} style={{ marginRight: PADDING.p01 }} />
+            {title ?
+              <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
+              : ''}
+          </View>
+
+          {/* Right links */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity style={{ marginLeft: PADDING.p03 }} onPress={() => navigation.navigate('Dictionary')}>
               <Icon name='book-open-blank-variant' size={28} color={COLORS.black} />
             </TouchableOpacity>
@@ -168,6 +198,29 @@ const HeaderComponent = ({ title }) => {
             <TouchableOpacity onPress={() => navigation.navigate('Search')}>
               <Icon name='magnify' size={28} color={COLORS.black} />
             </TouchableOpacity>
+          </View>
+        </View>
+      </>
+    );
+  }
+
+  if (route.name === 'OrganizationSettings') {
+    return (
+      <>
+        {/* Status bar */}
+        <StatusBar barStyle='dark-content' backgroundColor={COLORS.warning} />
+
+        {/* Content */}
+        <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
+          {/* Brand */}
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name='chevron-left' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
+            </TouchableOpacity>
+            <LogoText width={115} height={31} style={{ marginLeft: PADDING.p01 }} />
+            {title ?
+              <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
+              : ''}
           </View>
         </View>
       </>

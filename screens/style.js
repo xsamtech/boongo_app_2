@@ -706,7 +706,7 @@ const homeStyles = StyleSheet.create({
 
     searchInputSubmit: {
         marginVertical: 15,
-        paddingTop: PADDING.p01,
+        paddingTop: PADDING.p03,
         paddingHorizontal: 14,
         borderWidth: 1,
         borderStartWidth: 0,

@@ -96,7 +96,14 @@
         "description_maps": "Here, geographic maps will be displayed which can be consulted by members.",
         "description_user_works": "This member has not yet published any work.",
         "description_user_circles": "This member is not part of any discussion circle.",
-        "description_user_consultations": "This member has not yet paid to view a work."
+        "description_user_consultations": "This member has not yet paid to view a work.",
+        "description_establishments": "Here will be displayed the establishments to which the members belong.",
+        "description_establishment_programs": "This establishment has not yet published a program.",
+        "description_establishment_events": "This establishment has not yet published any events.",
+        "description_establishment_books": "This establishment has not yet published any work.",
+        "description_establishment_teach": "There are no online courses for this establishment yet.",
+        "description_governments": "Here will be displayed the institutions to which the members belong.",
+        "description_government_events": "This institution has not yet published any events."
     },
     "unpaid": {
         "consultation": "Ordered consultations",
@@ -108,6 +115,7 @@
         "title": "Details about the work",
         "publish_new": "Publish a work",
         "publishing_info": "Your work will be reviewed before becoming visible on the platform.",
+        "publication_date": "Publication date:",
         "work_title": "Work title",
         "work_content": "Description",
         "work_url": "YouTube URL",
@@ -147,6 +155,7 @@
     "search_filter_apply": "Apply filters",
     "reading": "Reading",
     "summary": "Summary",
+    "add": "Add",
     "show": "Show",
     "hide": "Hide",
     "all_m": "All",
@@ -156,6 +165,7 @@
     "expand": "Expand",
     "cut": "Cut",
     "report": "Report",
+    "change_organization": "Change organization",
     "select_report_reason": "Choose a report reason",
     "explanation_optional": "Explanation (Optional)",
     "delete": {
@@ -179,7 +189,7 @@
     "logout": "Log out",
     "personal_infos": "Personal infos",
     "change_password": "Change password",
-    "activation":  {
+    "activation": {
         "link": "Subscribe with a code",
         "title": "Activate the subscription with a code",
         "description": "One of our partners may have given you a unique code to activate the subscription",
@@ -193,7 +203,7 @@
             "error": "Please type the code!"
         }
     },
-    "subscription":  {
+    "subscription": {
         "title": "Add subscriptions to your cart",
         "info": "You do not have a subscription. Please subscribe to view.",
         "type": "Subscription type",
@@ -201,7 +211,7 @@
         "link": "Subscribe",
         "back": "Return to subscriptions"
     },
-    "consultation":  {
+    "consultation": {
         "info": "Consulting this work is not free, as you may have noticed.",
         "link": "Pay to consult"
     },
@@ -211,7 +221,7 @@
     "withdraw": "Withdraw",
     "pay": "Pay",
     "amount_to_pay": "Amount to pay:",
-    "payment_method":  {
+    "payment_method": {
         "mobile_money": {
             "label": "Mobile money",
             "title": "Payment by mobile money",
@@ -232,18 +242,17 @@
                 "label": "Card number",
                 "placeholder": "1234 1234 1234 1234"
             },
-            "expiration":{
+            "expiration": {
                 "label": "Expiration",
                 "placeholder": "MM/YY"
             },
             "cvc": "CVC"
         }
     },
-    "media":  {
+    "media": {
         "title": "Media reading",
         "description": "In progress..."
     },
-
     "navigation": {
         "home": {
             "title": "Home",
@@ -272,6 +281,7 @@
         "establishment": {
             "title": "Establishment",
             "new": "Add my establishment",
+            "publishing_info": "Your establishment will only be visible to everyone after approval by the platform administrator.",
             "course_schedule": "Schedule",
             "event": "Events",
             "authors": {
@@ -279,14 +289,16 @@
                 "books": "Books"
             },
             "data": {
+                "upload_photo": "Upload logo",
                 "name": "Establishment name",
+                "acronym": "Acronym",
+                "legal_status": "Legal status (e.g.: LLC, NPO, PLC, etc.)",
                 "description": "Describe your establishment",
                 "id_number": "ID number",
                 "address": "Address",
                 "phone": "Phone number",
                 "email": "Email",
                 "p_o_box": "P.O. Box",
-                "legal_status": "Legal status",
                 "year_of_creation": "Year of creation",
                 "website_url": "Website URL",
                 "choose_type": "Choose type"
@@ -295,10 +307,15 @@
         "government": {
             "title": "Institutions",
             "new": "Add an institution",
+            "publishing_info": "Your institution will only be visible to everyone after approval by the platform administrator.",
             "event": "Events",
             "data": {
+                "upload_photo": "Upload logo",
                 "name": "Institution name",
+                "acronym": "Acronym",
+                "legal_status": "Legal status (e.g.: LLC, NPO, PLC, etc.)",
                 "description": "Describe the institution",
+                "id_number": "ID number",
                 "address": "Address",
                 "phone": "Phone number",
                 "email": "Email",
@@ -308,29 +325,29 @@
             }
         },
         "settings": {
-            "title" : "Settings",
+            "title": "Settings",
             "update_account": {
-                "title" : "Update account",
-                "description" : "Information about your account. You can download an archive of your personal data."
+                "title": "Update account",
+                "description": "Information about your account. You can download an archive of your personal data."
             },
-            "privacy_and_safety" : {
-                "title" : "Privacy and safety",
-                "description" : "Manage your access and your visibility (of your information) with other members.",
-                "blocked_accounts" : {
-                    "title" : "Blocked accounts",
-                    "description" : "View all members you have blocked."
+            "privacy_and_safety": {
+                "title": "Privacy and safety",
+                "description": "Manage your access and your visibility (of your information) with other members.",
+                "blocked_accounts": {
+                    "title": "Blocked accounts",
+                    "description": "View all members you have blocked."
                 },
-                "2fa_login" : {
-                    "title" : "2-step login",
-                    "by_mail" : "By mail",
-                    "by_phone" : "By SMS"
+                "2fa_login": {
+                    "title": "2-step login",
+                    "by_mail": "By mail",
+                    "by_phone": "By SMS"
                 }
             },
-            "close_account" : {
-                "title" : "Account closure",
-                "description" : "Your account will be recoverable for 30 days. Be sure to save your personal information before closing your account.",
-                "save_perso_data" : "Save my personal data",
-                "link" : "Close account"
+            "close_account": {
+                "title": "Account closure",
+                "description": "Your account will be recoverable for 30 days. Be sure to save your personal information before closing your account.",
+                "save_perso_data": "Save my personal data",
+                "link": "Close account"
             }
         },
         "reading": "Reading",
@@ -347,7 +364,6 @@
         "dictionary": "Dictionary",
         "cart": "My cart"
     },
-
     "auth": {
         "organization": {
             "title": "Choose an organization",

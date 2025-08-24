@@ -19,7 +19,7 @@ import TrackPlayer, { Capability, Event } from 'react-native-track-player';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PADDING } from './tools/constants';
 import DrawerContent from './DrawerContent';
-import Logo from './assets/img/logo.svg';
+import Logo from './assets/img/icon.svg';
 import useColors from './hooks/useColors';
 import homeStyles from './screens/style';
 import SplashScreen from './screens/splash_screen';
@@ -53,6 +53,7 @@ import MediaScreen from './screens/Organization/media';
 import PDFViewerScreen from './screens/pdf_viewer';
 import VideoPlayerScreen from './screens/video_screen';
 import OrganizationDataScreen from './screens/Organization/organization_data';
+import OrganizationSettingsScreen from './screens/Organization/organization_settings';
 import GovernmentScreen from './screens/Organization/Government';
 import AddGovernmentScreen from './screens/Organization/Government/add_government';
 import AudioScreen from './screens/audio_screen';
@@ -99,9 +100,9 @@ const AboutBottomTab = () => {
           return (
             <>
               <TouchableOpacity onPress={() => navigation.navigate('Home', { screen: 'HomeStack' })}>
-                <Icon name='arrow-left' color={COLORS.black} style={{ fontSize: 24, marginLeft: PADDING.p01 }} />
+                <Icon name='chevron-left' size={37} color={COLORS.black} />
               </TouchableOpacity>
-              <Logo width={41} height={41} style={{ marginHorizontal: PADDING.p01 }} />
+              <Logo width={30} height={30} style={{ marginRight: PADDING.p01 }} />
             </>
           );
         },
@@ -225,9 +226,9 @@ const HomeStackNav = () => {
             return (
               <>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Icon name='arrow-left' color={COLORS.black} style={{ fontSize: 24 }} />
+                  <Icon name='chevron-left' size={37} color={COLORS.black} />
                 </TouchableOpacity>
-                <Logo width={41} height={41} style={{ marginHorizontal: PADDING.p01 }} />
+                <Logo width={30} height={30} style={{ marginRight: PADDING.p01 }} />
                 <Icon name='translate' color={COLORS.black} style={{ fontSize: 28, marginRight: PADDING.p01 }} />
               </>
             );
@@ -238,31 +239,31 @@ const HomeStackNav = () => {
         options={{
           headerShown: true,
           headerTitle: isSearchActive ? '' : t('navigation.dictionary'),
-          headerTintColor: 'white',
+          headerTintColor: COLORS.black,
           headerStyle: {
-            backgroundColor: COLORS.danger
+            backgroundColor: COLORS.white
           },
           headerTitleStyle: {
-            color: 'white'
+            color: COLORS.black
           },
           headerLeft: () => {
             return (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Home', { screen: 'HomeStack' })}>
-                  <Icon name='arrow-left' color='white' style={{ fontSize: 24 }} />
+                  <Icon name='chevron-left' size={37} color={COLORS.black} />
                 </TouchableOpacity>
                 {isSearchActive ? (
                   <>
                     <TextInput
                       value={searchQuery}
                       onChangeText={setSearchQuery}
-                      style={[homeStyles.searchInputText, { fontSize: 18, width: Dimensions.get('window').width - 120, height: 37, color: 'white', marginVertical: 0, paddingVertical: 5, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, borderColor: 'white' }]}
+                      style={[homeStyles.searchInputText, { fontSize: 18, width: Dimensions.get('window').width - 120, height: 37, color: COLORS.black, marginVertical: 0, paddingVertical: 5, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, borderColor: 'white' }]}
                       placeholder={t('search')}
                       placeholderTextColor={COLORS.secondary}
                     />
                   </>
                 ) : (
-                  <Icon name='book-open-blank-variant' color='white' style={{ fontSize: 28, marginHorizontal: PADDING.p01 }} />
+                  <Icon name='book-open-blank-variant' color={COLORS.black} style={{ fontSize: 28, marginHorizontal: PADDING.p01 }} />
                 )}
               </View>
             );
@@ -295,6 +296,7 @@ const HomeStackNav = () => {
       <Stack.Screen name='ChatEntity' component={ChatEntityScreen} />
       <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} />
       <Stack.Screen name='OrganizationData' component={OrganizationDataScreen} />
+      <Stack.Screen name='OrganizationSettings' component={OrganizationSettingsScreen} />
       <Stack.Screen name='Establishment' component={EstablishmentScreen} />
       <Stack.Screen name='AddEstablishment' component={AddEstablishmentScreen} />
       <Stack.Screen name='Government' component={GovernmentScreen} />

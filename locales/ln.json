@@ -96,7 +96,14 @@
         "description_maps": "Awa, eko lakisama ba cartes géographiques oyo ba membres bakoki ko consulte.",
         "description_user_works": "Membre oyo a publier nanu mosala moko te.",
         "description_user_circles": "Membre oyo azali na kati ya cercle moko te ya masolo.",
-        "description_user_consultations": "Membre oyo afuti nanu te pona kotala mosala moko."
+        "description_user_consultations": "Membre oyo afuti nanu te pona kotala mosala moko.",
+        "description_establishments": "Awa, ba etablisséman oyo ba membres bazali na yango ekolakisama.",
+        "description_establishment_programs": "Etablisséman oyo ebimisi nanu programme te.",
+        "description_establishment_events": "Etablisséman oyo ebimisi nanu milulu te.",
+        "description_establishment_books": "Etablisséman oyo ebimisi nanu buku te.",
+        "description_establishment_teach": "Ba cours en ligne ezali nanu te pona etablisséman oyo.",
+        "description_governments": "Awa, ba institution oyo ba membres bazali na yango ekolakisama.",
+        "description_government_events": "Institution oyo ebimisi nanu milulu te."
     },
     "unpaid": {
         "consultation": "Ba consultations o commander",
@@ -108,6 +115,7 @@
         "title": "Makambo etali mosala",
         "publish_new": "Tinda mosala",
         "publishing_info": "Tokolandela mosala na yo liboso ete emonana na plateforme mobimba.",
+        "publication_date": "Date etindamaki :",
         "work_title": "Titre ya mosala",
         "work_content": "Ndimbola",
         "work_url": "URL ya YouTube",
@@ -147,6 +155,7 @@
     "search_filter_apply": "Salelá ba filtres",
     "reading": "Kotanga",
     "summary": "Résumés",
+    "add": "Bakisa",
     "show": "Kolakisa",
     "hide": "Kobombana",
     "all_m": "Nyonso",
@@ -156,6 +165,7 @@
     "expand": "Komisa mingi",
     "cut": "Kata",
     "report": "Funda",
+    "change_organization": "Bongola organization",
     "select_report_reason": "Pona tina yako funda",
     "explanation_optional": "Explication (Facultatif)",
     "delete": {
@@ -179,7 +189,7 @@
     "logout": "Na bima",
     "personal_infos": "Ba sango ya moto ye moko",
     "change_password": "Kobongola mot de passe",
-    "activation":  {
+    "activation": {
         "link": "S’abonner na nzela ya code",
         "title": "Activer abonnément na nzela ya code",
         "description": "Moko ya ba partenaires na biso akokaki kopesa yo code ya kosalela mbala moko pona ko activer abonnément.",
@@ -193,7 +203,7 @@
             "error": "Esengeli okoma code !"
         }
     },
-    "subscription":  {
+    "subscription": {
         "title": "Bakisa ba abonnéments na kitunga na yo",
         "info": "Ozali na abonnément te. Banda ko s’abonner po otala.",
         "type": "Lolenge ya abonnément",
@@ -201,7 +211,7 @@
         "link": "S’abonner",
         "back": "Zonga na ba abonnéments"
     },
-    "consultation":  {
+    "consultation": {
         "info": "Kotala mosala oyo eza ofele te, ndenge okoki komona yango.",
         "link": "Nafuta po natala"
     },
@@ -211,7 +221,7 @@
     "withdraw": "Longola",
     "pay": "Nafuta",
     "amount_to_pay": "Mbongo ya kofuta :",
-    "payment_method":  {
+    "payment_method": {
         "mobile_money": {
             "label": "Mobile money",
             "title": "Kofuta na mobile money",
@@ -232,18 +242,17 @@
                 "label": "Nimero ya karte",
                 "placeholder": "1234 1234 1234 1234"
             },
-            "expiration":{
+            "expiration": {
                 "label": "Expiration",
                 "placeholder": "MM/YY"
             },
             "cvc": "CVC"
         }
     },
-    "media":  {
+    "media": {
         "title": "Kotanga média",
         "description": "Ez’otanga..."
     },
-
     "navigation": {
         "home": {
             "title": "Ebandeli",
@@ -272,6 +281,7 @@
         "establishment": {
             "title": "Etablisséman",
             "new": "Nakomisa etablisséman",
+            "publishing_info": "Établissement na yo ekomonana na batu nioso kaka sima ya kondimama na administrateur ya plateforme.",
             "course_schedule": "Programme",
             "event": "Milulu",
             "authors": {
@@ -279,14 +289,16 @@
                 "books": "Ba buku"
             },
             "data": {
+                "upload_photo": "Kotisa logo",
                 "name": "Kombo ya etablisséman",
+                "acronym": "Na mokuse (Acronyme)",
+                "legal_status": "Statut juridique (ex: SARL, ASBL, SA, ...)",
                 "description": "Lobelá etablisséman na yo",
                 "id_number": "Nimero ya identification",
                 "address": "Adresi",
                 "phone": "Nimero ya téléfon",
                 "email": "E-mail",
                 "p_o_box": "Boite Postale",
-                "legal_status": "Statut juridique",
                 "year_of_creation": "Mbula ya bozalisi",
                 "website_url": "URL ya site web",
                 "choose_type": "Pona type"
@@ -295,10 +307,15 @@
         "government": {
             "title": "Ba institutions",
             "new": "Nakomisa institution",
+            "publishing_info": "Institution na yo ekomonana na batu nioso kaka sima ya kondimama na administrateur ya plateforme.",
             "event": "Milulu",
             "data": {
+                "upload_photo": "Kotisa logo",
                 "name": "Kombo ya institution",
+                "acronym": "Na mokuse (Acronyme)",
+                "legal_status": "Statut juridique (ex: SARL, ASBL, SA, ...)",
                 "description": "Lobelá institution",
+                "id_number": "Nimero ya identification",
                 "address": "Adresi",
                 "phone": "Nimero ya téléfon",
                 "email": "E-mail",
@@ -308,29 +325,29 @@
             }
         },
         "settings": {
-            "title" : "Ba paramètres",
+            "title": "Ba paramètres",
             "update_account": {
-                "title" : "Bongola compte",
-                "description" : "Ba informations oyo etali compte na yo. Okoki kozwa archive ya ba données personnelles na yo."
+                "title": "Bongola compte",
+                "description": "Ba informations oyo etali compte na yo. Okoki kozwa archive ya ba données personnelles na yo."
             },
-            "privacy_and_safety" : {
-                "title" : "Nkuku pe bobateli makambu",
-                "description" : "Landela kokota na compte na yo pe visibilité na yo (ya ba informations na yo) na misu ya ba membres misusu.",
-                "blocked_accounts" : {
-                    "title" : "Ba membres o kanga",
-                    "description" : "Lakisa ba membres nionso oyo o bloqué."
+            "privacy_and_safety": {
+                "title": "Nkuku pe bobateli makambu",
+                "description": "Landela kokota na compte na yo pe visibilité na yo (ya ba informations na yo) na misu ya ba membres misusu.",
+                "blocked_accounts": {
+                    "title": "Ba membres o kanga",
+                    "description": "Lakisa ba membres nionso oyo o bloqué."
                 },
-                "2fa_login" : {
-                    "title" : "Kokota na ba étapes mibale",
-                    "by_mail" : "Na nzela ya E-mail",
-                    "by_phone" : "Na nzela ya SMS"
+                "2fa_login": {
+                    "title": "Kokota na ba étapes mibale",
+                    "by_mail": "Na nzela ya E-mail",
+                    "by_phone": "Na nzela ya SMS"
                 }
             },
-            "close_account" : {
-                "title" : "Bokangi ya compte",
-                "description" : "Compte na yo ekoki kozonga na mikolo 30. Sala makasi obomba ba données personnelles na yo avant ya kokanga compte na yo.",
-                "save_perso_data" : "Na bomba ba données personnelles na nga",
-                "link" : "Kanga compte na nga"
+            "close_account": {
+                "title": "Bokangi ya compte",
+                "description": "Compte na yo ekoki kozonga na mikolo 30. Sala makasi obomba ba données personnelles na yo avant ya kokanga compte na yo.",
+                "save_perso_data": "Na bomba ba données personnelles na nga",
+                "link": "Kanga compte na nga"
             }
         },
         "reading": "Lecture",
@@ -347,7 +364,6 @@
         "dictionary": "Dictionnaire",
         "cart": "Kitunga na nga"
     },
-
     "auth": {
         "organization": {
             "title": "Pona organisation",

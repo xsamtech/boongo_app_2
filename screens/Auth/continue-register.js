@@ -29,11 +29,11 @@ const ContinueRegisterScreen = () => {
   const { theme } = useContext(ThemeContext);
   // =============== User data ===============
   const firstname = endRegisterInfo.firstname;
+  const city = endRegisterInfo.city;
   const [surname, setSurname] = useState(null);
-  const [city, setCity] = useState(null);
   const [address_1, setAddress1] = useState(null);
-  const [address_2, setAddress2] = useState(null);
-  const [p_o_box, setPOBox] = useState(null);
+  // const [address_2, setAddress2] = useState(null);
+  // const [p_o_box, setPOBox] = useState(null);
   const [password, setPassword] = useState(null);
   const [confirm_password, setConfirmPassword] = useState(null);
   // COUNTRY dropdown
@@ -213,14 +213,6 @@ const ContinueRegisterScreen = () => {
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
           onChange={handleCountryChange} />
-
-        {/* City  */}
-        <TextInput
-          style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-          value={city}
-          placeholder={t('auth.city')}
-          placeholderTextColor={COLORS.dark_secondary}
-          onChangeText={text => setCity(text)} />
 
         {/* Address 1  */}
         <TextInput

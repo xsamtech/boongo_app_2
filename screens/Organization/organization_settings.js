@@ -2,47 +2,48 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TextInput, ScrollView, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, ScrollView, Image, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
 import { Button } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Spinner from 'react-native-loading-spinner-overlay';
 import DropDownPicker from 'react-native-dropdown-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { AuthContext } from '../../../contexts/AuthContext';
-import { API, PADDING, WEB } from '../../../tools/constants';
-import LogoText from '../../../assets/img/brand.svg';
-import useColors from '../../../hooks/useColors';
-import homeStyles from '../../style';
+import { AuthContext } from '../../contexts/AuthContext';
+import { API, PADDING } from '../../tools/constants';
+import useColors from '../../hooks/useColors';
+import homeStyles from '../style';
+import HeaderComponent from '../header';
 
-const AddEstablishmentScreen = () => {
+const OrganizationSettingsScreen = ({ route, navigation }) => {
   // =============== Colors ===============
   const COLORS = useColors();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
+  // =============== Get parameters ===============
+  const { organization_id } = route.params;
   // =============== Get data ===============
-  const [orgName, setOrgName] = useState('');
-  const [orgAcronym, setOrgAcronym] = useState('');
-  const [orgDescription, setOrgDescription] = useState('');
+  const [selectedOrganization, setSelectedOrganization] = useState({});
+  const [orgName, setOrgName] = useState(selectedOrganization.org_name || '');
+  const [orgAcronym, setOrgAcronym] = useState(selectedOrganization.org_acronym || '');
+  const [orgDescription, setOrgDescription] = useState(selectedOrganization.org_description || '');
   const [inputDescHeight, setInputDescHeight] = useState(40);
-  const [idNumber, setIdNumber] = useState('');
-  const [address, setAddress] = useState('');
+  const [idNumber, setIdNumber] = useState(selectedOrganization.id_number || '');
+  const [address, setAddress] = useState(selectedOrganization.address || '');
   const [inputAddrHeight, setInputAddrHeight] = useState(40);
   const [phoneCode, setPhoneCode] = useState(null);
-  const [phone, setPhone] = useState(null);
-  const [email, setEmail] = useState('');
-  const [p_o_box, setPOBox] = useState('');
-  const [legalStatus, setLegalStatus] = useState('');
-  const [yearOfCreation, setYearOfCreation] = useState('');
-  const [websiteURL, setWebsiteURL] = useState('');
+  const [phone, setPhone] = useState(selectedOrganization.phone || '');
+  const [email, setEmail] = useState(selectedOrganization.email || '');
+  const [p_o_box, setPOBox] = useState(selectedOrganization.p_o_box || '');
+  const [legalStatus, setLegalStatus] = useState(selectedOrganization.legal_status || '');
+  const [yearOfCreation, setYearOfCreation] = useState(selectedOrganization.year_of_creation || '');
+  const [websiteURL, setWebsiteURL] = useState(selectedOrganization.website_url || '');
   const [imageData, setImageData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   // COUNTRIES DATA dropdown
@@ -87,6 +88,53 @@ const AddEstablishmentScreen = () => {
     setPhoneCode(item.value);
   };
 
+  // =============== Refresh control ===============
+  const onRefresh = useCallback(() => {
+    setLoading(true);
+    setTimeout(() => { setLoading(false); }, 2000);
+  }, []);
+
+  // =============== Get current organization ===============
+  useEffect(() => {
+    getOrganization();
+  }, []);
+
+  const getOrganization = () => {
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/organization/${organization_id}`,
+      headers: {
+        'X-localization': 'fr',
+        'Authorization': `Bearer ${userInfo.api_token}`,
+      }
+    };
+
+    axios(config)
+      .then(res => {
+        const organizationData = res.data.data;
+
+        setSelectedOrganization(organizationData);
+        setLoading(false);
+
+        setOrgName(organizationData.org_name || '');
+        setOrgAcronym(organizationData.org_acronym || '');
+        setOrgDescription(organizationData.org_description || '');
+        setIdNumber(organizationData.id_number || '');
+        setAddress(organizationData.address || '');
+        setPhone(organizationData.phone || '');
+        setEmail(organizationData.email || '');
+        setPOBox(organizationData.p_o_box || '');
+        setLegalStatus(organizationData.legal_status || '');
+        setYearOfCreation(organizationData.year_of_creation || '');
+        setWebsiteURL(organizationData.website_url || '');
+        setImageData(organizationData.cover_url || null);
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      });
+  };
+
   // =============== Handle Image Picker ===============
   const imagePick = () => {
     ImagePicker.openPicker({
@@ -107,11 +155,12 @@ const AddEstablishmentScreen = () => {
 
     const formData = new FormData();
 
+    formData.append('id', organization_id);
     formData.append('org_name', orgName || '');
     formData.append('org_acronym', orgAcronym || '');
     formData.append('org_description', orgDescription || '');
     formData.append('id_number', idNumber || '');
-    formData.append('phone', (phoneCode && phone ? `${phoneCode}${phone}` : null));
+    formData.append('phone', (phoneCode ? (phone ? `${phoneCode}${phone}` : null) : phone));
     formData.append('email', email || '');
     formData.append('address', address || '');
     formData.append('p_o_box', p_o_box || '');
@@ -124,8 +173,8 @@ const AddEstablishmentScreen = () => {
     formData.append('image_64', imageData || null);
 
     try {
-      const response = await fetch(`${API.boongo_url}/organization`, {
-        method: 'POST',
+      const response = await fetch(`${API.boongo_url}/organization/${organization_id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'multipart/form-data',
           'X-localization': 'fr',
@@ -143,7 +192,6 @@ const AddEstablishmentScreen = () => {
       setOrgDescription('');
       setIdNumber('');
       setAddress('');
-      setPhoneCode('');
       setPhone('');
       setEmail('');
       setPOBox('');
@@ -164,26 +212,28 @@ const AddEstablishmentScreen = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.white }}>
+      {/* Spinner */}
       <Spinner visible={isLoading} />
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p10, paddingHorizontal: PADDING.p10 }}>
-        {/* Brand / Title */}
-        <View style={homeStyles.authlogo}>
-          <LogoText width={200} height={48} />
-        </View>
-        <Text style={[homeStyles.authTitle, { color: COLORS.black, textAlign: 'center', marginBottom: PADDING.p02 }]}>{t('navigation.establishment.new')}</Text>
-        <Text style={{ color: COLORS.black, textAlign: 'center', fontWeight: '300', marginBottom: PADDING.p12, paddingHorizontal: PADDING.p05 }}>{t('navigation.establishment.publishing_info')}</Text>
+      {/* Loader */}
+      <View style={{ paddingTop: PADDING.p01 }}>
+        <HeaderComponent />
+      </View>
+
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingVertical: PADDING.p10, paddingHorizontal: PADDING.p10 }} refreshControl={<RefreshControl refreshing={loading} onRefresh={onRefresh} />}>
+        {/* Title */}
+        <Text style={[homeStyles.authTitle, { fontSize: 25, color: COLORS.black, textAlign: 'center', marginTop: 0, marginBottom: PADDING.p12 }]}>{t('change_organization')}</Text>
 
         {/* Logo image */}
         <View style={{ alignItems: 'center', marginVertical: PADDING.p01 }}>
-          <Image style={{ width: 210, height: 210, borderRadius: 30 }} source={{ uri: imageData || `${WEB.boongo_url}/assets/img/banner-organization.png` }} />
+          <Image style={{ width: 210, height: 210, borderRadius: 30 }} source={{ uri: imageData || selectedOrganization.cover_url }} />
           <TouchableOpacity style={{ backgroundColor: COLORS.primary, marginTop: -30, marginLeft: 140, borderRadius: 40 / 2, padding: PADDING.p01 }} onPress={imagePick}>
             <Icon name='lead-pencil' size={20} color='white' />
           </TouchableOpacity>
         </View>
 
-        {/* Organization name
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.name')}</Text> */}
+        {/* Organization name */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.name')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={orgName || ''}
@@ -191,8 +241,8 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setOrgName} />
 
-        {/* Acronym
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.acronym')}</Text> */}
+        {/* Acronym */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.acronym')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={orgAcronym || ''}
@@ -200,8 +250,8 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setOrgAcronym} />
 
-        {/* Legal status
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.legal_status')}</Text> */}
+        {/* Legal status */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.legal_status')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={legalStatus || ''}
@@ -209,8 +259,8 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setLegalStatus} />
 
-        {/* Description
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.description')}</Text> */}
+        {/* Description */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.description')}</Text>
         <TextInput
           multiline
           onContentSizeChange={(e) =>
@@ -222,8 +272,8 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setOrgDescription} />
 
-        {/* ID number
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.id_number')}</Text> */}
+        {/* ID number */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.id_number')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={idNumber || ''}
@@ -231,8 +281,8 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setIdNumber} />
 
-        {/* Address
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.address')}</Text> */}
+        {/* Address */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.address')}</Text>
         <TextInput
           multiline
           onContentSizeChange={(e) =>
@@ -244,66 +294,78 @@ const AddEstablishmentScreen = () => {
           placeholderTextColor={COLORS.dark_secondary}
           onChangeText={setAddress} />
 
-        {/* Phone
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.phone')}</Text> */}
-        <View style={{ flexDirection: 'row' }}>
-          {/* Phone code  */}
-          <DropDownPicker
-            modalTitle={t('auth.phone_code.title')}
-            disabled={countriesData.length === 0}
-            loading={countriesData.length === 0}
-            modalProps={{
-              presentationStyle: 'fullScreen', // optional
-              animationType: 'slide',
-            }}
-            modalContentContainerStyle={{
-              backgroundColor: COLORS.white,
-              borderTopWidth: 0,
-              borderBottomWidth: 1,
-              borderBottomColor: COLORS.light_secondary,
-            }}
-            closeIconStyle={{
-              tintColor: COLORS.black
-            }}
-            textStyle={{ color: COLORS.black }}
-            placeholderStyle={{ color: COLORS.black }}
-            placeholder={t('auth.phone_code.label')}
-            arrowIconStyle={{ tintColor: COLORS.black }}
-            containerStyle={{ width: '50%', height: 50 }}
-            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
-            listMode='MODAL'
-            open={open}
-            value={phoneCode}
-            items={countriesData}
-            setOpen={setOpen}
-            setValue={setPhoneCode}
-            onChangeItem={handleCountryChange}
-            renderListItem={({ item }) => {
-              return (
-                <TouchableOpacity onPress={() => { handleCountryChange(item); setOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                  {item.flag ? (
-                    <Image source={{ uri: item.flag }} style={{ width: 20, height: 15, marginRight: 10 }} />
-                  ) : null}
-                  <Text style={{ color: COLORS.black }}>
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
+        {/* Phone */}
+        {selectedOrganization.phone ? (
+          <>
+            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.phone')}</Text>
+            <TextInput
+              style={[homeStyles.authInput, { color: COLORS.black, height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
+              keyboardType='phone-pad'
+              value={phone}
+              placeholder={t('navigation.establishment.data.phone')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={text => setPhone(text)} />
+          </>
+        ) : (
+          <View style={{ flexDirection: 'row' }}>
+            {/* Phone code  */}
+            <DropDownPicker
+              modalTitle={t('auth.phone_code.title')}
+              disabled={countriesData.length === 0}
+              loading={countriesData.length === 0}
+              modalProps={{
+                presentationStyle: 'fullScreen', // optional
+                animationType: 'slide',
+              }}
+              modalContentContainerStyle={{
+                backgroundColor: COLORS.white,
+                borderTopWidth: 0,
+                borderBottomWidth: 1,
+                borderBottomColor: COLORS.light_secondary,
+              }}
+              closeIconStyle={{
+                tintColor: COLORS.black
+              }}
+              textStyle={{ color: COLORS.black }}
+              placeholderStyle={{ color: COLORS.black }}
+              placeholder={t('auth.phone_code.label')}
+              arrowIconStyle={{ tintColor: COLORS.black }}
+              containerStyle={{ width: '50%', height: 50 }}
+              style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary, borderTopEndRadius: 0, borderBottomEndRadius: 0, borderRightWidth: 0 }]}
+              listMode='MODAL'
+              open={open}
+              value={phoneCode}
+              items={countriesData}
+              setOpen={setOpen}
+              setValue={setPhoneCode}
+              onChangeItem={handleCountryChange}
+              renderListItem={({ item }) => {
+                return (
+                  <TouchableOpacity onPress={() => { handleCountryChange(item); setOpen(false); }} style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
+                    {item.flag ? (
+                      <Image source={{ uri: item.flag }} style={{ width: 20, height: 15, marginRight: 10 }} />
+                    ) : null}
+                    <Text style={{ color: COLORS.black }}>
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
 
-          {/* Phone number */}
-          <TextInput
-            style={[homeStyles.authInput, { color: COLORS.black, width: '50%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
-            keyboardType='phone-pad'
-            value={phone}
-            placeholder={t('auth.phone')}
-            placeholderTextColor={COLORS.dark_secondary}
-            onChangeText={text => setPhone(text)} />
-        </View>
+            {/* Phone number */}
+            <TextInput
+              style={[homeStyles.authInput, { color: COLORS.black, width: '50%', height: 50, borderColor: COLORS.light_secondary, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }]}
+              keyboardType='phone-pad'
+              value={phone}
+              placeholder={t('auth.phone')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={text => setPhone(text)} />
+          </View>
+        )}
 
-        {/* Email
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.email')}</Text> */}
+        {/* Email */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.email')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={email || ''}
@@ -314,8 +376,8 @@ const AddEstablishmentScreen = () => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ width: (Dimensions.get('window').width / 2) - 29 }}>
-            {/* P.O. box
-            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.p_o_box')}</Text> */}
+            {/* P.O. box */}
+            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.p_o_box')}</Text>
             <TextInput
               style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
               value={p_o_box || ''}
@@ -324,8 +386,8 @@ const AddEstablishmentScreen = () => {
               onChangeText={setPOBox} />
           </View>
           <View style={{ width: (Dimensions.get('window').width / 2) - 29 }}>
-            {/* Year of creation
-            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.year_of_creation')}</Text> */}
+            {/* Year of creation */}
+            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.year_of_creation')}</Text>
             <TextInput
               keyboardType='numeric'
               maxLength={4}
@@ -337,8 +399,8 @@ const AddEstablishmentScreen = () => {
           </View>
         </View>
 
-        {/* Website URL
-        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.website_url')}</Text> */}
+        {/* Website URL */}
+        <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.website_url')}</Text>
         <TextInput
           style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
           value={websiteURL || ''}
@@ -349,11 +411,11 @@ const AddEstablishmentScreen = () => {
 
         {/* Submit */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleSubmit}>
-          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('publish')}</Text>
+          <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('update')}</Text>
         </Button>
       </ScrollView>
     </View>
   );
 };
 
-export default AddEstablishmentScreen;
+export default OrganizationSettingsScreen;

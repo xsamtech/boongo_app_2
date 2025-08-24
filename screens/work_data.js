@@ -58,6 +58,13 @@ const WorkDataScreen = ({ route, navigation }) => {
   // Check if user has added subscription in the 
   const isInCart = userInfo.unpaid_consultations && userInfo.unpaid_consultations.some(consultation => consultation.id === work.id);
 
+  // =============== First letter uppercase ===============
+  const ucfirst = (str) => {
+    if (!str) return str;
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
+
   // =============== Check if file is video ===============
   const isVideoFile = (url) => {
     if (!url) return false;
@@ -640,6 +647,15 @@ const WorkDataScreen = ({ route, navigation }) => {
         <View style={[homeStyles.workBody, { paddingTop: 0, paddingBottom: PADDING.p01 }]}>
           <View style={homeStyles.workCard}>
             <View style={[homeStyles.workTop, { flexDirection: 'column', alignItems: 'flex-start' }]}>
+              {work.user_id ?
+                <View style={{ width: Dimensions.get('window').width - 50 }}>
+                  <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }} onPress={() => { navigation.navigate('Profile', { user_id: work.user_owner.id }); }}>
+                    <Image source={{ uri: work.user_owner.avatar_url }} style={{ width: 37, height: 37, marginRight: PADDING.p02, borderRadius: 37 / 2 }} />
+                    <Text style={{ fontSize: TEXT_SIZE.normal, color: COLORS.black }}>{`${work.user_owner.firstname} ${work.user_owner.lastname}`}</Text>
+                  </TouchableOpacity>
+                  <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.dark_secondary, textAlign: 'center' }}>{`${t('work.publication_date')} ${ucfirst(work.created_at_explicit)}`}</Text>
+                </View>
+                : ''}
               <View>
                 <Image source={{ uri: work.photo_url }} style={[homeStyles.workImage, { width: Dimensions.get('window').width - 50, height: mWidth * 2 }]} />
               </View>
