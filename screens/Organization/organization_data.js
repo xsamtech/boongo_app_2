@@ -42,9 +42,8 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const [formModalVisible, setFormModalVisible] = useState(false);
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
   const [newClass, setNewClass] = useState('');
-  const [pdfUri, setPdfUri] = useState(null);
   // Loaders
-  const [loading, setLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const scrollViewListRef = listRef || useRef(null);
@@ -86,24 +85,21 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
 
   // ================= Get programs =================
   useEffect(() => {
-    if (selectedOrganization.id) {
+    if (selectedOrganization.id && isLoaded === false) {
       fetchPrograms(); // Appelez fetchPrograms une fois l'organisation disponible
     }
-  }, [selectedOrganization]); // Dépendance sur selectedOrganization
+  }, [selectedOrganization]);
 
   const fetchPrograms = async () => {
-    if (loading) return;
-    setLoading(true);
-
     try {
       const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
       setPrograms(response.data.data); // Mettre à jour la liste des programmes
       setSelectedProgram(response.data.data[0]);
-      setLoading(false);
+      setIsLoaded(true);
     } catch (error) {
       console.error('Error fetching programs:', error);
-      setLoading(false);
+      setIsLoaded(false);
     }
   };
 
@@ -116,17 +112,19 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     formData.append('course_year', course_year);
     formData.append('class', newClass);
     formData.append('document_url', {
-      uri: pdfUri, // URI du fichier PDF
-      type: 'application/pdf',
-      name: 'new_program.pdf',
+      uri: files[0].uri,
+      type: files[0].type,
+      name: files[0].name,
     });
+
+    console.log(formData);
 
     try {
       const response = await axios.post(`${API.boongo_url}/program/add_organization_program/${organization_id}`, formData, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
-      fetchPrograms(); // Recharger les programmes après ajout
+      fetchPrograms(); // Reload programs after adding
       setSelectedProgram(response.data.data);
-      setFormModalVisible(false); // Fermer le modal
+      setFormModalVisible(false); // Close modal
       setIsLoading(false);
     } catch (error) {
       console.error('Error adding program:', error);
@@ -148,16 +146,17 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   };
 
   const handleBadgeClick = async (programId) => {
-    setLoading(true);
+    setRefreshing(true);
 
     try {
       const response = await axios.get(`${API.boongo_url}/program/${programId}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
+      setSelectedProgram(null);
       setSelectedProgram(response.data.data);
-      setLoading(false);
+      setRefreshing(false);
     } catch (error) {
       console.error('Error fetching program details:', error);
-      setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -171,16 +170,16 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
         onPress={() => handleBadgeClick(item.id)}
         style={
           isSelected
-            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.danger, borderWidth: 0 }]
-            : [homeStyles.categoryBadge, { backgroundColor: 'white', borderWidth: 1, borderColor: COLORS.danger }]
+            ? [homeStyles.categoryBadge, { backgroundColor: 'white', borderWidth: 1, borderColor: COLORS.primary }]
+            : [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.primary, borderWidth: 0 }]
         }
         underlayColor={COLORS.light_secondary}
       >
         <Text
           style={
             isSelected
-              ? [homeStyles.categoryBadgeTextSelected, { color: 'white' }]
-              : [homeStyles.categoryBadgeText, { color: 'black' }]
+              ? [homeStyles.categoryBadgeText, { color: COLORS.primary }]
+              : [homeStyles.categoryBadgeTextSelected, { color: 'black' }]
           }
         >
           {item.class}
@@ -192,15 +191,19 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   // =============== Truncate file name for PDF ===============
   const truncateFileName = (name, maxLength = 30) => {
     if (name.length <= maxLength) return name;
+
     const start = name.slice(0, 15);
     const end = name.slice(-12);
+
     return `${start} ... ${end}`;
   };
 
   // =============== Get icon for PDF file ===============
   const getIconName = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
+
     if (ext === 'pdf') return 'file-document-outline';
+
     return 'file-outline'; // Default icon if not PDF
   };
 
@@ -280,74 +283,80 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
             }}
             renderItem={({ item }) => <ProgramItem item={item} />}
             ListFooterComponent={
-              <TouchableOpacity style={{ width: 32, height: 32, backgroundColor: COLORS.danger, padding: 2.5, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(true)}>
-                <Icon name='plus' size={28} color='white' />
+              <TouchableOpacity style={{ width: 32, height: 32, backgroundColor: COLORS.primary, padding: 2.5, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(true)}>
+                <Icon name='plus' size={28} color='black' />
               </TouchableOpacity>
             }
           />
 
           {selectedProgram ? (
             <>
-              {/* Program details */}
-              <View style={{ flexDirection: 'row', padding: PADDING.p03 }}>
-                <View style={{ width: 160 }}>
-                  <Pdf
-                    trustAllCerts={false}
-                    source={{ uri: selectedProgram.files[0].file_url, cache: true }}
-                    onLoadComplete={(numberOfPages, filePath) => {
-                      console.log(`Number of pages: ${numberOfPages}`);
-                    }}
-                    onPageChanged={(page, numberOfPages) => {
-                      console.log(`Current page: ${page}`);
-                    }}
-                    onError={(error) => {
-                      console.log(error);
-                    }}
-                    onPressLink={(uri) => {
-                      console.log(`Link pressed: ${uri}`);
-                    }}
-                    page={pdfPage}
-                    style={{ flex: 1, width: '100%', height: 230 }} />
-                </View>
+              {refreshing ? (
+                <Text style={{ fontSize: TEXT_SIZE.paragraph, color: COLORS.black, textAlign: 'center', marginTop: PADDING.p05 }}>{t('loading')}</Text>
+              ) : (
+                <>
+                  {/* Program details */}
+                  <View style={{ flexDirection: 'row', padding: PADDING.p03 }}>
+                    <View style={{ width: 160 }}>
+                      <Pdf
+                        trustAllCerts={false}
+                        source={{ uri: selectedProgram.files[0].file_url, cache: true }}
+                        onLoadComplete={(numberOfPages, filePath) => {
+                          console.log(`Number of pages: ${numberOfPages}`);
+                        }}
+                        onPageChanged={(page, numberOfPages) => {
+                          console.log(`Current page: ${page}`);
+                        }}
+                        onError={(error) => {
+                          console.log(error);
+                        }}
+                        onPressLink={(uri) => {
+                          console.log(`Link pressed: ${uri}`);
+                        }}
+                        page={pdfPage}
+                        style={{ flex: 1, width: '100%', height: 230 }} />
+                    </View>
 
-                <View style={{ flexShrink: 1, marginLeft: PADDING.p01, marginTop: PADDING.p05 }}>
-                  <Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.black, textAlign: 'left' }}>{t('program.title', { class: selectedProgram.class, course_year: selectedProgram.course_year.year })}</Text>
-                  <TouchableOpacity style={homeStyles.linkIcon} onPress={() => setPdfModalVisible(true)}>
-                    <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
-                    <Icon name='dock-window' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Modal to see program details */}
-              <Modal visible={pdfModalVisible} animationType='slide'>
-                <SafeAreaView contentContainerStyle={{ flexGrow: 1, padding: PADDING.p05, backgroundColor: COLORS.white }}>
-                  <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setPdfModalVisible(false)}>
-                    <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
-                  </TouchableOpacity>
-
-                  <View style={{ height: Dimensions.get('window').height - 5, justifyContent: 'flex-start', alignItems: 'center' }}>
-                    <Pdf
-                      trustAllCerts={false}
-                      source={{ uri: selectedProgram.files[0].file_url, cache: true }}
-                      onLoadComplete={(numberOfPages, filePath) => {
-                        console.log(`Number of pages: ${numberOfPages}`);
-                      }}
-                      onPageChanged={(page, numberOfPages) => {
-                        console.log(`Current page: ${page}`);
-                        // setPdfPage(page);
-                      }}
-                      onError={(error) => {
-                        console.log(error);
-                      }}
-                      onPressLink={(uri) => {
-                        console.log(`Link pressed: ${uri}`);
-                      }}
-                      page={pdfPage}
-                      style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height, }} />
+                    <View style={{ flexShrink: 1, marginLeft: PADDING.p01, marginTop: PADDING.p05 }}>
+                      <Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.black, textAlign: 'left' }}>{t('program.title', { class: selectedProgram.class, course_year: selectedProgram.course_year.year })}</Text>
+                      <TouchableOpacity style={homeStyles.linkIcon} onPress={() => setPdfModalVisible(true)}>
+                        <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
+                        <Icon name='dock-window' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </SafeAreaView>
-              </Modal>
+
+                  {/* Modal to see program details */}
+                  <Modal visible={pdfModalVisible} animationType='slide'>
+                    <SafeAreaView contentContainerStyle={{ flexGrow: 1, padding: PADDING.p05, backgroundColor: COLORS.white }}>
+                      <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setPdfModalVisible(false)}>
+                        <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
+                      </TouchableOpacity>
+
+                      <View style={{ height: Dimensions.get('window').height - 5, justifyContent: 'flex-start', alignItems: 'center' }}>
+                        <Pdf
+                          trustAllCerts={false}
+                          source={{ uri: selectedProgram.files[0].file_url, cache: true }}
+                          onLoadComplete={(numberOfPages, filePath) => {
+                            console.log(`Number of pages: ${numberOfPages}`);
+                          }}
+                          onPageChanged={(page, numberOfPages) => {
+                            console.log(`Current page: ${page}`);
+                            // setPdfPage(page);
+                          }}
+                          onError={(error) => {
+                            console.log(error);
+                          }}
+                          onPressLink={(uri) => {
+                            console.log(`Link pressed: ${uri}`);
+                          }}
+                          page={pdfPage}
+                          style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height, }} />
+                      </View>
+                    </SafeAreaView>
+                  </Modal>
+                </>
+              )}
             </>
 
           ) : (
@@ -356,7 +365,6 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
               <EmptyListComponent iconName="file-document-outline" title={t('empty_list.title')} description={t('empty_list.description_establishment_programs')} />
             </>
           )}
-
 
           {/* Modal to add a program */}
           <Modal visible={formModalVisible} animationType='slide'>
@@ -391,26 +399,28 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
                     nestedScrollEnabled
                     keyExtractor={(item, index) => index.toString()}
                     style={{ flexGrow: 0 }}
-                    renderItem={({ item, index }) => (
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: PADDING.p01, }}>
-                        {/* Icon associated with the file */}
-                        <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
+                    renderItem={({ item, index }) => {
+                      return (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: PADDING.p01, }}>
+                          {/* Icon associated with the file */}
+                          <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
 
-                        {/* File name */}
-                        <Text style={{ flex: 1, color: COLORS.black }}>{truncateFileName(item.name)}</Text>
+                          {/* File name */}
+                          <Text style={{ flex: 1, color: COLORS.black }}>{truncateFileName(item.name)}</Text>
 
-                        {/* Button to delete */}
-                        <TouchableOpacity style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8, }}
-                          onPress={() => {
-                            const updatedFiles = [...files];
-                            updatedFiles.splice(index, 1);
-                            setFiles(updatedFiles);
-                          }}
-                        >
-                          <Icon name="close" size={16} color="white" />
-                        </TouchableOpacity>
-                      </View>
-                    )}
+                          {/* Button to delete */}
+                          <TouchableOpacity style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8, }}
+                            onPress={() => {
+                              const updatedFiles = [...files];
+                              updatedFiles.splice(index, 1);
+                              setFiles(updatedFiles);
+                            }}
+                          >
+                            <Icon name="close" size={16} color="white" />
+                          </TouchableOpacity>
+                        </View>
+                      )
+                    }}
                   />
                 </>
               ) : (
