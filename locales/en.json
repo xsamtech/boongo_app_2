@@ -166,6 +166,14 @@
     "cut": "Cut",
     "report": "Report",
     "change_organization": "Change organization",
+    "program": {
+        "title": "{{ class }} program for {{ course_year }}",
+        "data": {
+            "title": "Add a class or promotion for this course year ({{ course_year }})",
+            "class": "Class / Promotion",
+            "file": "Upload document"
+        }
+    },
     "select_report_reason": "Choose a report reason",
     "explanation_optional": "Explanation (Optional)",
     "delete": {

@@ -166,6 +166,14 @@
     "cut": "Couper",
     "report": "Signaler",
     "change_organization": "Modifier organization",
+    "program": {
+        "title": "Programme de {{ class }} pour {{ course_year }}",
+        "data": {
+            "title": "Ajouter une classe ou une promotion pour cette année d’étude ({{ course_year }})",
+            "class": "Classe / Promotion",
+            "file": "Uploader document"
+        }
+    },
     "select_report_reason": "Choisir un motif de signalement",
     "explanation_optional": "Explication (Facultatif)",
     "delete": {

@@ -3,22 +3,22 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, Button } from 'react-native'
-import { TabBar, TabView } from 'react-native-tab-view';
-import { useTranslation } from 'react-i18next';
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, ToastAndroid } from 'react-native'
+import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'react-native-paper';
+import { TabBar, TabView } from 'react-native-tab-view';
 import Pdf from 'react-native-pdf';
-import FaIcon from 'react-native-vector-icons/FontAwesome6';
+import Spinner from 'react-native-loading-spinner-overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { API, IMAGE_SIZE, PADDING, WEB } from '../../tools/constants';
+import { API, IMAGE_SIZE, PADDING, TEXT_SIZE, WEB } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import EmptyListComponent from '../../components/empty_list';
-import WorkItemComponent from '../../components/work_item';
-import EntityItemComponent from '../../components/entity_item';
-import FloatingActionsButton from '../../components/floating_actions_button';
-import homeStyles from '../style';
+import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
+import homeStyles from '../style';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -28,21 +28,33 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
   const route = useRoute();
-  const { organization_id, type } = route.params;
+  const { organization_id } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
   const [programs, setPrograms] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [pdfPage, setPdfPage] = useState(1);
+  // Form data
+  const [formModalVisible, setFormModalVisible] = useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
   const [newClass, setNewClass] = useState('');
-  const [pdfUri, setPdfUri] = useState(null); // URI du fichier PDF pour l'ajout d'un programme
-  const flatListRef = listRef || useRef(null);
+  const [pdfUri, setPdfUri] = useState(null);
+  // Loaders
+  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const scrollViewListRef = listRef || useRef(null);
+  // Protect pick execution against multiple clicks on button
+  const [files, setFiles] = useState([]);
+  const [isPicking, setIsPicking] = useState(false);
+  // Current course year
+  const currentYear = new Date().getFullYear();
+  const currentMonthNumber = new Date().getMonth() + 1;
+  const course_year = (currentMonthNumber >= 8 ? `${currentYear}-${currentYear + 1}` : `${currentYear - 1}-${currentYear}`);
 
   // ================= Get current organization =================
   useEffect(() => {
@@ -80,22 +92,28 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   }, [selectedOrganization]); // Dépendance sur selectedOrganization
 
   const fetchPrograms = async () => {
+    if (loading) return;
+    setLoading(true);
+
     try {
-      const currentYear = new Date().getFullYear();
-      const currentMonthNumber = new Date().getMonth() + 1;
-      const course_year = (currentMonthNumber >= 8 ? `${currentYear}-${currentYear + 1}` : `${currentYear - 1}-${currentYear}`);
       const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
       setPrograms(response.data.data); // Mettre à jour la liste des programmes
+      setSelectedProgram(response.data.data[0]);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching programs:', error);
+      setLoading(false);
     }
   };
 
   // Ajouter un nouveau programme via API
   const addNewProgram = async () => {
+    setIsLoading(true);
+
     const formData = new FormData();
-    formData.append('course_year', year);
+
+    formData.append('course_year', course_year);
     formData.append('class', newClass);
     formData.append('document_url', {
       uri: pdfUri, // URI du fichier PDF
@@ -107,23 +125,39 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       const response = await axios.post(`${API.boongo_url}/program/add_organization_program/${organization_id}`, formData, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
       fetchPrograms(); // Recharger les programmes après ajout
-      setModalVisible(false); // Fermer le modal
+      setSelectedProgram(response.data.data);
+      setFormModalVisible(false); // Fermer le modal
+      setIsLoading(false);
     } catch (error) {
       console.error('Error adding program:', error);
+      setIsLoading(false);
     }
   };
 
+  // ================= Handlers =================
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPrograms([]);
+    await fetchPrograms();
+    setRefreshing(false);
+    console.log(selectedProgram.files[0].file_url);
+  };
+
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    scrollViewListRef.current?.scrollTo({ y: 0, animated: true });
   };
 
   const handleBadgeClick = async (programId) => {
+    setLoading(true);
+
     try {
       const response = await axios.get(`${API.boongo_url}/program/${programId}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
       setSelectedProgram(response.data.data);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching program details:', error);
+      setLoading(false);
     }
   };
 
@@ -137,15 +171,15 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
         onPress={() => handleBadgeClick(item.id)}
         style={
           isSelected
-            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
-            : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]
+            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.danger, borderWidth: 0 }]
+            : [homeStyles.categoryBadge, { backgroundColor: 'white', borderWidth: 1, borderColor: COLORS.danger }]
         }
         underlayColor={COLORS.light_secondary}
       >
         <Text
           style={
             isSelected
-              ? [homeStyles.categoryBadgeTextSelected, { color: COLORS.black }]
+              ? [homeStyles.categoryBadgeTextSelected, { color: 'white' }]
               : [homeStyles.categoryBadgeText, { color: 'black' }]
           }
         >
@@ -155,17 +189,85 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     );
   };
 
+  // =============== Truncate file name for PDF ===============
+  const truncateFileName = (name, maxLength = 30) => {
+    if (name.length <= maxLength) return name;
+    const start = name.slice(0, 15);
+    const end = name.slice(-12);
+    return `${start} ... ${end}`;
+  };
+
+  // =============== Get icon for PDF file ===============
+  const getIconName = (fileName) => {
+    const ext = fileName.split('.').pop().toLowerCase();
+    if (ext === 'pdf') return 'file-document-outline';
+    return 'file-outline'; // Default icon if not PDF
+  };
+
+  // Accepted extensions for a single PDF file
+  const acceptedExtensions = ['pdf'];
+
+  // =============== Filter valid extension for single PDF ===============
+  const filterValidFiles = (files) => {
+    return files.filter(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return acceptedExtensions.includes(ext);
+    });
+  };
+
+  // =============== Handle File Selection for single PDF ===============
+  const pickFile = async () => {
+    if (isPicking) return;
+    setIsPicking(true);
+
+    try {
+      const selectedFiles = await pick({
+        mode: 'import',
+        allowMultiSelection: false,  // Only allow one file
+        types: [docTypes.pdf],        // Only allow PDF files
+      });
+
+      const validFiles = filterValidFiles(selectedFiles);
+
+      if (validFiles.length === 0) {
+        ToastAndroid.show(t('error.invalid_file_type'), ToastAndroid.LONG);
+        console.warn("Le fichier sélectionné n'est pas un PDF valide.");
+        return;
+      }
+
+      setFiles(validFiles); // Set only the first valid PDF file
+
+    } catch (err) {
+      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) {
+        console.log('L’utilisateur a annulé la sélection.');
+      } else {
+        console.error('Erreur lors de la sélection de fichier:', err);
+      }
+    } finally {
+      setIsPicking(false); // reset, even in the case of error
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+      <Spinner visible={isLoading} />
+
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]} onPress={scrollToTop}>
           <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
-      <Animated.ScrollView contentContainerStyle={{ flexGrow: 1 }} onScroll={handleScroll}>
-        <View style={{ flex: 1, paddingTop: headerHeight + 48 }}>
-          {/* FlatList des programmes/classes */}
+      <Animated.ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        ref={scrollViewListRef}
+        onScroll={handleScroll}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
+      >
+        <View style={{ flex: 1, paddingTop: headerHeight + TAB_BAR_HEIGHT }}>
+          {/* Classes list */}
           <FlatList
             data={programs}
             keyExtractor={item => item.id.toString()}
@@ -178,38 +280,163 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
             }}
             renderItem={({ item }) => <ProgramItem item={item} />}
             ListFooterComponent={
-              <TouchableOpacity style={[homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]} onPress={() => setModalVisible(true)}>
-                <Text style={[homeStyles.categoryBadgeText, { color: 'black' }]}>+ {t('add')}</Text>
+              <TouchableOpacity style={{ width: 32, height: 32, backgroundColor: COLORS.danger, padding: 2.5, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(true)}>
+                <Icon name='plus' size={28} color='white' />
               </TouchableOpacity>
             }
           />
 
-          {/* Détails du programme */}
           {selectedProgram ? (
-            <View style={{ marginTop: 20, padding: 20 }}>
-              <Text>Classe: {selectedProgram.class}</Text>
-              <Text>Année: {selectedProgram.course_year.year}</Text>
-              <Pdf source={{ uri: selectedProgram.files[0].file_url, cache: true }} />
-            </View>
+            <>
+              {/* Program details */}
+              <View style={{ flexDirection: 'row', padding: PADDING.p03 }}>
+                <View style={{ width: 160 }}>
+                  <Pdf
+                    trustAllCerts={false}
+                    source={{ uri: selectedProgram.files[0].file_url, cache: true }}
+                    onLoadComplete={(numberOfPages, filePath) => {
+                      console.log(`Number of pages: ${numberOfPages}`);
+                    }}
+                    onPageChanged={(page, numberOfPages) => {
+                      console.log(`Current page: ${page}`);
+                    }}
+                    onError={(error) => {
+                      console.log(error);
+                    }}
+                    onPressLink={(uri) => {
+                      console.log(`Link pressed: ${uri}`);
+                    }}
+                    page={pdfPage}
+                    style={{ flex: 1, width: '100%', height: 230 }} />
+                </View>
+
+                <View style={{ flexShrink: 1, marginLeft: PADDING.p01, marginTop: PADDING.p05 }}>
+                  <Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.black, textAlign: 'left' }}>{t('program.title', { class: selectedProgram.class, course_year: selectedProgram.course_year.year })}</Text>
+                  <TouchableOpacity style={homeStyles.linkIcon} onPress={() => setPdfModalVisible(true)}>
+                    <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
+                    <Icon name='dock-window' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Modal to see program details */}
+              <Modal visible={pdfModalVisible} animationType='slide'>
+                <SafeAreaView contentContainerStyle={{ flexGrow: 1, padding: PADDING.p05, backgroundColor: COLORS.white }}>
+                  <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setPdfModalVisible(false)}>
+                    <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
+                  </TouchableOpacity>
+
+                  <View style={{ height: Dimensions.get('window').height - 5, justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <Pdf
+                      trustAllCerts={false}
+                      source={{ uri: selectedProgram.files[0].file_url, cache: true }}
+                      onLoadComplete={(numberOfPages, filePath) => {
+                        console.log(`Number of pages: ${numberOfPages}`);
+                      }}
+                      onPageChanged={(page, numberOfPages) => {
+                        console.log(`Current page: ${page}`);
+                        // setPdfPage(page);
+                      }}
+                      onError={(error) => {
+                        console.log(error);
+                      }}
+                      onPressLink={(uri) => {
+                        console.log(`Link pressed: ${uri}`);
+                      }}
+                      page={pdfPage}
+                      style={{ flex: 1, width: Dimensions.get('window').width, height: Dimensions.get('window').height, }} />
+                  </View>
+                </SafeAreaView>
+              </Modal>
+            </>
+
           ) : (
-            <EmptyListComponent iconName="file-document-outline" title={t('empty_list.title')} description={t('empty_list.description_establishment_programs')} />
+            <>
+              {/* Empty list message */}
+              <EmptyListComponent iconName="file-document-outline" title={t('empty_list.title')} description={t('empty_list.description_establishment_programs')} />
+            </>
           )}
 
-          {/* Modal pour ajouter un programme */}
-          <Modal visible={modalVisible} animationType="slide">
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 20, padding: 20 }}>
+
+          {/* Modal to add a program */}
+          <Modal visible={formModalVisible} animationType='slide'>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white, padding: 20 }}>
+              {/* Close modal */}
+              <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(false)}>
+                <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
+              </TouchableOpacity>
+
+              {/* Brand / Title */}
+              <View style={[homeStyles.authlogo, { marginTop: PADDING.p05 }]}>
+                <LogoText width={200} height={48} />
+              </View>
+              <Text style={[homeStyles.authTitle, { fontSize: 21, fontWeight: '300', color: COLORS.black, textAlign: 'center' }]}>{t('program.data.title', { course_year: course_year })}</Text>
+
+              {/* Class */}
               <TextInput
                 style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-                label="Classe"
+                label={t('program.data.class')}
                 value={newClass}
-                placeholder={t('navigation.establishment.data.p_o_box')}
+                placeholder={t('program.data.class')}
                 placeholderTextColor={COLORS.dark_secondary}
                 onChangeText={setNewClass}
               />
-              {/* Ajouter un fichier PDF (par exemple via react-native-document-picker) */}
-              <Button title="Choisir un fichier" onPress={() => {/* Logic to choose file */ }} />
-              <Button title="Ajouter" onPress={addNewProgram} />
-              <Button title="Fermer" onPress={() => setModalVisible(false)} />
+
+              {/* Selected file */}
+              {files.length > 0 ? (
+                <>
+                  <FlatList
+                    data={files}
+                    scrollEnabled={false}
+                    nestedScrollEnabled
+                    keyExtractor={(item, index) => index.toString()}
+                    style={{ flexGrow: 0 }}
+                    renderItem={({ item, index }) => (
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: PADDING.p01, }}>
+                        {/* Icon associated with the file */}
+                        <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
+
+                        {/* File name */}
+                        <Text style={{ flex: 1, color: COLORS.black }}>{truncateFileName(item.name)}</Text>
+
+                        {/* Button to delete */}
+                        <TouchableOpacity style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8, }}
+                          onPress={() => {
+                            const updatedFiles = [...files];
+                            updatedFiles.splice(index, 1);
+                            setFiles(updatedFiles);
+                          }}
+                        >
+                          <Icon name="close" size={16} color="white" />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                </>
+              ) : (
+                <>
+                  {/* Select File */}
+                  <TouchableOpacity
+                    style={[homeStyles.authCancel, {
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      alignSelf: 'center',
+                      width: 230,
+                      borderColor: COLORS.dark_secondary,
+                      marginVertical: PADDING.p03,
+                      paddingVertical: PADDING.p00
+                    }]} onPress={pickFile} disabled={isPicking}>
+                    <Icon name='paperclip' color={COLORS.dark_secondary} size={30} />
+                    <Text style={[homeStyles.authText, { color: COLORS.dark_secondary, marginLeft: PADDING.p01 }]}>{t('program.data.file')}</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {/* Submit */}
+              <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={addNewProgram}>
+                <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
+              </Button>
             </View>
           </Modal>
         </View>
@@ -553,7 +780,7 @@ const OrganizationDataScreen = () => {
 
     } else {
       if (newIndex === 0 && scheduleListRef.current) {
-        scheduleListRef.current.scrollToOffset({ offset, animated: true });
+        scheduleListRef.current.scrollTo({ offset, animated: true });
 
       } else if (newIndex === 1 && eventListRef.current) {
         eventListRef.current.scrollToOffset({ offset, animated: true });

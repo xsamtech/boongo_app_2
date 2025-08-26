@@ -296,7 +296,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
     );
 
     const renderReportModal = () => {
-        <Modal visible={reportModalVisible} transparent={true} animationType="slide" onRequestClose={() => setReportModalVisible(false)}>
+        <Modal visible={reportModalVisible} transparent={true} animationType='slide' onRequestClose={() => setReportModalVisible(false)}>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                 <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' }}>
                     {/* Title */}

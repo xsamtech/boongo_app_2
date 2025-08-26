@@ -166,6 +166,14 @@
     "cut": "Kata",
     "report": "Funda",
     "change_organization": "Bongola organization",
+    "program": {
+        "title": "Programme ya {{ class }} pona {{ course_year }}",
+        "data": {
+            "title": "Bakisa kelasi to pe promotion pona mbula oyo ya kotanga ({{ course_year }})",
+            "class": "Kelasi / Promotion",
+            "file": "Kotisa document"
+        }
+    },
     "select_report_reason": "Pona tina yako funda",
     "explanation_optional": "Explication (Facultatif)",
     "delete": {

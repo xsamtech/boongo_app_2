@@ -4,10 +4,10 @@
  */
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, FlatList, ToastAndroid } from 'react-native';
-import { ActivityIndicator, Button, Checkbox, RadioButton } from 'react-native-paper';
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Button, Checkbox, RadioButton } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { TextInputMask } from 'react-native-masked-text';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -146,7 +146,6 @@ const AddWorkScreen = () => {
       setCategories(defaultCategories);
     }
   };
-
 
   // =============== Truncate long file name ===============
   const truncateFileName = (name, maxLength = 30) => {
