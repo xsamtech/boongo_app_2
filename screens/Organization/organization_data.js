@@ -3,12 +3,15 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, ToastAndroid } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, ToastAndroid, Platform } from 'react-native'
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'react-native-paper';
 import { TabBar, TabView } from 'react-native-tab-view';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import Pdf from 'react-native-pdf';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,6 +19,7 @@ import axios from 'axios';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE, WEB } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import EmptyListComponent from '../../components/empty_list';
+import EntityItemComponent from '../../components/entity_item';
 import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
@@ -39,8 +43,8 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [pdfPage, setPdfPage] = useState(1);
   // Form data
-  const [formModalVisible, setFormModalVisible] = useState(false);
-  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  const [formProgramModalVisible, setFormProgramModalVisible] = useState(false);
+  const [docProgramModalVisible, setDocProgramModalVisible] = useState(false);
   const [newClass, setNewClass] = useState('');
   // Loaders
   const [isLoaded, setIsLoaded] = useState(false);
@@ -86,7 +90,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   // ================= Get programs =================
   useEffect(() => {
     if (selectedOrganization.id && isLoaded === false) {
-      fetchPrograms(); // Appelez fetchPrograms une fois l'organisation disponible
+      fetchPrograms(); // Call fetchPrograms once organization is available
     }
   }, [selectedOrganization]);
 
@@ -94,7 +98,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     try {
       const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
-      setPrograms(response.data.data); // Mettre à jour la liste des programmes
+      setPrograms(response.data.data); // Update programs list
       setSelectedProgram(response.data.data[0]);
       setIsLoaded(true);
     } catch (error) {
@@ -124,7 +128,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
 
       fetchPrograms(); // Reload programs after adding
       setSelectedProgram(response.data.data);
-      setFormModalVisible(false); // Close modal
+      setFormProgramModalVisible(false); // Close modal
       setIsLoading(false);
     } catch (error) {
       console.error('Error adding program:', error);
@@ -256,8 +260,8 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       <Spinner visible={isLoading} />
 
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]} onPress={scrollToTop}>
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -283,7 +287,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
             }}
             renderItem={({ item }) => <ProgramItem item={item} />}
             ListFooterComponent={
-              <TouchableOpacity style={{ width: 32, height: 32, backgroundColor: COLORS.primary, padding: 2.5, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(true)}>
+              <TouchableOpacity style={{ width: 32, height: 32, backgroundColor: COLORS.primary, padding: 2.5, borderRadius: 37 / 2 }} onPress={() => setFormProgramModalVisible(true)}>
                 <Icon name='plus' size={28} color='black' />
               </TouchableOpacity>
             }
@@ -319,7 +323,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
 
                     <View style={{ flexShrink: 1, marginLeft: PADDING.p01, marginTop: PADDING.p05 }}>
                       <Text style={{ fontSize: TEXT_SIZE.title, color: COLORS.black, textAlign: 'left' }}>{t('program.title', { class: selectedProgram.class, course_year: selectedProgram.course_year.year })}</Text>
-                      <TouchableOpacity style={homeStyles.linkIcon} onPress={() => setPdfModalVisible(true)}>
+                      <TouchableOpacity style={homeStyles.linkIcon} onPress={() => setDocProgramModalVisible(true)}>
                         <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
                         <Icon name='dock-window' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
                       </TouchableOpacity>
@@ -327,9 +331,9 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
                   </View>
 
                   {/* Modal to see program details */}
-                  <Modal visible={pdfModalVisible} animationType='slide'>
+                  <Modal visible={docProgramModalVisible} animationType='slide'>
                     <SafeAreaView contentContainerStyle={{ flexGrow: 1, padding: PADDING.p05, backgroundColor: COLORS.white }}>
-                      <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setPdfModalVisible(false)}>
+                      <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setDocProgramModalVisible(false)}>
                         <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
                       </TouchableOpacity>
 
@@ -367,10 +371,10 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
           )}
 
           {/* Modal to add a program */}
-          <Modal visible={formModalVisible} animationType='slide'>
+          <Modal visible={formProgramModalVisible} animationType='slide'>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.white, padding: 20 }}>
               {/* Close modal */}
-              <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormModalVisible(false)}>
+              <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormProgramModalVisible(false)}>
                 <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
               </TouchableOpacity>
 
@@ -470,7 +474,27 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { organization_id, type } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
-  const flatListRef = listRef || useRef(null);
+  // Events list data
+  const [events, setEvents] = useState([]);
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
+  // Form data
+  const [formEventModalVisible, setFormEventModalVisible] = useState(false);
+  const [eventTitle, setEventTitle] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [eventPlace, setEventPlace] = useState('');
+  const [imageData, setImageData] = useState(null);
+  const [isOnline, setIsOnline] = useState(false); const flatListRef = listRef || useRef(null);
+  // Show picker
+  const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+  const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+  // Loaders
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // ================= Get current organization =================
   useEffect(() => {
@@ -500,30 +524,174 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       });
   };
 
+  // ================= Get events list =================
+  useEffect(() => {
+    if (selectedOrganization.id) {
+      fetchEvents(1); // INITIAL LOADING : Call fetchEvents once organization is available
+    }
+  }, [selectedOrganization]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchEvents(page);
+    }
+  }, [page]);
+
+  const fetchEvents = async (pageToFetch = 1) => {
+    if (isLoading || pageToFetch > lastPage) return;
+
+    try {
+      const response = await axios.get(`${API.boongo_url}/event/find_by_organization/${organization_id}?page=${pageToFetch}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+
+      if (pageToFetch === 1) {
+        setEvents(response.data.data);
+
+      } else {
+        setEvents(prev => [...prev, ...response.data.data]);
+      }
+
+      setAd(response.data.ad);
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =============== Handle Image Picker ===============
+  const imagePick = () => {
+    ImagePicker.openPicker({
+      width: 700,
+      height: 700,
+      cropping: true,
+      includeBase64: true
+    }).then(image => {
+      setImageData(`data:${image.mime};base64,${image.data}`);
+    }).catch(error => {
+      console.log(`${error}`);
+    });
+  };
+
+  // =============== Handle Add New Event ===============
+  const handleAddEvent = async () => {
+    setIsLoading(true);
+
+    const formData = new FormData();
+
+    formData.append('event_title', eventTitle || '');
+    formData.append('event_description', eventDescription || '');
+    formData.append('start_at', startDate.toISOString());
+    formData.append('end_at', endDate.toISOString());
+    formData.append('event_place', (isOnline ? '' : eventPlace));
+    formData.append('image_64', imageData);
+    formData.append('type_id', 36);
+    formData.append('status_id', 11);
+    formData.append('organization_id', selectedOrganization.id);
+
+    try {
+      const response = await fetch(`${API.boongo_url}/event`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-localization': 'fr',
+          'Authorization': `Bearer ${userInfo.api_token}`
+        },
+        body: formData,
+      });
+
+      const text = await response.text();
+      const json = JSON.parse(text);
+
+      // Reset all after success
+      setEventTitle('');
+      setEventDescription('');
+      setStartDate(new Date());
+      setEventPlace(new Date());
+      setImageData('');
+
+      console.log(json);
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+
+    setIsLoading(false);
+  };
+
+  // =============== Manage the display of date pickers ===============
+  const handleDateChange = (event, selectedDate, type) => {
+    const currentDate = selectedDate || (type === 'start' ? startDate : endDate);
+
+    if (type === 'start') {
+      setStartDate(currentDate);
+      setShowStartDatePicker(false);
+
+    } else {
+      setEndDate(currentDate);
+      setShowEndDatePicker(false);
+    }
+  };
+
+  // =============== Other functions ===============
   const scrollToTop = () => {
     flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
 
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   setPage(1);
-  //   await fetchCircles(1);
-  //   setRefreshing(false);
-  // };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    await fetchEvents(1);
+    setRefreshing(false);
+  };
 
-  // const onEndReached = () => {
-  //   if (!isLoading && page < lastPage) {
-  //     const nextPage = page + 1;
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      const nextPage = page + 1;
 
-  //     setPage(nextPage); // Update the page
-  //   }
-  // };
+      setPage(nextPage); // Update the page
+    }
+  };
 
-  // const combinedData = [...circles];
+  const combinedData = [...events];
 
-  // if (ad) {
-  //   combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
-  // }
+  if (ad) {
+    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
+  }
+
+  // =============== Event item ===============
+  const EventItemComponent = ({ item }) => {
+    return (
+      <Pressable onPress={handlePress} style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: PADDING.p03,
+        backgroundColor: COLORS.white
+      }}>
+        <Image
+          source={{ uri: item.cover_url }}
+          style={{
+            width: IMAGE_SIZE.s13,
+            height: IMAGE_SIZE.s13,
+            borderRadius: PADDING.p00,
+            marginRight: PADDING.p03,
+            borderWidth: 1,
+            borderColor: COLORS.light_secondary
+          }}
+        />
+        <View style={{ flex: 1 }}>
+          <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{`${item.event_title}`}</Text>
+          <Text numberOfLines={2} style={{ color: COLORS.dark_secondary }}>{`${item.event_description}`}</Text>
+        </View>
+        <Icon name="chevron-right" size={IMAGE_SIZE.s05} color={COLORS.black} />
+      </Pressable>
+    );
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
@@ -532,9 +700,127 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}>
+        <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      </TouchableOpacity>
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Events list */}
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Events List */}
+          <Animated.FlatList
+            ref={flatListRef}
+            data={combinedData}
+            keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
+            renderItem={({ item }) => (
+              <EventItemComponent item={item} />
+            )}
+            showsVerticalScrollIndicator={false}
+            onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingTop: headerHeight + TAB_BAR_HEIGHT }}
+            windowSize={10}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
+            ListEmptyComponent={<EmptyListComponent iconName='calendar-outline' title={t('empty_list.title')} description={t('empty_list.description_establishment_events')} />}
+            ListFooterComponent={() =>
+              isLoading ? (
+                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
+              ) : null
+            }
+          />
+        </View>
 
+        {/* Modal to add an event */}
+        <Modal animationType='slide' transparent={true} visible={formEventModalVisible} onRequestClose={() => setFormEventModalVisible(false)}>
+          <View style={{ flex: 1, alignItems: 'center', backgroundColor: COLORS.white, padding: 20 }}>
+            {/* Close modal */}
+            <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormEventModalVisible(false)}>
+              <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
+            </TouchableOpacity>
+
+            <TextInput
+              placeholder="Titre de l'événement"
+              value={eventTitle}
+              onChangeText={setEventTitle}
+              style={{ borderBottomWidth: 1, marginBottom: 10 }}
+            />
+
+            <TextInput
+              placeholder="Description"
+              value={eventDescription}
+              onChangeText={setEventDescription}
+              style={{ borderBottomWidth: 1, marginBottom: 10 }}
+            />
+
+            {/* Sélection de la date de début */}
+            <Text>Date de début</Text>
+            <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
+              <Text>{startDate.toLocaleString()}</Text>
+            </TouchableOpacity>
+            
+            {/* Affichage DateTimePickerModal pour la date de début */}
+            <DateTimePickerModal
+              isVisible={isStartPickerVisible}
+              mode="datetime"
+              date={startDate}
+              onConfirm={date => {
+                setStartDate(date);
+                setStartPickerVisible(false);  // ← refermer en premier :contentReference[oaicite:1]{index=1}
+              }}
+              onCancel={() => setStartPickerVisible(false)}
+            />
+
+            {/* Sélection de la date de fin */}
+            <Text>Date de fin</Text>
+            <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
+              <Text>{endDate.toLocaleString()}</Text>
+            </TouchableOpacity>
+
+            {/* Affichage DateTimePickerModal pour la date de fin */}
+            <DateTimePickerModal
+              isVisible={isEndPickerVisible}
+              mode="datetime"
+              date={endDate}
+              onConfirm={date => {
+                setEndDate(date);
+                setEndPickerVisible(false);
+              }}
+              onCancel={() => setEndPickerVisible(false)}
+            />
+
+            {/* Choisir si l'événement est en ligne */}
+            <TouchableOpacity onPress={() => setIsOnline(!isOnline)}>
+              <Text>{isOnline ? "Événement en ligne" : "Événement physique"}</Text>
+            </TouchableOpacity>
+
+            {/* Champ de lieu ou URL */}
+            {!isOnline && (
+              <TextInput
+                placeholder="Lieu"
+                value={eventPlace}
+                onChangeText={setEventPlace}
+                style={{ borderBottomWidth: 1, marginBottom: 10 }}
+              />
+            )}
+            {isOnline && (
+              <TextInput
+                placeholder="URL de l'événement"
+                value={eventPlace}
+                onChangeText={setEventPlace}
+                style={{ borderBottomWidth: 1, marginBottom: 10 }}
+              />
+            )}
+
+            {/* Submit */}
+            <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleAddEvent}>
+              <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
+            </Button>
+          </View>
+        </Modal>
       </SafeAreaView>
     </View>
   );
@@ -601,7 +887,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -673,7 +959,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 

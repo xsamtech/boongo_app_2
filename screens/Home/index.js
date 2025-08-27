@@ -313,7 +313,7 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 

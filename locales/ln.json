@@ -140,6 +140,19 @@
         "selected_files": "Ba fichiers otie :",
         "max_files": "Limite ya {{ count }} fichiers ekoki. Ba fichiers misusu ekoti te."
     },
+    "event": {
+        "create": "Kela milulu",
+        "update": "Bongola milulu",
+        "data": {
+            "event_title": "Kombo ya milulu",
+            "event_description": "Lobela oyo etali milulu",
+            "start_at": "Mokolo/Ngonga ya ebandeli",
+            "end_at": "Mokolo/Ngonga ya suka",
+            "is_online": "Milulu na Internet (Webinaire)",
+            "event_place": "Esika ya milulu",
+            "cover_url": "Bakisa couverture"
+        }
+    },
     "most_popular": "Oyo eza na lupemba ya makasi",
     "have_account": "Ozali déjà na compte?",
     "no_account": "Ozali na compte te?",

@@ -181,7 +181,7 @@ const MyWorks = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => 
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -399,7 +399,7 @@ const MyCart = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
             onPress={scrollToTop}
           >
-            <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+            <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
           </TouchableOpacity>
         )}
 
@@ -542,7 +542,7 @@ const MySubscribers = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name="chevron-double-up" size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 

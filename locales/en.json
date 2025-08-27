@@ -140,6 +140,19 @@
         "selected_files": "Selected files:",
         "max_files": "Limit of {{ count }} files reached. Some files were skipped."
     },
+    "event": {
+        "create": "Create an event",
+        "update": "Edit the event",
+        "data": {
+            "event_title": "Event title",
+            "event_description": "Event details",
+            "start_at": "Start Date/Time",
+            "end_at": "End Date/Time",
+            "is_online": "Online Event (Webinar)",
+            "event_place": "Event location",
+            "cover_url": "Add a cover"
+        }
+    },
     "most_popular": "The most popular",
     "have_account": "Already have an account?",
     "no_account": "Don’t have an account?",

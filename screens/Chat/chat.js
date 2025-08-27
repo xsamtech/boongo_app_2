@@ -654,7 +654,7 @@ const EventsTab = ({ handleScroll, showBackToTop, listRef, doc_title, doc_page, 
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.boongo_url}/user/member_groups/event/${userInfo.id}/15`;
+    const url = `${API.boongo_url}/user/member_groups/event/${userInfo.id}/15?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
