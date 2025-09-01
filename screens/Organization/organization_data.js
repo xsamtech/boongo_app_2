@@ -540,7 +540,6 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   const fetchEvents = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
-    setIsLoading(true);
 
     try {
       const response = await axios.get(`${API.boongo_url}/event/find_by_organization/${organization_id}?page=${pageToFetch}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
@@ -555,7 +554,6 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       setAd(response.data.ad);
       setLastPage(response.data.lastPage);
       setCount(response.data.count);
-      setIsLoading(false);
     } catch (error) {
       if (error.response?.status === 429) {
         console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
@@ -935,9 +933,9 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   };
 
   // ================= Get events list =================
-  useEffect(async () => {
+  useEffect(() => {
     if (selectedOrganization.id) {
-      await fetchBooks(1); // INITIAL LOADING : Call fetchBooks once organization is available
+      fetchBooks(1); // INITIAL LOADING : Call fetchBooks once organization is available
     }
   }, [selectedOrganization]);
 
