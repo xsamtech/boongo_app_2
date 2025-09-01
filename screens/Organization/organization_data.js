@@ -3,13 +3,12 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, ToastAndroid, Platform } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, FlatList, Text, Image, StatusBar, TextInput, Linking, ScrollView, Modal, ToastAndroid, Platform, Pressable } from 'react-native'
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'react-native-paper';
 import { TabBar, TabView } from 'react-native-tab-view';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import Pdf from 'react-native-pdf';
@@ -23,6 +22,7 @@ import EntityItemComponent from '../../components/entity_item';
 import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
+import WorkItemComponent from '../../components/work_item';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -471,7 +471,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
   const route = useRoute();
-  const { organization_id, type } = route.params;
+  const { organization_id } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
   // Events list data
@@ -484,6 +484,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const [formEventModalVisible, setFormEventModalVisible] = useState(false);
   const [eventTitle, setEventTitle] = useState('');
   const [eventDescription, setEventDescription] = useState('');
+  const [inputDescHeight, setInputDescHeight] = useState(40);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [eventPlace, setEventPlace] = useState('');
@@ -539,6 +540,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   const fetchEvents = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
+    setIsLoading(true);
 
     try {
       const response = await axios.get(`${API.boongo_url}/event/find_by_organization/${organization_id}?page=${pageToFetch}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
@@ -553,6 +555,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       setAd(response.data.ad);
       setLastPage(response.data.lastPage);
       setCount(response.data.count);
+      setIsLoading(false);
     } catch (error) {
       if (error.response?.status === 429) {
         console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
@@ -578,64 +581,48 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     });
   };
 
-  // =============== Handle Add New Event ===============
-  const handleAddEvent = async () => {
-    setIsLoading(true);
-
-    const formData = new FormData();
-
-    formData.append('event_title', eventTitle || '');
-    formData.append('event_description', eventDescription || '');
-    formData.append('start_at', startDate.toISOString());
-    formData.append('end_at', endDate.toISOString());
-    formData.append('event_place', (isOnline ? '' : eventPlace));
-    formData.append('image_64', imageData);
-    formData.append('type_id', 36);
-    formData.append('status_id', 11);
-    formData.append('organization_id', selectedOrganization.id);
-
-    try {
-      const response = await fetch(`${API.boongo_url}/event`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'X-localization': 'fr',
-          'Authorization': `Bearer ${userInfo.api_token}`
-        },
-        body: formData,
-      });
-
-      const text = await response.text();
-      const json = JSON.parse(text);
-
-      // Reset all after success
-      setEventTitle('');
-      setEventDescription('');
-      setStartDate(new Date());
-      setEventPlace(new Date());
-      setImageData('');
-
-      console.log(json);
-
-    } catch (error) {
-      console.error('Error:', error);
-    }
-
-    setIsLoading(false);
+  // =============== Format Datetime ===============
+  const formatDateForSQL = (date) => {
+    return date.toISOString().slice(0, 19).replace('T', ' '); // Format 'YYYY-MM-DD HH:MM:SS'
   };
 
-  // =============== Manage the display of date pickers ===============
-  const handleDateChange = (event, selectedDate, type) => {
-    const currentDate = selectedDate || (type === 'start' ? startDate : endDate);
+  // =============== Handle Add New Event ===============
+  const handleAddEvent = () => {
+    setIsLoading(true);
 
-    if (type === 'start') {
-      setStartDate(currentDate);
-      setShowStartDatePicker(false);
+    axios.post(`${API.boongo_url}/event`, {
+      event_title: eventTitle, event_description: eventDescription, start_at: formatDateForSQL(startDate), end_at: formatDateForSQL(endDate), event_place: (isOnline ? '' : eventPlace), image_64: imageData, type_id: 36, status_id: 11, organization_id: selectedOrganization.id
+    }, {
+      headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+    }).then(res => {
+      const message = res.data.message;
+      const userData = res.data.data.user;
 
-    } else {
-      setEndDate(currentDate);
-      setShowEndDatePicker(false);
-    }
+      setStartRegisterInfo(userData);
+
+      ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+      console.log(`${message}`);
+
+      setFormEventModalVisible(false);
+      setIsLoading(false);
+
+    }).catch(error => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+        console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+      } else if (error.request) {
+        // The request was made but no response was received
+        ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+      } else {
+        // An error occurred while configuring the query
+        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+      }
+
+      setIsLoading(false);
+    });
   };
 
   // =============== Other functions ===============
@@ -665,9 +652,9 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }
 
   // =============== Event item ===============
-  const EventItemComponent = ({ item }) => {
+  const EventItemComponent = ({ item, event_id, event_title, event_profile }) => {
     return (
-      <Pressable onPress={handlePress} style={{
+      <Pressable onPress={() => { navigation.navigate('NewChat', { chat_entity: 'event', chat_entity_id: event_id, chat_entity_name: event_title, chat_entity_profile: event_profile }) }} style={{
         flexDirection: 'row',
         alignItems: 'center',
         padding: PADDING.p03,
@@ -695,6 +682,8 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+      <Spinner visible={isLoading} />
+
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
@@ -713,7 +702,12 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             data={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
             renderItem={({ item }) => (
-              <EventItemComponent item={item} />
+              <EventItemComponent
+                item={item}
+                event_id={item.id}
+                event_title={item.event_title}
+                event_profile={item.cover_url}
+              />
             )}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -736,90 +730,125 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
         {/* Modal to add an event */}
         <Modal animationType='slide' transparent={true} visible={formEventModalVisible} onRequestClose={() => setFormEventModalVisible(false)}>
-          <View style={{ flex: 1, alignItems: 'center', backgroundColor: COLORS.white, padding: 20 }}>
+          <ScrollView style={{ flex: 1, backgroundColor: COLORS.white }}>
             {/* Close modal */}
             <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormEventModalVisible(false)}>
               <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
             </TouchableOpacity>
 
-            <TextInput
-              placeholder="Titre de l'événement"
-              value={eventTitle}
-              onChangeText={setEventTitle}
-              style={{ borderBottomWidth: 1, marginBottom: 10 }}
-            />
+            {/* Brand / Title */}
+            <View style={[homeStyles.authlogo, { marginTop: PADDING.p15 }]}>
+              <LogoText width={200} height={48} />
+            </View>
+            <Text style={[homeStyles.authTitle, { fontSize: 21, fontWeight: '300', color: COLORS.black, textAlign: 'center' }]}>{t('event.create')}</Text>
 
-            <TextInput
-              placeholder="Description"
-              value={eventDescription}
-              onChangeText={setEventDescription}
-              style={{ borderBottomWidth: 1, marginBottom: 10 }}
-            />
+            {/* Event cover */}
+            <View style={{ position: 'relative', width: Dimensions.get('window').width, marginVertical: PADDING.p01 }}>
+              <TouchableOpacity style={{ position: 'absolute', top: 10, right: 10, zIndex: 9, backgroundColor: COLORS.primary, marginLeft: 140, borderRadius: 40 / 2, padding: PADDING.p01 }} onPress={imagePick}>
+                <Icon name='lead-pencil' size={20} color='white' />
+              </TouchableOpacity>
+              <Image style={{ width: Dimensions.get('window').width, height: 250 }} source={{ uri: imageData || `${WEB.boongo_url}/assets/img/banner-event.png` }} />
+            </View>
 
-            {/* Sélection de la date de début */}
-            <Text>Date de début</Text>
-            <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
-              <Text>{startDate.toLocaleString()}</Text>
-            </TouchableOpacity>
-            
-            {/* Affichage DateTimePickerModal pour la date de début */}
-            <DateTimePickerModal
-              isVisible={isStartPickerVisible}
-              mode="datetime"
-              date={startDate}
-              onConfirm={date => {
-                setStartDate(date);
-                setStartPickerVisible(false);  // ← refermer en premier :contentReference[oaicite:1]{index=1}
-              }}
-              onCancel={() => setStartPickerVisible(false)}
-            />
-
-            {/* Sélection de la date de fin */}
-            <Text>Date de fin</Text>
-            <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
-              <Text>{endDate.toLocaleString()}</Text>
-            </TouchableOpacity>
-
-            {/* Affichage DateTimePickerModal pour la date de fin */}
-            <DateTimePickerModal
-              isVisible={isEndPickerVisible}
-              mode="datetime"
-              date={endDate}
-              onConfirm={date => {
-                setEndDate(date);
-                setEndPickerVisible(false);
-              }}
-              onCancel={() => setEndPickerVisible(false)}
-            />
-
-            {/* Choisir si l'événement est en ligne */}
-            <TouchableOpacity onPress={() => setIsOnline(!isOnline)}>
-              <Text>{isOnline ? "Événement en ligne" : "Événement physique"}</Text>
-            </TouchableOpacity>
-
-            {/* Champ de lieu ou URL */}
-            {!isOnline && (
+            <View style={{ padding: PADDING.p07 }}>
+              {/* Event title */}
               <TextInput
-                placeholder="Lieu"
-                value={eventPlace}
-                onChangeText={setEventPlace}
-                style={{ borderBottomWidth: 1, marginBottom: 10 }}
+                style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                label={t('event.data.event_title')}
+                value={eventTitle}
+                placeholder={t('event.data.event_title')}
+                placeholderTextColor={COLORS.dark_secondary}
+                onChangeText={setEventTitle}
               />
-            )}
-            {isOnline && (
-              <TextInput
-                placeholder="URL de l'événement"
-                value={eventPlace}
-                onChangeText={setEventPlace}
-                style={{ borderBottomWidth: 1, marginBottom: 10 }}
-              />
-            )}
 
-            {/* Submit */}
-            <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleAddEvent}>
-              <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
-            </Button>
-          </View>
+              {/* Event description */}
+              <TextInput
+                multiline
+                onContentSizeChange={(e) =>
+                  setInputDescHeight(e.nativeEvent.contentSize.height)
+                }
+                style={[homeStyles.authInput, { height: Math.max(40, inputDescHeight), color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                value={eventDescription}
+                placeholder={t('event.data.event_description')}
+                placeholderTextColor={COLORS.dark_secondary}
+                onChangeText={setEventDescription} />
+
+              <View style={{ flexDirection: 'row', width: '100%', marginBottom: PADDING.p01, padding: PADDING.p00, borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: 5 }}>
+                {/* Start at */}
+                <View style={{ width: '50%', paddingVertical: PADDING.p00 }}>
+                  <Icon name='calendar' size={IMAGE_SIZE.s09} color={COLORS.dark_secondary} style={{ alignSelf: 'center' }} />
+                  <Text style={{ textAlign: 'center', color: COLORS.dark_secondary }}>{t('event.data.start_at')}</Text>
+                  <TouchableOpacity onPress={() => setStartPickerVisible(true)}>
+                    <Text style={{ color: COLORS.black, textAlign: 'center' }}>{startDate.toLocaleString()}</Text>
+                  </TouchableOpacity>
+
+                  <DateTimePickerModal
+                    isVisible={isStartPickerVisible}
+                    mode="datetime"
+                    date={startDate}
+                    onConfirm={date => {
+                      setStartDate(date);
+                      setStartPickerVisible(false);  // ← refermer en premier :contentReference[oaicite:1]{index=1}
+                    }}
+                    onCancel={() => setStartPickerVisible(false)}
+                  />
+                </View>
+
+                {/* End at */}
+                <View style={{ width: '50%', paddingVertical: PADDING.p00 }}>
+                  <Icon name='calendar' size={IMAGE_SIZE.s09} color={COLORS.dark_secondary} style={{ alignSelf: 'center' }} />
+                  <Text style={{ textAlign: 'center', color: COLORS.dark_secondary }}>{t('event.data.end_at')}</Text>
+                  <TouchableOpacity onPress={() => setEndPickerVisible(true)}>
+                    <Text style={{ color: COLORS.black, textAlign: 'center' }}>{endDate.toLocaleString()}</Text>
+                  </TouchableOpacity>
+
+                  <DateTimePickerModal
+                    isVisible={isEndPickerVisible}
+                    mode="datetime"
+                    date={endDate}
+                    onConfirm={date => {
+                      setEndDate(date);
+                      setEndPickerVisible(false);
+                    }}
+                    onCancel={() => setEndPickerVisible(false)}
+                  />
+                </View>
+              </View>
+
+              {/* Choose whether the event is online */}
+              <View style={{ width: Dimensions.get('window').width - PADDING.p15 }}>
+                <TouchableOpacity onPress={() => setIsOnline(!isOnline)} style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: PADDING.p00 }}>
+                  <Icon name={!isOnline ? 'checkbox-blank-outline' : 'checkbox-outline'} size={IMAGE_SIZE.s07} color={!isOnline ? COLORS.dark_secondary : COLORS.black} />
+                  <Text style={{ color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.data.is_online')}</Text>
+                </TouchableOpacity>
+
+                {/* Champ de lieu ou URL */}
+                {!isOnline && (
+                  <TextInput
+                    style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                    label={t('event.data.event_place')}
+                    value={eventPlace}
+                    placeholder={t('event.data.event_place')}
+                    placeholderTextColor={COLORS.dark_secondary}
+                    onChangeText={setEventPlace}
+                  />
+                )}
+                {/* {isOnline && (
+                  <TextInput
+                    placeholder="URL de l'événement"
+                    value={eventPlace}
+                    onChangeText={setEventPlace}
+                    style={{ borderBottomWidth: 1, marginBottom: 10 }}
+                  />
+                )} */}
+              </View>
+
+              {/* Submit */}
+              <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleAddEvent}>
+                <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
+              </Button>
+            </View>
+          </ScrollView>
         </Modal>
       </SafeAreaView>
     </View>
@@ -832,13 +861,24 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Navigation ===============
+  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
   const route = useRoute();
-  const { organization_id, type } = route.params;
+  const { organization_id } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
+  const [categories, setCategories] = useState([]);
+  const [idCat, setIdCat] = useState(0);
+  const [books, setBooks] = useState([]);
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
   // ================= Get current organization =================
@@ -869,29 +909,190 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       });
   };
 
+  // ================= Get categories =================
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    const headers = {
+      'X-localization': 'fr',
+      Authorization: `Bearer ${userInfo.api_token}`,
+    };
+
+    try {
+      const res = await axios.get(`${API.boongo_url}/category/find_by_group/Catégorie%20pour%20œuvre`, { headers });
+      const data = res.data.data;
+      const itemAll = { id: 0, category_name: t('all_f'), category_name_fr: "Toutes", category_name_en: "All", category_name_ln: "Nioso", category_description: null, };
+
+      data.unshift(itemAll);
+      setCategories(data);
+      setIdCat(itemAll.id);
+
+    } catch (error) {
+      console.error('Erreur fetchCategories', error);
+    }
+  };
+
+  // ================= Get events list =================
+  useEffect(async () => {
+    if (selectedOrganization.id) {
+      await fetchBooks(1); // INITIAL LOADING : Call fetchBooks once organization is available
+    }
+  }, [selectedOrganization]);
+
+  useEffect(() => {
+    if (page > 1) {
+      fetchBooks(page);
+    }
+  }, [page]);
+
+  const fetchBooks = async (pageToFetch = 1) => {
+    if (isLoading || pageToFetch > lastPage) return;
+    setIsLoading(true);
+
+    const qs = require('qs');
+    const url = `${API.boongo_url}/work/filter_by_categories?page=${pageToFetch}`;
+    const params = {
+      'categories_ids[0]': idCat,
+      type_id: 29,
+      status_id: 17,
+      organization_id: selectedOrganization.id,
+    };
+    const headers = {
+      'X-localization': 'fr',
+      Authorization: `Bearer ${userInfo.api_token}`,
+    };
+
+    try {
+      const response = await axios.post(url, qs.stringify(params), { headers });
+      const data = response.data.data || [];
+
+      setBooks(prev => (page === 1 ? data : [...prev, ...data]));
+      setAd(response.data.ad || null);
+      setLastPage(response.data.lastPage || page);
+      setCount(response.data.count || 0);
+
+      // console.log(response.data);
+
+    } catch (error) {
+      console.error('Erreur fetchBooks', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ================= Combined data =================
+  const combinedData = [...books];
+
+  if (ad) {
+    combinedData.push({ ...ad, id: 'ad', realId: ad.id });
+  }
+
   // ================= Handlers =================
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   await getUser();
-  //   setRefreshing(false);
-  // };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    setBooks([]);
+    await fetchBooks(1);
+    setRefreshing(false);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      setPage(prev => prev + 1);
+    }
+  };
 
   const scrollToTop = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
+  const handleBadgePress = useCallback((id) => {
+    setIdCat(id);
+    setPage(1);
+    setBooks([]);
+    setLastPage(1);
+  }, []);
+
+  const CategoryItem = ({ item }) => {
+    const isSelected = idCat === item.id;
+    const Container = isSelected ? TouchableHighlight : TouchableOpacity;
+
+    return (
+      <Container
+        key={item.id}
+        onPress={() => handleBadgePress(item.id)}
+        style={
+          isSelected
+            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
+            : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]
+        }
+        underlayColor={COLORS.light_secondary}
+      >
+        <Text
+          style={
+            isSelected
+              ? [homeStyles.categoryBadgeTextSelected, { color: COLORS.black }]
+              : [homeStyles.categoryBadgeText, { color: 'black' }]
+          }
+        >
+          {item.category_name}
+        </Text>
+      </Container>
+    );
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
-        <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
-          onPress={scrollToTop}
-        >
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => navigation.navigate('AddWork', { owner: 'organization', ownerId: selectedOrganization.id })}>
+        <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      </TouchableOpacity>
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Books List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <WorkItemComponent item={item} />}
+          horizontal={false}
+          bounces={false}
+          showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: headerHeight + TAB_BAR_HEIGHT,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
+          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_user_works')} />}
+          ListHeaderComponent={
+            <>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 40, flexGrow: 0 }}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: PADDING.p00,
+                }}
+                renderItem={({ item }) => <CategoryItem item={item} />}
+              />
+            </>
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
 
       </SafeAreaView>
     </View>
@@ -908,7 +1109,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
   const route = useRoute();
-  const { organization_id, type } = route.params;
+  const { organization_id } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
   const flatListRef = listRef || useRef(null);

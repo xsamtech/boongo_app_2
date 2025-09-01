@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, FlatList, ToastAndroid } from 'react-native';
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Button, Checkbox, RadioButton } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -28,6 +28,9 @@ const AddWorkScreen = () => {
   const { t } = useTranslation();
   // =============== Get contexts ===============
   const { userInfo, changeRole } = useContext(AuthContext);
+  // =============== Get parameters ===============
+  const route = useRoute();
+  const { owner, ownerId } = route.params;
   // =============== Get data ===============
   const [workTitle, setWorkTitle] = useState('');
   const [workContent, setWorkContent] = useState('');
@@ -242,7 +245,7 @@ const AddWorkScreen = () => {
     formData.append('currency_id', currency ?? '');
     formData.append('type_id', selectedType ?? '');
     formData.append('status_id', 18);
-    formData.append('user_id', userInfo.id);
+    formData.append(`${owner}_id`, ownerId);
 
     // Add selected categories
     selectedCategories.forEach((catId) => {

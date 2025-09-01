@@ -2,22 +2,25 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Animated, { Easing, Extrapolation, interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withSpring, withTiming } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { AuthContext } from '../contexts/AuthContext';
 import { IMAGE_SIZE } from '../tools/constants';
 import useColors from '../hooks/useColors';
 
 const FloatingActionsButton = () => {
     // =============== Colors ===============
     const COLORS = useColors();
-    // =============== Navigation ===============
-    const navigation = useNavigation();
     // =============== Language ===============
     const { t } = useTranslation();
+    // =============== Navigation ===============
+    const navigation = useNavigation();
+    // =============== Get contexts ===============
+    const { userInfo } = useContext(AuthContext);
     // =============== Get data ===============
     const firstValue = useSharedValue(30);
     const secondValue = useSharedValue(30);
@@ -69,7 +72,7 @@ const FloatingActionsButton = () => {
         } else {
             firstValue.value = withDelay(300, withSpring(80));
             secondValue.value = withDelay(200, withSpring(160));
-            thirdValue.value =  withDelay(100, withSpring(240));
+            thirdValue.value = withDelay(100, withSpring(240));
             fourthValue.value = withSpring(320);
             firstWidth.value = withDelay(1300, withSpring(250));
             secondWidth.value = withDelay(1200, withSpring(250));
@@ -187,7 +190,7 @@ const FloatingActionsButton = () => {
 
             {/* Add a work */}
             <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>
-                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork'); handlePress(); }}>
+                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('AddWork', { owner: 'user', ownerId: userInfo.id }); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='book-arrow-right' size={IMAGE_SIZE.s06} color='white' />
                     </View>
