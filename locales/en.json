@@ -141,6 +141,8 @@
         "max_files": "Limit of {{ count }} files reached. Some files were skipped."
     },
     "event": {
+        "about": "About",
+        "chat": "Chat",
         "create": "Create an event",
         "update": "Edit the event",
         "data": {

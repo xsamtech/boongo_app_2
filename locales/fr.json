@@ -141,6 +141,8 @@
         "max_files": "Limite de {{ count }} fichiers atteinte. Certains fichiers ont été ignorés."
     },
     "event": {
+        "about": "A propos",
+        "chat": "Discussion",
         "create": "Créer un événement",
         "update": "Editer l’événement",
         "data": {

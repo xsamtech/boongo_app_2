@@ -18,11 +18,10 @@ import axios from 'axios';
 import { API, IMAGE_SIZE, PADDING, TEXT_SIZE, WEB } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import EmptyListComponent from '../../components/empty_list';
-import EntityItemComponent from '../../components/entity_item';
+import WorkItemComponent from '../../components/work_item';
 import LogoText from '../../assets/img/brand.svg';
 import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
-import WorkItemComponent from '../../components/work_item';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -489,7 +488,8 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const [endDate, setEndDate] = useState(new Date());
   const [eventPlace, setEventPlace] = useState('');
   const [imageData, setImageData] = useState(null);
-  const [isOnline, setIsOnline] = useState(false); const flatListRef = listRef || useRef(null);
+  const [isOnline, setIsOnline] = useState(false);
+  const flatListRef = listRef || useRef(null);
   // Show picker
   const [isStartPickerVisible, setStartPickerVisible] = useState(false);
   const [isEndPickerVisible, setEndPickerVisible] = useState(false);
@@ -698,15 +698,10 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           <Animated.FlatList
             ref={flatListRef}
             data={combinedData}
+            extraData={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
-            renderItem={({ item }) => (
-              <EventItemComponent
-                item={item}
-                event_id={item.id}
-                event_title={item.event_title}
-                event_profile={item.cover_url}
-              />
-            )}
+            renderItem={({ item }) => (<EventItemComponent item={item} event_id={item.id} event_title={item.event_title} event_profile={item.cover_url} />)}
+            horizontal={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
             onEndReached={onEndReached}
@@ -717,7 +712,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
             contentInset={{ top: 0 }}
             contentOffset={{ y: 0 }}
-            ListEmptyComponent={<EmptyListComponent iconName='calendar-outline' title={t('empty_list.title')} description={t('empty_list.description_establishment_events')} />}
+            ListEmptyComponent={<EmptyListComponent iconName='calendar-outline' title={t('empty_list.title')} description={selectedOrganization && selectedOrganization.type && selectedOrganization.type.alias ? (selectedOrganization.type.alias === 'government_organization' ? t('empty_list.description_government_events') : t('empty_list.description_establishment_events')) : '...'} />}
             ListFooterComponent={() =>
               isLoading ? (
                 <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
@@ -1023,7 +1018,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
         style={
           isSelected
             ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
-            : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]
+            : [homeStyles.categoryBadge, { backgroundColor: COLORS.info }]
         }
         underlayColor={COLORS.light_secondary}
       >
@@ -1044,10 +1039,10 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => navigation.navigate('AddWork', { owner: 'organization', ownerId: selectedOrganization.id })}>
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]} onPress={() => navigation.navigate('AddWork', { owner: 'organization', ownerId: selectedOrganization.id })}>
         <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
       </TouchableOpacity>
 
@@ -1060,19 +1055,17 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <WorkItemComponent item={item} />}
           horizontal={false}
-          bounces={false}
           showsVerticalScrollIndicator={false}
-          alwaysBounceVertical={false}
           onScroll={handleScroll}
           onEndReached={onEndReached}
           onEndReachedThreshold={0.1}
           scrollEventThrottle={16}
+          contentContainerStyle={{ paddingTop: headerHeight + TAB_BAR_HEIGHT }}
           windowSize={10}
-          contentContainerStyle={{
-            paddingTop: headerHeight + TAB_BAR_HEIGHT,
-          }}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
-          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_user_works')} />}
+          contentInset={{ top: 0 }}
+          contentOffset={{ y: 0 }}
+          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_establishment_books')} />}
           ListHeaderComponent={
             <>
               <FlatList
@@ -1103,6 +1096,8 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
+  // =============== Navigation ===============
+  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
@@ -1110,7 +1105,29 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { organization_id } = route.params;
   // =============== Get data ===============
   const [selectedOrganization, setSelectedOrganization] = useState({});
+  // Events list data
+  const [events, setEvents] = useState([]);
+  const [ad, setAd] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [count, setCount] = useState(0);
+  // Form data
+  const [formEventModalVisible, setFormEventModalVisible] = useState(false);
+  const [eventTitle, setEventTitle] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
+  const [inputDescHeight, setInputDescHeight] = useState(40);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [eventPlace, setEventPlace] = useState('');
+  const [imageData, setImageData] = useState(null);
+  const [isOnline, setIsOnline] = useState(false);
   const flatListRef = listRef || useRef(null);
+  // Show picker
+  const [isStartPickerVisible, setStartPickerVisible] = useState(false);
+  const [isEndPickerVisible, setEndPickerVisible] = useState(false);
+  // Loaders
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // ================= Get current organization =================
   useEffect(() => {
@@ -1140,30 +1157,332 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       });
   };
 
-  // ================= Handlers =================
-  // const onRefresh = async () => {
-  //   setRefreshing(true);
-  //   await getUser();
-  //   setRefreshing(false);
-  // };
+  // ================= Get events list =================
+  useEffect(() => {
+    if (selectedOrganization.id) {
+      fetchEvents(1); // INITIAL LOADING : Call fetchEvents once organization is available
+    }
+  }, [selectedOrganization]);
 
+  useEffect(() => {
+    if (page > 1) {
+      fetchEvents(page);
+    }
+  }, [page]);
+
+  const fetchEvents = async (pageToFetch = 1) => {
+    if (isLoading || pageToFetch > lastPage) return;
+
+    const qs = require('qs');
+    const url = `${API.boongo_url}/work/filter_by_categories?page=${pageToFetch}`;
+    const mParams = { type_id: 33, status_id: 17 };
+    const mHeaders = {
+      'X-localization': 'fr',
+      'Authorization': `Bearer ${userInfo.api_token}`
+    };
+
+    try {
+      const response = await axios.post(url, qs.stringify(mParams), { headers: mHeaders });
+
+      if (pageToFetch === 1) {
+        setEvents(response.data.data);
+
+      } else {
+        setEvents(prev => [...prev, ...response.data.data]);
+      }
+
+      setAd(response.data.ad);
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =============== Handle Image Picker ===============
+  const imagePick = () => {
+    ImagePicker.openPicker({
+      width: 700,
+      height: 700,
+      cropping: true,
+      includeBase64: true
+    }).then(image => {
+      setImageData(`data:${image.mime};base64,${image.data}`);
+    }).catch(error => {
+      console.log(`${error}`);
+    });
+  };
+
+  // =============== Format Datetime ===============
+  const formatDateForSQL = (date) => {
+    return date.toISOString().slice(0, 19).replace('T', ' '); // Format 'YYYY-MM-DD HH:MM:SS'
+  };
+
+  // =============== Handle Add New Event ===============
+  const handleAddEvent = () => {
+    setIsLoading(true);
+
+    axios.post(`${API.boongo_url}/event`, {
+      event_title: eventTitle, event_description: eventDescription, start_at: formatDateForSQL(startDate), end_at: formatDateForSQL(endDate), event_place: (isOnline ? '' : eventPlace), image_64: imageData, type_id: 36, status_id: 11, organization_id: selectedOrganization.id
+    }, {
+      headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
+    }).then(res => {
+      const message = res.data.message;
+      const userData = res.data.data.user;
+
+      setStartRegisterInfo(userData);
+
+      ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+      console.log(`${message}`);
+
+      setFormEventModalVisible(false);
+      setIsLoading(false);
+
+    }).catch(error => {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+        console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+      } else if (error.request) {
+        // The request was made but no response was received
+        ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+
+      } else {
+        // An error occurred while configuring the query
+        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+      }
+
+      setIsLoading(false);
+    });
+  };
+
+  // =============== Other functions ===============
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPage(1);
+    await fetchEvents(1);
+    setRefreshing(false);
+  };
+
+  const onEndReached = () => {
+    if (!isLoading && page < lastPage) {
+      const nextPage = page + 1;
+
+      setPage(nextPage); // Update the page
+    }
+  };
+
+  const combinedData = [...events];
+
+  if (ad) {
+    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
+  }
+
+  // =============== Event item ===============
+  const EventItemComponent = ({ item, event_id, event_title, event_profile }) => {
+    return (
+      <Pressable onPress={() => { navigation.navigate('NewChat', { chat_entity: 'event', chat_entity_id: event_id, chat_entity_name: event_title, chat_entity_profile: event_profile }) }} style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: PADDING.p03,
+        backgroundColor: COLORS.white
+      }}>
+        <Image
+          source={{ uri: item.cover_url }}
+          style={{
+            width: IMAGE_SIZE.s13,
+            height: IMAGE_SIZE.s13,
+            borderRadius: PADDING.p00,
+            marginRight: PADDING.p03,
+            borderWidth: 1,
+            borderColor: COLORS.light_secondary
+          }}
+        />
+        <View style={{ flex: 1 }}>
+          <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{`${item.event_title}`}</Text>
+          <Text numberOfLines={2} style={{ color: COLORS.dark_secondary }}>{`${item.event_description}`}</Text>
+        </View>
+        <Icon name="chevron-right" size={IMAGE_SIZE.s05} color={COLORS.black} />
+      </Pressable>
+    );
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+      <Spinner visible={isLoading} />
+
       {showBackToTop && (
-        <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
-          onPress={scrollToTop}
-        >
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}>
+        <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      </TouchableOpacity>
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Events list */}
+        <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
+          {/* Events List */}
+          <Animated.FlatList
+            ref={flatListRef}
+            data={combinedData}
+            extraData={combinedData}
+            keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
+            renderItem={({ item }) => (<EventItemComponent item={item} event_id={item.id} event_title={item.event_title} event_profile={item.cover_url} />)}
+            horizontal={false}
+            showsVerticalScrollIndicator={false}
+            onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingTop: headerHeight + TAB_BAR_HEIGHT }}
+            windowSize={10}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
+            contentInset={{ top: 0 }}
+            contentOffset={{ y: 0 }}
+            ListEmptyComponent={<EmptyListComponent iconName='brain' title={t('empty_list.title')} description={t('empty_list.description_establishment_teach')} />}
+            ListFooterComponent={() =>
+              isLoading ? (
+                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
+              ) : null
+            }
+          />
+        </View>
 
+        {/* Modal to add an event */}
+        <Modal animationType='slide' transparent={true} visible={formEventModalVisible} onRequestClose={() => setFormEventModalVisible(false)}>
+          <ScrollView style={{ flex: 1, backgroundColor: COLORS.white }}>
+            {/* Close modal */}
+            <TouchableOpacity style={{ position: 'absolute', right: PADDING.p01, top: PADDING.p01, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', padding: 2.6, borderRadius: 37 / 2 }} onPress={() => setFormEventModalVisible(false)}>
+              <Icon name='close' size={IMAGE_SIZE.s07} color='black' />
+            </TouchableOpacity>
+
+            {/* Brand / Title */}
+            <View style={[homeStyles.authlogo, { marginTop: PADDING.p15 }]}>
+              <LogoText width={200} height={48} />
+            </View>
+            <Text style={[homeStyles.authTitle, { fontSize: 21, fontWeight: '300', color: COLORS.black, textAlign: 'center' }]}>{t('event.create')}</Text>
+
+            {/* Event cover */}
+            <View style={{ position: 'relative', width: Dimensions.get('window').width, marginVertical: PADDING.p01 }}>
+              <TouchableOpacity style={{ position: 'absolute', top: 10, right: 10, zIndex: 9, backgroundColor: COLORS.primary, marginLeft: 140, borderRadius: 40 / 2, padding: PADDING.p01 }} onPress={imagePick}>
+                <Icon name='lead-pencil' size={20} color='white' />
+              </TouchableOpacity>
+              <Image style={{ width: Dimensions.get('window').width, height: 250 }} source={{ uri: imageData || `${WEB.boongo_url}/assets/img/banner-event.png` }} />
+            </View>
+
+            <View style={{ padding: PADDING.p07 }}>
+              {/* Event title */}
+              <TextInput
+                style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                label={t('event.data.event_title')}
+                value={eventTitle}
+                placeholder={t('event.data.event_title')}
+                placeholderTextColor={COLORS.dark_secondary}
+                onChangeText={setEventTitle}
+              />
+
+              {/* Event description */}
+              <TextInput
+                multiline
+                onContentSizeChange={(e) =>
+                  setInputDescHeight(e.nativeEvent.contentSize.height)
+                }
+                style={[homeStyles.authInput, { height: Math.max(40, inputDescHeight), color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                value={eventDescription}
+                placeholder={t('event.data.event_description')}
+                placeholderTextColor={COLORS.dark_secondary}
+                onChangeText={setEventDescription} />
+
+              <View style={{ flexDirection: 'row', width: '100%', marginBottom: PADDING.p01, padding: PADDING.p00, borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: 5 }}>
+                {/* Start at */}
+                <View style={{ width: '50%', paddingVertical: PADDING.p00 }}>
+                  <Icon name='calendar' size={IMAGE_SIZE.s09} color={COLORS.dark_secondary} style={{ alignSelf: 'center' }} />
+                  <Text style={{ textAlign: 'center', color: COLORS.dark_secondary }}>{t('event.data.start_at')}</Text>
+                  <TouchableOpacity onPress={() => setStartPickerVisible(true)}>
+                    <Text style={{ color: COLORS.black, textAlign: 'center' }}>{startDate.toLocaleString()}</Text>
+                  </TouchableOpacity>
+
+                  <DateTimePickerModal
+                    isVisible={isStartPickerVisible}
+                    mode="datetime"
+                    date={startDate}
+                    onConfirm={date => {
+                      setStartDate(date);
+                      setStartPickerVisible(false);  // ← refermer en premier :contentReference[oaicite:1]{index=1}
+                    }}
+                    onCancel={() => setStartPickerVisible(false)}
+                  />
+                </View>
+
+                {/* End at */}
+                <View style={{ width: '50%', paddingVertical: PADDING.p00 }}>
+                  <Icon name='calendar' size={IMAGE_SIZE.s09} color={COLORS.dark_secondary} style={{ alignSelf: 'center' }} />
+                  <Text style={{ textAlign: 'center', color: COLORS.dark_secondary }}>{t('event.data.end_at')}</Text>
+                  <TouchableOpacity onPress={() => setEndPickerVisible(true)}>
+                    <Text style={{ color: COLORS.black, textAlign: 'center' }}>{endDate.toLocaleString()}</Text>
+                  </TouchableOpacity>
+
+                  <DateTimePickerModal
+                    isVisible={isEndPickerVisible}
+                    mode="datetime"
+                    date={endDate}
+                    onConfirm={date => {
+                      setEndDate(date);
+                      setEndPickerVisible(false);
+                    }}
+                    onCancel={() => setEndPickerVisible(false)}
+                  />
+                </View>
+              </View>
+
+              {/* Choose whether the event is online */}
+              <View style={{ width: Dimensions.get('window').width - PADDING.p15 }}>
+                <TouchableOpacity onPress={() => setIsOnline(!isOnline)} style={{ width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: PADDING.p00 }}>
+                  <Icon name={!isOnline ? 'checkbox-blank-outline' : 'checkbox-outline'} size={IMAGE_SIZE.s07} color={!isOnline ? COLORS.dark_secondary : COLORS.black} />
+                  <Text style={{ color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.data.is_online')}</Text>
+                </TouchableOpacity>
+
+                {/* Champ de lieu ou URL */}
+                {!isOnline && (
+                  <TextInput
+                    style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                    label={t('event.data.event_place')}
+                    value={eventPlace}
+                    placeholder={t('event.data.event_place')}
+                    placeholderTextColor={COLORS.dark_secondary}
+                    onChangeText={setEventPlace}
+                  />
+                )}
+                {/* {isOnline && (
+                  <TextInput
+                    placeholder="URL de l'événement"
+                    value={eventPlace}
+                    onChangeText={setEventPlace}
+                    style={{ borderBottomWidth: 1, marginBottom: 10 }}
+                  />
+                )} */}
+              </View>
+
+              {/* Submit */}
+              <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]} onPress={handleAddEvent}>
+                <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('send')}</Text>
+              </Button>
+            </View>
+          </ScrollView>
+        </Modal>
       </SafeAreaView>
     </View>
   );

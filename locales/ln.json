@@ -141,6 +141,8 @@
         "max_files": "Limite ya {{ count }} fichiers ekoki. Ba fichiers misusu ekoti te."
     },
     "event": {
+        "about": "Oyo etali",
+        "chat": "Masolo",
         "create": "Kela milulu",
         "update": "Bongola milulu",
         "data": {

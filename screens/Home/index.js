@@ -44,6 +44,7 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
     if (isLoading || pageToFetch > lastPage) return;
 
     setIsLoading(true);
+
     const qs = require('qs');
     const url = `${API.boongo_url}/work/filter_by_categories?page=${pageToFetch}`;
     const mParams = { type_id: 33, status_id: 17 };

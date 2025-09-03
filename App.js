@@ -56,6 +56,8 @@ import OrganizationDataScreen from './screens/Organization/organization_data';
 import OrganizationSettingsScreen from './screens/Organization/organization_settings';
 import GovernmentScreen from './screens/Organization/Government';
 import AddGovernmentScreen from './screens/Organization/Government/add_government';
+import EventScreen from './screens/Organization/event_data';
+import QuizScreen from './screens/Organization/quiz';
 import AudioScreen from './screens/audio_screen';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
@@ -301,6 +303,8 @@ const HomeStackNav = () => {
       <Stack.Screen name='AddEstablishment' component={AddEstablishmentScreen} />
       <Stack.Screen name='Government' component={GovernmentScreen} />
       <Stack.Screen name='AddGovernment' component={AddGovernmentScreen} />
+      <Stack.Screen name='Event' component={EventScreen} />
+      <Stack.Screen name='Quiz' component={QuizScreen} />
       <Stack.Screen name='AddWork' component={AddWorkScreen} />
       <Stack.Screen name='Book' component={BookScreen} />
       <Stack.Screen name='Journal' component={JournalScreen} />
