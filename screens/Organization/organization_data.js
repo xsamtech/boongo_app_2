@@ -650,25 +650,10 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }
 
   // =============== Event item ===============
-  const EventItemComponent = ({ item, event_id, event_title, event_profile }) => {
+  const EventItemComponent = ({ item }) => {
     return (
-      <Pressable onPress={() => { navigation.navigate('NewChat', { chat_entity: 'event', chat_entity_id: event_id, chat_entity_name: event_title, chat_entity_profile: event_profile }) }} style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: PADDING.p03,
-        backgroundColor: COLORS.white
-      }}>
-        <Image
-          source={{ uri: item.cover_url }}
-          style={{
-            width: IMAGE_SIZE.s13,
-            height: IMAGE_SIZE.s13,
-            borderRadius: PADDING.p00,
-            marginRight: PADDING.p03,
-            borderWidth: 1,
-            borderColor: COLORS.light_secondary
-          }}
-        />
+      <Pressable onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{ flexDirection: 'row', alignItems: 'center', padding: PADDING.p03, backgroundColor: COLORS.white }}>
+        <Image source={{ uri: item.cover_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
         <View style={{ flex: 1 }}>
           <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{`${item.event_title}`}</Text>
           <Text numberOfLines={2} style={{ color: COLORS.dark_secondary }}>{`${item.event_description}`}</Text>

@@ -22,7 +22,7 @@ const HeaderComponent = ({ title }) => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  if (route.name === 'HomeStack') {
+  if (route.name === 'HomeStack' || route.name === 'Media') {
     return (
       <>
         {/* Status bar */}
@@ -174,7 +174,9 @@ const HeaderComponent = ({ title }) => {
     route.name === 'Summary' ||
     route.name === 'Subscription' ||
     route.name === 'MobileSubscribe' ||
-    route.name === 'BankCardSubscribe') {
+    route.name === 'BankCardSubscribe' ||
+    route.name === 'Language' ||
+    route.name === 'Chats') {
     return (
       <>
         {/* Status bar */}

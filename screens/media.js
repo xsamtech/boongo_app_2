@@ -2,40 +2,35 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar } from 'react-native'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, SafeAreaView, TouchableHighlight, Animated } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { API, IMAGE_SIZE, PADDING, WEB } from '../../tools/constants';
-import { AuthContext } from '../../contexts/AuthContext';
-import EmptyListComponent from '../../components/empty_list';
-import FloatingActionsButton from '../../components/floating_actions_button';
-import homeStyles from '../style';
-import useColors from '../../hooks/useColors';
+import { AuthContext } from '../contexts/AuthContext';
+import { API, PADDING } from '../tools/constants';
+import HeaderComponent from './header';
+import FloatingActionsButton from '../components/floating_actions_button';
+import EmptyListComponent from '../components/empty_list';
+import useColors from '../hooks/useColors';
+import homeStyles from './style';
 
 const TAB_BAR_HEIGHT = 48;
 
-// About frame
-const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
+// Medias frame
+const Medias = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get parameters ===============
-  const route = useRoute();
-  const { event_id } = route.params;
   // =============== Get data ===============
-  const [selectedEvent, setSelectedEvent] = useState({});
   const [categories, setCategories] = useState([]);
   const [idCat, setIdCat] = useState(0);
-  const [works, setWorks] = useState([]);
+  const [medias, setMedias] = useState([]);
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -43,34 +38,6 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
-
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
-
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
-
-        setSelectedEvent(eventData);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
 
   // ================= Get categories =================
   useEffect(() => {
@@ -97,21 +64,19 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     }
   };
 
-  // ================= Fetch works when idCat or page changes =================
+  // ================= Fetch meidas when idCat or page changes =================
   // useEffect(() => {
-  //   fetchWorks();
+  //   fetchMedias();
   // }, [page, idCat]);
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (selectedEvent && selectedEvent.id) {
-        fetchWorks();
-      }
+      fetchMedias();
     }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [selectedEvent, page, idCat]);
+  }, [page, idCat]);
 
-  const fetchWorks = async () => {
+  const fetchMedias = async () => {
     if (isLoading || page > lastPage) return;
     setIsLoading(true);
 
@@ -119,19 +84,20 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     const url = `${API.boongo_url}/work/filter_by_categories?page=${page}`;
     const params = {
       'categories_ids[0]': idCat,
-      user_id: selectedEvent.id,
+      type_id: 31,
+      status_id: 17,
     };
+
     const headers = {
       'X-localization': 'fr',
       Authorization: `Bearer ${userInfo.api_token}`,
-      'X-user-id': userInfo.id,
     };
 
     try {
       const response = await axios.post(url, qs.stringify(params), { headers });
       const data = response.data.data || [];
 
-      setWorks(prev => (page === 1 ? data : [...prev, ...data]));
+      setMedias(prev => (page === 1 ? data : [...prev, ...data]));
       setAd(response.data.ad || null);
       setLastPage(response.data.lastPage || page);
       setCount(response.data.count || 0);
@@ -139,14 +105,14 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       // console.log(response.data);
 
     } catch (error) {
-      console.error('Erreur fetchWorks', error);
+      console.error('Erreur fetchMedias', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   // ================= Combined data =================
-  const combinedData = [...works];
+  const combinedData = [...medias];
   if (ad) {
     combinedData.push({ ...ad, id: 'ad', realId: ad.id });
   }
@@ -155,8 +121,8 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-    setWorks([]);
-    await fetchWorks();
+    setMedias([]);
+    await fetchMedias();
     setRefreshing(false);
   };
 
@@ -173,7 +139,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const handleBadgePress = useCallback((id) => {
     setIdCat(id);
     setPage(1);
-    setWorks([]);
+    setMedias([]);
     setLastPage(1);
   }, []);
 
@@ -208,20 +174,62 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+        <TouchableOpacity
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
+          onPress={scrollToTop}
+        >
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-
+        {/* <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}> */}
+        {/* Medias List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <WorkItemComponent item={item} />}
+          horizontal={false}
+          showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: 110,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
+          ListEmptyComponent={<EmptyListComponent iconName="play-box-multiple-outline" title={t('empty_list.title')} description={t('empty_list.description_medias')} />}
+          ListHeaderComponent={
+            <>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 40, flexGrow: 0 }}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: PADDING.p00,
+                }}
+                renderItem={({ item }) => <CategoryItem item={item} />}
+              />
+            </>
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
+        {/* </View> */}
       </SafeAreaView>
     </View>
   );
 };
 
-// Chat frame
-const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
+// Favorite frame
+const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -230,96 +238,23 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get parameters ===============
-  const route = useRoute();
-  const { event_id } = route.params;
   // =============== Get data ===============
-  const [selectedEvent, setSelectedEvent] = useState({});
-  const [circles, setCircles] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [count, setCount] = useState(0);
-  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
-
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
-
-        setSelectedEvent(eventData);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  // Fetch data from API
-  const fetchSearchData = async (searchTerm) => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-
-    const qs = require('qs');
-    const params = {
-      data: searchTerm,
-      user_id: selectedEvent.id
-    };
-
-    try {
-      const response = await axios.post(
-        `${API.boongo_url}/circle/search`,
-        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
-        {
-          headers: {
-            'X-localization': 'fr',
-            'Authorization': `Bearer ${userInfo.api_token}`,
-            'X-user-id': userInfo.id,
-            'Content-Type': 'application/x-www-form-urlencoded', // consistent
-          },
-        }
-      );
-
-      setAddressees(response.data.data);
-    } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle search event
-  const handleSearch = (text) => {
-    setInputValue(text);
-    fetchSearchData(text);
-  };
-
-  const fetchCircles = async (pageToFetch = 1) => {
+  const fetchFavorites = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
 
     setIsLoading(true);
 
     const qs = require('qs');
-    const url = `${API.boongo_url}/user/member_groups/circle/${selectedEvent.id}/15?page=${pageToFetch}`;
+    const url = `${API.boongo_url}/work/favorites/${userInfo.id}?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -329,10 +264,10 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       const response = await axios.get(url, { headers: mHeaders });
 
       if (pageToFetch === 1) {
-        setCircles(response.data.data);
+        setFavorites(response.data.data);
 
       } else {
-        setCircles(prev => [...prev, ...response.data.data]);
+        setFavorites(prev => [...prev, ...response.data.data]);
       }
 
       setAd(response.data.ad);
@@ -368,21 +303,19 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     }
   };
 
-  const combinedData = [...circles];
+  const combinedData = [...favorites];
 
   if (ad) {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
   }
 
   useEffect(() => {
-    if (selectedEvent && selectedEvent.id) {
-      fetchCircles(1); // Initial loading
-    }
-  }, [selectedEvent]);
+    fetchFavorites(1); // Initial loading
+  }, []);
 
   useEffect(() => {
     if (page > 1) {
-      fetchCircles(page);
+      fetchFavorites(page);
     }
   }, [page]);
 
@@ -401,54 +334,36 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   );
 };
 
-const EventScreen = () => {
+const MediaScreen = () => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
-  // =============== Get contexts ===============
-  const { userInfo } = useContext(AuthContext);
-  // =============== Get parameters ===============
-  const route = useRoute();
-  const { event_id } = route.params;
   // =============== Get data ===============
-  const [selectedEvent, setSelectedEvent] = useState({});
-
-  const aboutListRef = useRef(null);
-  const chatListRef = useRef(null);
-
+  const mediasListRef = useRef(null);
+  const favoriteListRef = useRef(null);
   const [index, setIndex] = useState(0); // State for managing active tab index
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [showBackToTopByTab, setShowBackToTopByTab] = useState({ about: false, chat: false });
-
+  const [showBackToTopByTab, setShowBackToTopByTab] = useState({ medias: false, favorite: false });
   const scrollY = useRef(new Animated.Value(0)).current;
-  const savedScrollOffsets = useRef({ about: 0, chat: 0 });
-  const clampedScrollY = Animated.diffClamp(scrollY, 0, headerHeight);
+  const savedScrollOffsets = useRef({ medias: 0, favorite: 0 });
 
-  const headerTranslateY = clampedScrollY.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [0, -headerHeight],
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 50],
+    outputRange: [0, -60], // The header hides at -60px
     extrapolate: 'clamp',
   });
 
   const [routes] = useState([
-    { key: 'about', title: t('event.about') },
-    { key: 'chat', title: t('event.chat') },
+    { key: 'medias', title: t('navigation.media.title') },
+    { key: 'favorite', title: t('navigation.media.favorite') },
   ]);
 
   const renderScene = ({ route }) => {
-    const sceneProps = {
-      handleScroll,
-      headerHeight,
-    };
-
     switch (route.key) {
-      case 'about':
-        return <About {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.about} listRef={aboutListRef} />;
-      case 'chat':
-        return <Chat {...sceneProps} handleScroll={handleScroll} showBackToTop={showBackToTopByTab.chat} listRef={chatListRef} />;
+      case 'medias':
+        return <Medias handleScroll={handleScroll} showBackToTop={showBackToTopByTab.news} listRef={mediasListRef} />;
+      case 'favorite':
+        return <Favorite handleScroll={handleScroll} showBackToTop={showBackToTopByTab.books} listRef={favoriteListRef} />;
       default:
         return null;
     }
@@ -461,7 +376,7 @@ const EventScreen = () => {
       useNativeDriver: true,
       listener: (event) => {
         const offsetY = event.nativeEvent.contentOffset.y;
-        const currentTab = (index === 0 ? 'about' : 'chat');
+        const currentTab = (index === 0 ? 'medias' : 'favorite');
 
         savedScrollOffsets.current[currentTab] = offsetY;
 
@@ -476,7 +391,7 @@ const EventScreen = () => {
 
   // On "TabBar" index change
   const handleIndexChange = (newIndex) => {
-    const newTabKey = (newIndex === 0 ? 'about' : 'chat');
+    const newTabKey = newIndex === 0 ? 'medias' : 'favorite';
     const offset = savedScrollOffsets.current[newTabKey] || 0;
 
     // Animate scrollY back to 0 smoothly (for header + tabbar)
@@ -487,77 +402,21 @@ const EventScreen = () => {
     }).start();
 
     // Back to top according to selected tab
-    if (newIndex === 0 && aboutListRef.current) {
-      aboutListRef.current.scrollToOffset({ offset, animated: true });
+    if (newIndex === 0 && mediasListRef.current) {
+      mediasListRef.current.scrollToOffset({ offset, animated: true });
 
-    } else if (newIndex === 1 && chatListRef.current) {
-      chatListRef.current.scrollToOffset({ offset, animated: true });
+    } else if (newIndex === 1 && favoriteListRef.current) {
+      favoriteListRef.current.scrollToOffset({ offset, animated: true });
     }
 
     setIndex(newIndex);
   };
 
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
-
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
-
-        setSelectedEvent(eventData);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
   // Custom "TabBar"
   const renderTabBar = (props) => (
     <>
-      <Animated.View onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)} style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
-        {/* Status bar */}
-        <StatusBar barStyle='light-content' backgroundColor={COLORS.success} />
-
-        {/* Content */}
-        <View style={{ backgroundColor: COLORS.white }}>
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity style={{ position: 'absolute', left: 7, top: -7, zIndex: 10 }} onPress={() => navigation.goBack()}>
-              <Icon name='chevron-left' size={37} color={COLORS.black} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Profile */}
-          <View style={{ flexDirection: 'row', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'flex-start', paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
-            {/* 
-                TODO MAKE EVENT PROFILE
-             */}
-          </View>
-        </View>
-      </Animated.View>
-      <Animated.View
-        style={{
-          transform: [{ translateY: headerTranslateY }],
-          position: 'absolute',
-          top: headerHeight, // Positionnée juste en dessous du header
-          zIndex: 999,
-          width: '100%',
-          height: TAB_BAR_HEIGHT,
-          backgroundColor: COLORS.white,
-        }}>
+      <Animated.View style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
+        <HeaderComponent />
         <TabBar
           {...props}
           style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
@@ -581,4 +440,4 @@ const EventScreen = () => {
   );
 };
 
-export default EventScreen;
+export default MediaScreen;

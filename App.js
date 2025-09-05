@@ -49,7 +49,7 @@ import AddWorkScreen from './screens/add_work';
 import BookScreen from './screens/Organization/book';
 import JournalScreen from './screens/Organization/journal';
 import MappingScreen from './screens/Organization/mapping';
-import MediaScreen from './screens/Organization/media';
+import MediaScreen from './screens/media';
 import PDFViewerScreen from './screens/pdf_viewer';
 import VideoPlayerScreen from './screens/video_screen';
 import OrganizationDataScreen from './screens/Organization/organization_data';
@@ -220,22 +220,7 @@ const HomeStackNav = () => {
         headerTintColor: COLORS.dark_secondary
       }}>
       <Stack.Screen name='HomeStack' component={HomeScreen} />
-      <Stack.Screen name='Language' component={LanguageScreen}
-        options={{
-          headerShown: true,
-          title: t('change_lang'),
-          headerLeft: () => {
-            return (
-              <>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Icon name='chevron-left' size={37} color={COLORS.black} />
-                </TouchableOpacity>
-                <Logo width={30} height={30} style={{ marginRight: PADDING.p01 }} />
-                <Icon name='translate' color={COLORS.black} style={{ fontSize: 28, marginRight: PADDING.p01 }} />
-              </>
-            );
-          }
-        }} />
+      <Stack.Screen name='Language' component={LanguageScreen} />
       <Stack.Screen name='About' component={AboutBottomTab} />
       <Stack.Screen name='Dictionary' component={DictionaryScreen}
         options={{

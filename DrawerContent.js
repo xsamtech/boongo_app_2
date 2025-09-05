@@ -21,7 +21,7 @@ const DrawerList = [
     { icon: 'account-outline', label: 'navigation.account.title', navigateTo: 'Account', toScreen: null },
     { icon: 'bank-outline', label: 'navigation.establishment.title', navigateTo: 'Establishment', toScreen: null },
     { icon: 'city-variant-outline', label: 'navigation.government.title', navigateTo: 'Government', toScreen: null },
-    { icon: 'image-multiple-outline', label: 'navigation.media', navigateTo: 'Media', toScreen: null },
+    { icon: 'image-multiple-outline', label: 'navigation.media.title', navigateTo: 'Media', toScreen: null },
     { icon: 'cog-outline', label: 'navigation.settings.title', navigateTo: 'Settings', toScreen: null },
     { icon: 'help-circle-outline', label: 'navigation.about', navigateTo: 'About', toScreen: 'Contact' }
 ];

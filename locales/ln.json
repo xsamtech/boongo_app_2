@@ -373,9 +373,12 @@
                 "link": "Kanga compte na nga"
             }
         },
+        "media": {
+            "title": "Ba media",
+            "favorite": "Oyo nalingaka"
+        },
         "reading": "Lecture",
         "summary": "Résumés",
-        "media": "Ba imaje",
         "notification": "Notifications",
         "about": "Oyo etali",
         "terms": "Mibeko",

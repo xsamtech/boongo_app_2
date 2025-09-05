@@ -373,9 +373,12 @@
                 "link": "Fermer mon compte"
             }
         },
+        "media": {
+            "title": "Médias",
+            "favorite": "Favoris"
+        },
         "reading": "Lecture",
         "summary": "Résumés",
-        "media": "Médias",
         "notification": "Notifications",
         "about": "A propos",
         "terms": "Conditions",

@@ -12,7 +12,7 @@
   "dependencies": {
     "@freakycoder/react-native-text-area": "^0.1.5",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
-    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^8.4.4",
     "@react-native-community/hooks": "^100.1.0",
@@ -49,6 +49,7 @@
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-element-dropdown": "^2.12.4",
     "react-native-file-viewer": "^2.1.5",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.25.0",
     "react-native-image-crop-picker": "^0.42.0",
     "react-native-image-generator": "^0.3.1",
@@ -79,8 +80,10 @@
     "react-native-user-agent": "^2.3.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^6.15.0",
+    "react-native-webrtc": "^124.0.6",
     "react-native-webview": "^13.13.5",
-    "react-native-youtube-iframe": "^2.3.0"
+    "react-native-youtube-iframe": "^2.3.0",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

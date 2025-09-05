@@ -3,18 +3,24 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, Image, ToastAndroid, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import DocumentPicker from 'react-native-document-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFS from 'react-native-fs';
 import axios from 'axios';
-import { AuthContext } from '../../contexts/AuthContext';
-import MessageItem from '../../components/message_item';
-import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
-import homeStyles from '../style';
-import useColors from '../../hooks/useColors';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js/react-native';
+import { AuthContext } from '../../contexts/AuthContext';
+import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
+import CallScreen from '../../components/call_screen';
+import RTCManager from '../../webrtc/RTCManager';
+import RTCGroupManager from '../../webrtc/RTCGroupManager';
+import MessageItem from '../../components/message_item';
+import homeStyles from '../style';
+import useColors from '../../hooks/useColors';
 
 const NewChatScreen = ({ route }) => {
   // =============== Get parameters ===============
@@ -30,6 +36,29 @@ const NewChatScreen = ({ route }) => {
   // =============== Get data ===============
   const [keyboardOffset, setKeyboardOffset] = useState(0); // Manage the "TextInput" position when the keyboard appears/disappears
   const [messages, setMessages] = useState([]);
+  const [isPicking, setIsPicking] = useState(false);
+  const [files, setFiles] = useState([]);
+  const MAX_FILES = 20;
+
+  const [rtc, setRtc] = useState(null);
+  const [rtcGroup, setRtcGroup] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [showCall, setShowCall] = useState(false);
+
+  // Clé de stockage local (1-1 user)
+  const chatKey = `chat:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
+  // RoomName de signalisation (1-1)
+  const roomName = (() => {
+    if (chat_entity === 'user') {
+      const a = Math.min(userInfo.id, chat_entity_id);
+      const b = Math.max(userInfo.id, chat_entity_id);
+      return `webrtc.user.${a}-${b}`;
+    }
+    // Pour circle/org/event, on peut faire: `webrtc.circle.${chat_entity_id}` (mesh P2P, à itérer plus tard)
+    return `webrtc.${chat_entity}.${chat_entity_id}`;
+  })();
+
   const [text, setText] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const [emojis, setEmojis] = useState([]);
@@ -60,7 +89,7 @@ const NewChatScreen = ({ route }) => {
     };
   }, []);
 
-  // 
+  // Distinguer les cas 1-to-1 (RTCManager) et groupes (RTCGroupManager)
   useEffect(() => {
     if (!userInfo?.api_token || !userInfo?.id) return;
 
@@ -80,9 +109,9 @@ const NewChatScreen = ({ route }) => {
         headers: {
           Authorization: `Bearer ${userInfo.api_token}`,
           'X-user-id': userInfo.id,
-          'X-localization': 'fr'
-        }
-      }
+          'X-localization': 'fr',
+        },
+      },
     });
 
     echo.connector.pusher.connection.bind('connected', () => {
@@ -90,8 +119,7 @@ const NewChatScreen = ({ route }) => {
       console.log('📡 Socket ID connecté :', socketId);
     });
 
-
-    // Canal à écouter
+    // Canal Laravel Echo (pour compatibilité avec events backend)
     let channelName = '';
     let channel = null;
 
@@ -118,31 +146,100 @@ const NewChatScreen = ({ route }) => {
 
     channel.listen('MessageSent', (e) => {
       console.log('📡 Nouveau message reçu :', e.message);
-      setMessages(prev => [e.message, ...prev]);
+      setMessages((prev) => [e.message, ...prev]);
     });
 
-    return () => {
-      echo.leave(channelName);
-    };
+    // =============================
+    // 🎯 WebRTC init
+    // =============================
+    if (chat_entity === 'user') {
+      // 👉 Cas 1-to-1
+      const roomName = `webrtc.user.${Math.min(userInfo.id, chat_entity_id)}-${Math.max(userInfo.id, chat_entity_id)}`;
+
+      const rtcMgr = new RTCManager({
+        echo,
+        roomName,
+        localUserId: userInfo.id,
+        onMessage: async (msgObj) => {
+          const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
+          setMessages(next);
+        },
+        onFile: async ({ name, mime, path }) => {
+          const msg = {
+            id: Date.now(),
+            message_content: `📎 ${name}`,
+            user: { id: chat_entity_id },
+            created_at: new Date().toISOString(),
+            documents: [{ file_url: 'file://' + path, file_name: name, mime }],
+          };
+          const next = await RTCManager.appendLocalMessage(chatKey, msg);
+          setMessages(next);
+        },
+        onPeerState: (state) => console.log('RTC state:', state),
+        onRemoteStream: (stream) => setRemoteStream(stream),
+      });
+
+      rtcMgr.attachSignaling();
+      rtcMgr.connectAsCaller().catch(console.warn);
+      setRtc(rtcMgr);
+
+      return () => {
+        echo.leave(channelName);
+        rtcMgr.close();
+      };
+    }
+
+    if (chat_entity === 'circle') {
+      // 👉 Cas groupe (mesh)
+      const roomName = `webrtc.circle.${chat_entity_id}`;
+
+      // ⚠️ Tu dois récupérer la liste des membres du cercle (ex via ton API circle_user)
+      const members = []; // <- remplis avec [id1, id2, id3...]
+
+      const rtcGrp = new RTCGroupManager({
+        echo,
+        roomName,
+        localUserId: userInfo.id,
+        members,
+        onMessage: async (msgObj) => {
+          const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
+          setMessages(next);
+        },
+        onFile: async ({ name, mime, path }) => {
+          const msg = {
+            id: Date.now(),
+            message_content: `📎 ${name}`,
+            user: { id: 0 }, // TODO: ajoute "from" dans RTCManager pour indiquer expéditeur
+            created_at: new Date().toISOString(),
+            documents: [{ file_url: 'file://' + path, file_name: name, mime }],
+          };
+          const next = await RTCManager.appendLocalMessage(chatKey, msg);
+          setMessages(next);
+        },
+        onPeerState: (peerId, state) => console.log(`Peer ${peerId} → ${state}`),
+      });
+
+      rtcGrp.init();
+      setRtcGroup(rtcGrp);
+
+      return () => {
+        echo.leave(channelName);
+        rtcGrp.closeAll();
+      };
+    }
+
+    // Tu peux étendre pour organization/event comme pour circle
   }, [userInfo, chat_entity, chat_entity_id]);
 
 
-
   // Selected chat (Messages list)
+  // Charger les messages locaux à l'ouverture
   useEffect(() => {
-    // if (!endpoint) return;
-
-    axios.get(endpoint, {
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-        'X-user-id': userInfo.id,
-      }
-    }).then(res => {
-      setMessages(res.data.data);
-      setIsLoading(false);
-    });
-  }, [endpoint]);
+    (async () => {
+      const local = await RTCManager.loadLocalMessages(chatKey);
+      setMessages(local);
+    })();
+  }, [chatKey]);
 
   // Emojis
   useEffect(() => {
@@ -160,61 +257,30 @@ const NewChatScreen = ({ route }) => {
   const handleSend = () => {
     setIsLoading(true);
 
-    if (!text.trim()) return;
-
-    let dataToSend = {};
-    const commonData = {
-      message_content: text,
-      answered_for: answeredFor,
-      type_id: 27,
-      user_id: userInfo.id,
-    };
-
-    switch (chat_entity) {
-      case 'user':
-        dataToSend = {
-          ...commonData,
-          addressee_user_id: chat_entity_id
-        };
-        break;
-      case 'circle':
-        dataToSend = {
-          ...commonData,
-          addressee_circle_id: chat_entity_id
-        };
-        break;
-      case 'organization':
-        dataToSend = {
-          ...commonData,
-          addressee_organization_id: chat_entity_id
-        };
-        break;
-      case 'event':
-        dataToSend = {
-          ...commonData,
-          event_id: chat_entity_id
-        };
-        break;
-    }
-
-    axios.post(`${API.boongo_url}/message`, dataToSend, {
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-        'X-user-id': userInfo.id,
-      }
-    })
-      .then(res => {
-        setMessages(prevMessages => [res.data.data, ...prevMessages]);
-        setText('');
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error(t('error'), error);
-        ToastAndroid.show(`${t('error')} ${error}`, ToastAndroid.LONG)
-        setIsLoading(false);
-      });
+    // if (!text.trim()) return;
+    if (!text.trim()) { setIsLoading(false); return; }
   };
+
+  // Construire un objet compatible MessageItem
+  const messageObj = {
+    id: Date.now(),
+    message_content: text,
+    user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+    created_at: new Date().toISOString(),
+    answered_for: answeredFor,
+    type_id: 27,
+  };
+
+  // 1) j'affiche et persiste localement
+  RTCManager.appendLocalMessage(chatKey, messageObj).then((next) => {
+    setMessages(next);
+  });
+
+  // 2) j'envoie au pair via DataChannel
+  rtc?.sendTextMessage(messageObj);
+
+  setText('');
+  setIsLoading(false);
 
   if (!endpoint) {
     return (
@@ -224,15 +290,93 @@ const NewChatScreen = ({ route }) => {
     );
   }
 
-  // return (
-  //   <View style={{ flex: 1, backgroundColor: COLORS.white }}>
-  //     {messages.map((message, index) => (
-  //       <Text key={message.id || index} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>
-  //         {message.message_content}
-  //       </Text>
-  //     ))}
-  //   </View>
-  // );
+  // =============== Truncate long file name ===============
+  const truncateFileName = (name, maxLength = 30) => {
+    if (name.length <= maxLength) return name;
+    const start = name.slice(0, 15);
+    const end = name.slice(-12);
+    return `${start} ... ${end}`;
+  };
+
+  // =============== Get icon according to file type ===============
+  const getIconName = (fileName) => {
+    const ext = fileName.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png'].includes(ext)) return 'file-image-outline';
+    if (['mp4', 'avi', 'mov', 'mkv', 'webm'].includes(ext)) return 'television-play';
+    if (['pdf'].includes(ext)) return 'file-document-outline';
+    if (['mp3', 'wav'].includes(ext)) return 'microphone-outline';
+    return 'file-outline';
+  };
+
+  const acceptedExtensions = ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov', 'mkv', 'webm', 'pdf', 'mp3', 'wav'];
+
+  const filterValidFiles = (files) => {
+    return files.filter(file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      return acceptedExtensions.includes(ext);
+    });
+  };
+
+  const pickFiles = async () => {
+    if (isPicking) return;
+    setIsPicking(true);
+
+    try {
+      const selectedFiles = await pick({
+        mode: 'import',
+        allowMultiSelection: true,
+        types: [docTypes.images, docTypes.audio, docTypes.video, docTypes.pdf],
+      });
+
+      const validFiles = filterValidFiles(selectedFiles);
+      const totalFiles = files.length + validFiles.length;
+
+      if (totalFiles > MAX_FILES) {
+        const allowedToAdd = MAX_FILES - files.length;
+        const limitedFiles = validFiles.slice(0, allowedToAdd);
+
+        setFiles(prev => [...prev, ...limitedFiles]);
+        ToastAndroid.show(`Max ${MAX_FILES} fichiers`, ToastAndroid.LONG);
+        console.warn(`Limite de ${MAX_FILES} fichiers atteinte.`);
+      } else {
+        setFiles(prev => [...prev, ...validFiles]);
+      }
+
+      // Envoi direct via WebRTC
+      for (let f of validFiles) {
+        await rtc?.sendFile({
+          path: f.uri.replace('file://', ''),
+          name: f.name,
+          mime: f.type,
+        });
+      }
+
+    } catch (err) {
+      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) {
+        console.log('Annulé.');
+      } else {
+        console.error('Erreur sélection:', err);
+      }
+    } finally {
+      setIsPicking(false);
+    }
+  };
+
+  if (showCall) {
+    return (
+      <CallScreen
+        localStream={localStream}
+        remoteStream={remoteStream}
+        onHangup={() => {
+          rtc?.close();
+          rtcGroup?.closeAll();
+          setLocalStream(null);
+          setRemoteStream(null);
+          setShowCall(false);
+        }}
+      />
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -260,10 +404,18 @@ const NewChatScreen = ({ route }) => {
               </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={async () => {
+                  try {
+                    const s = await rtc?.enableAV({ audio: true, video: true });
+                    setLocalStream(s);
+                    setShowCall(true);
+                  } catch (e) { console.warn(e); }
+                }}
+              >
                 <Icon name='phone-plus' size={23} color={COLORS.black} />
               </TouchableOpacity>
-              <TouchableOpacity style={{ marginLeft: PADDING.p01 }}>
+              <TouchableOpacity style={{ marginLeft: PADDING.p01 }} onPress={pickFiles}>
                 <Icon name='paperclip' size={23} color={COLORS.black} />
               </TouchableOpacity>
             </View>

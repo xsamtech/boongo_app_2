@@ -428,8 +428,7 @@ const homeStyles = StyleSheet.create({
         paddingVertical: PADDING.p01,
         paddingHorizontal: PADDING.p03,
         textAlign: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(0, 89, 255, 0.3)'
+        borderBottomWidth: 1
     },
 
     button: {

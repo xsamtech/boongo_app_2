@@ -188,6 +188,9 @@ const SettingsScreen = () => {
           <Icon name='chevron-left' size={37} color={COLORS.black} />
         </TouchableOpacity>
         <Text style={{ width: '100%', fontSize: 20, fontWeight: '400', textAlign: 'center', color: COLORS.warning }}>{`${userInfo.firstname} ${userInfo.lastname}`}</Text>
+        <TouchableOpacity style={{ position: 'absolute', right: 14, top: 10, zIndex: 10 }} onPress={() => navigation.navigate('Language')}>
+          <Icon name='translate' size={25} color={COLORS.black} />
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={{ flexGrow: 1, paddingHorizontal: 30 }}>
