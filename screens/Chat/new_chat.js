@@ -3,10 +3,10 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation } from 'react-native';
+import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation, ToastAndroid } from 'react-native';
+import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import DocumentPicker from 'react-native-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFS from 'react-native-fs';
@@ -36,8 +36,8 @@ const NewChatScreen = ({ route }) => {
   // =============== Get data ===============
   const [keyboardOffset, setKeyboardOffset] = useState(0); // Manage the "TextInput" position when the keyboard appears/disappears
   const [messages, setMessages] = useState([]);
-  const [isPicking, setIsPicking] = useState(false);
   const [files, setFiles] = useState([]);
+  const [isPicking, setIsPicking] = useState(false);
   const MAX_FILES = 20;
 
   const [rtc, setRtc] = useState(null);
@@ -46,16 +46,15 @@ const NewChatScreen = ({ route }) => {
   const [remoteStream, setRemoteStream] = useState(null);
   const [showCall, setShowCall] = useState(false);
 
-  // Clé de stockage local (1-1 user)
+  // Local storage key (1-1 user)
   const chatKey = `chat:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
-  // RoomName de signalisation (1-1)
+  // Signaling roomName (1-1)
   const roomName = (() => {
     if (chat_entity === 'user') {
       const a = Math.min(userInfo.id, chat_entity_id);
       const b = Math.max(userInfo.id, chat_entity_id);
       return `webrtc.user.${a}-${b}`;
     }
-    // Pour circle/org/event, on peut faire: `webrtc.circle.${chat_entity_id}` (mesh P2P, à itérer plus tard)
     return `webrtc.${chat_entity}.${chat_entity_id}`;
   })();
 
@@ -66,10 +65,6 @@ const NewChatScreen = ({ route }) => {
   const [inputHeight, setInputHeight] = useState(44);
   const [isLoading, setIsLoading] = useState(false);
   const endpoint = `${API.boongo_url}/message/selected_chat/fr/Discussion/${userInfo.id}/${chat_entity}/${chat_entity_id}`;
-
-  console.log(`Document title: ${doc_title}`);
-  console.log(`Document page: ${doc_page}`);
-  console.log(`My note: ${doc_note}`);
 
   // Fixing the error is often related to using LayoutAnimation or Keyboard.scheduleLayoutAnimation()
   useEffect(() => {
@@ -89,7 +84,7 @@ const NewChatScreen = ({ route }) => {
     };
   }, []);
 
-  // Distinguer les cas 1-to-1 (RTCManager) et groupes (RTCGroupManager)
+  // Distinguish 1-to-1 (RTCManager) and groups (RTCGroupManager)
   useEffect(() => {
     if (!userInfo?.api_token || !userInfo?.id) return;
 
@@ -116,10 +111,9 @@ const NewChatScreen = ({ route }) => {
 
     echo.connector.pusher.connection.bind('connected', () => {
       const socketId = echo.socketId();
-      console.log('📡 Socket ID connecté :', socketId);
+      console.log('📡 Socket ID connected:', socketId);
     });
 
-    // Canal Laravel Echo (pour compatibilité avec events backend)
     let channelName = '';
     let channel = null;
 
@@ -145,7 +139,7 @@ const NewChatScreen = ({ route }) => {
     }
 
     channel.listen('MessageSent', (e) => {
-      console.log('📡 Nouveau message reçu :', e.message);
+      console.log('📡 New message received:', e.message);
       setMessages((prev) => [e.message, ...prev]);
     });
 
@@ -153,7 +147,6 @@ const NewChatScreen = ({ route }) => {
     // 🎯 WebRTC init
     // =============================
     if (chat_entity === 'user') {
-      // 👉 Cas 1-to-1
       const roomName = `webrtc.user.${Math.min(userInfo.id, chat_entity_id)}-${Math.max(userInfo.id, chat_entity_id)}`;
 
       const rtcMgr = new RTCManager({
@@ -190,11 +183,8 @@ const NewChatScreen = ({ route }) => {
     }
 
     if (chat_entity === 'circle') {
-      // 👉 Cas groupe (mesh)
       const roomName = `webrtc.circle.${chat_entity_id}`;
-
-      // ⚠️ Tu dois récupérer la liste des membres du cercle (ex via ton API circle_user)
-      const members = []; // <- remplis avec [id1, id2, id3...]
+      const members = []; // ⚠️ fetch circle members from API
 
       const rtcGrp = new RTCGroupManager({
         echo,
@@ -209,7 +199,7 @@ const NewChatScreen = ({ route }) => {
           const msg = {
             id: Date.now(),
             message_content: `📎 ${name}`,
-            user: { id: 0 }, // TODO: ajoute "from" dans RTCManager pour indiquer expéditeur
+            user: { id: 0 }, // TODO: add "from" in RTCManager for sender
             created_at: new Date().toISOString(),
             documents: [{ file_url: 'file://' + path, file_name: name, mime }],
           };
@@ -227,13 +217,9 @@ const NewChatScreen = ({ route }) => {
         rtcGrp.closeAll();
       };
     }
-
-    // Tu peux étendre pour organization/event comme pour circle
   }, [userInfo, chat_entity, chat_entity_id]);
 
-
   // Selected chat (Messages list)
-  // Charger les messages locaux à l'ouverture
   useEffect(() => {
     (async () => {
       const local = await RTCManager.loadLocalMessages(chatKey);
@@ -247,50 +233,71 @@ const NewChatScreen = ({ route }) => {
 
     axios.get(`https://emoji-api.com/emojis?access_key=${API.open_emoji_key}`)
       .then(res => {
-        setEmojis(res.data.slice(0, 500)); // Initial limit for performance
+        setEmojis(res.data.slice(0, 500));
       })
       .catch(error => {
         console.error(t('error'), error);
       });
   }, [showEmojis]);
 
-  const handleSend = () => {
+  // =============== Send message ===============
+  const handleSend = async () => {
     setIsLoading(true);
 
-    // if (!text.trim()) return;
-    if (!text.trim()) { setIsLoading(false); return; }
+    // nothing to send
+    if (!text.trim() && files.length === 0) {
+      setIsLoading(false);
+      return;
+    }
+
+    // ========== 1. build text message ==========
+    if (text.trim()) {
+      const messageObj = {
+        id: Date.now(),
+        message_content: text,
+        user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+        created_at: new Date().toISOString(),
+        answered_for: answeredFor,
+        type_id: 27,
+      };
+
+      // display + persist
+      const next = await RTCManager.appendLocalMessage(chatKey, messageObj);
+      setMessages(next);
+
+      // send via DataChannel
+      if (rtc) rtc.sendTextMessage(messageObj);
+      else if (rtcGroup) rtcGroup.sendTextMessage(messageObj);
+    }
+
+    // ========== 2. build file messages ==========
+    for (let f of files) {
+      const fileMsg = {
+        id: Date.now() + Math.random(),
+        message_content: `📎 ${f.name}`,
+        user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+        created_at: new Date().toISOString(),
+        documents: [{ file_url: f.uri, file_name: f.name, mime: f.type }],
+        type_id: 28, // optional: a type to distinguish file msgs
+      };
+
+      const next = await RTCManager.appendLocalMessage(chatKey, fileMsg);
+      setMessages(next);
+
+      if (rtc) {
+        rtc.sendFile({ path: f.uri.replace('file://', ''), name: f.name, mime: f.type });
+      } else if (rtcGroup) {
+        rtcGroup.sendFile({ path: f.uri.replace('file://', ''), name: f.name, mime: f.type });
+      }
+    }
+
+    // ========== 3. cleanup ==========
+    setText('');
+    setFiles([]); // empty preview
+    setIsLoading(false);
   };
 
-  // Construire un objet compatible MessageItem
-  const messageObj = {
-    id: Date.now(),
-    message_content: text,
-    user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
-    created_at: new Date().toISOString(),
-    answered_for: answeredFor,
-    type_id: 27,
-  };
-
-  // 1) j'affiche et persiste localement
-  RTCManager.appendLocalMessage(chatKey, messageObj).then((next) => {
-    setMessages(next);
-  });
-
-  // 2) j'envoie au pair via DataChannel
-  rtc?.sendTextMessage(messageObj);
-
-  setText('');
-  setIsLoading(false);
-
-  if (!endpoint) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.light_secondary }}>
-        <Text style={{ fontSize: TEXT_SIZE.header }}>{t('error_message.no_addressee_selected')}</Text>
-      </View>
-    );
-  }
-
-  // =============== Truncate long file name ===============
+  // =============== File handling ===============
   const truncateFileName = (name, maxLength = 30) => {
     if (name.length <= maxLength) return name;
     const start = name.slice(0, 15);
@@ -298,7 +305,6 @@ const NewChatScreen = ({ route }) => {
     return `${start} ... ${end}`;
   };
 
-  // =============== Get icon according to file type ===============
   const getIconName = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
     if (['jpg', 'jpeg', 'png'].includes(ext)) return 'file-image-outline';
@@ -319,6 +325,7 @@ const NewChatScreen = ({ route }) => {
 
   const pickFiles = async () => {
     if (isPicking) return;
+
     setIsPicking(true);
 
     try {
@@ -336,26 +343,16 @@ const NewChatScreen = ({ route }) => {
         const limitedFiles = validFiles.slice(0, allowedToAdd);
 
         setFiles(prev => [...prev, ...limitedFiles]);
-        ToastAndroid.show(`Max ${MAX_FILES} fichiers`, ToastAndroid.LONG);
-        console.warn(`Limite de ${MAX_FILES} fichiers atteinte.`);
+        ToastAndroid.show(`Max ${MAX_FILES} files`, ToastAndroid.LONG);
       } else {
         setFiles(prev => [...prev, ...validFiles]);
       }
-
-      // Envoi direct via WebRTC
-      for (let f of validFiles) {
-        await rtc?.sendFile({
-          path: f.uri.replace('file://', ''),
-          name: f.name,
-          mime: f.type,
-        });
-      }
-
     } catch (err) {
       if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) {
-        console.log('Annulé.');
+        console.log('Cancelled.');
+
       } else {
-        console.error('Erreur sélection:', err);
+        console.error('File pick error:', err);
       }
     } finally {
       setIsPicking(false);
@@ -375,6 +372,14 @@ const NewChatScreen = ({ route }) => {
           setShowCall(false);
         }}
       />
+    );
+  }
+
+  if (!endpoint) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.light_secondary }}>
+        <Text style={{ fontSize: TEXT_SIZE.header }}>{t('error_message.no_addressee_selected')}</Text>
+      </View>
     );
   }
 
@@ -425,11 +430,9 @@ const NewChatScreen = ({ route }) => {
           <FlatList
             data={messages}
             keyExtractor={(item, index) => item.id?.toString() || `msg-${index}`}
-            // renderItem={({ item }) => <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} />}
             renderItem={({ item }) => {
               if (!item || !item.id || !item.user || !item.user.id) {
-                console.warn("Message mal formé", item);
-
+                console.warn("Malformed message", item);
                 return null;
               }
               return <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} />;
@@ -437,6 +440,53 @@ const NewChatScreen = ({ route }) => {
             inverted
             style={{ flex: 1, padding: PADDING.p01 }}
           />
+
+          {/* Selected files */}
+          {files.length > 0 && (
+            <>
+              {/* <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.selected_files')}</Text> */}
+              <FlatList
+                data={files}
+                scrollEnabled={false}
+                keyExtractor={(item, index) => index.toString()}
+                style={{ flexGrow: 0, margin: 0 }}
+                renderItem={({ item, index }) => (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      maxWidth: 100,
+                      backgroundColor: COLORS.white,
+                      borderRadius: PADDING.p01,
+                      padding: PADDING.p01,
+                      marginVertical: 2,
+                    }}
+                  >
+                    <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
+                    <Text style={{ flex: 1, color: COLORS.black }}>
+                      {truncateFileName(item.name)}
+                    </Text>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: COLORS.danger,
+                        padding: 6,
+                        borderRadius: PADDING.p07,
+                        marginLeft: 8,
+                      }}
+                      onPress={() => {
+                        const updated = [...files];
+                        updated.splice(index, 1);
+                        setFiles(updated);
+                      }}
+                    >
+                      <Icon name="close" size={16} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              />
+            </>
+          )}
 
           {/* Emoji Panel */}
           {showEmojis && (

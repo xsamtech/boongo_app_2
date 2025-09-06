@@ -4,12 +4,13 @@
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar } from 'react-native'
+import * as RNLocalize from 'react-native-localize';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
-import { API, IMAGE_SIZE, PADDING, WEB } from '../../tools/constants';
+import { API, IMAGE_SIZE, PADDING, TEXT_SIZE, WEB } from '../../tools/constants';
 import { AuthContext } from '../../contexts/AuthContext';
 import EmptyListComponent from '../../components/empty_list';
 import FloatingActionsButton from '../../components/floating_actions_button';
@@ -415,6 +416,10 @@ const EventScreen = () => {
   const { event_id } = route.params;
   // =============== Get data ===============
   const [selectedEvent, setSelectedEvent] = useState({});
+  const startAt = new Date(selectedEvent.start_at || '1900-01-01 00:00:00');
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // Array of abbreviated months
+  const mois = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jui', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Déc'];
 
   const aboutListRef = useRef(null);
   const chatListRef = useRef(null);
@@ -453,6 +458,20 @@ const EventScreen = () => {
         return null;
     }
   };
+
+  // Get system language
+  const getLanguage = () => {
+    const locales = RNLocalize.getLocales();
+
+    if (locales && locales.length > 0) {
+      return locales[0].languageCode;
+    }
+
+    return 'fr';
+  };
+
+  const startingDay = startAt.getDate(); // Get day
+  const startingMonth = (getLanguage() === 'fr' ? mois[startAt.getMonth()] : months[startAt.getMonth()]); // Gets the month and converts it to a 3-letter abbreviation
 
   // Handle scrolling and show/hide the header
   const handleScroll = Animated.event(
@@ -535,16 +554,21 @@ const EventScreen = () => {
         {/* Content */}
         <View style={{ backgroundColor: COLORS.white }}>
           <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity style={{ position: 'absolute', left: 7, top: -7, zIndex: 10 }} onPress={() => navigation.goBack()}>
-              <Icon name='chevron-left' size={37} color={COLORS.black} />
+            <TouchableOpacity style={{ position: 'absolute', left: PADDING.p02, top: -2, zIndex: 10, width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', borderRadius: 37 / 2 }} onPress={() => navigation.goBack()}>
+              <Icon name='chevron-left' size={37} color='black' />
             </TouchableOpacity>
           </View>
 
-          {/* Profile */}
-          <View style={{ flexDirection: 'row', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'flex-start', paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
-            {/* 
-                TODO MAKE EVENT PROFILE
-             */}
+          {/* Cover */}
+          <Image source={{ uri: selectedEvent.cover_url || `${WEB.boongo_url}/assets/img/banner-event.png` }} style={{ width: Dimensions.get('window').width, height: 250, marginTop: -20, marginBottom: PADDING.p00 }} />
+
+          {/* Title */}
+          <View style={{ flexDirection: 'row', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'center', paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
+            <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.black, width: 60, height: 70, borderRadius: PADDING.p01 }}>
+              <Text style={{ fontSize: 19, fontWeight: '300', color: COLORS.warning, textTransform: 'uppercase' }}>{startingMonth}</Text>
+              <Text style={{ fontSize: 40, fontWeight: '400', color: COLORS.white, marginTop: -12 }}>{startingDay}</Text>
+            </View>
+            <Text style={{ fontSize: 28, fontWeight: '400', color: COLORS.black, lineHeight: PADDING.p10, maxWidth: '75%', marginLeft: PADDING.p02 }}>{selectedEvent.event_title || '...'}</Text>
           </View>
         </View>
       </Animated.View>

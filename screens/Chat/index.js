@@ -102,53 +102,60 @@ const ChatsScreen = () => {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      <HeaderComponent />
-      {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
-        </TouchableOpacity>
-      )}
-      <TouchableOpacity
-        style={[homeStyles.floatingButton, { backgroundColor: COLORS.primary, bottom: 30 }]}
-        onPress={() => navigation.navigate('ChatEntity')}
-      >
-        <Icon name="pencil-outline" size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
-      </TouchableOpacity>
+    <>
+      {/* Header */}
+      <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
+        <HeaderComponent />
+      </View>
 
-      <SafeAreaView style={{ flex: 1 }}>
-        <Animated.FlatList
-          ref={flatListRef}
-          data={combinedData}
-          keyExtractor={item => (item.id ?? Math.random().toString()).toString()}
-          renderItem={({ item }) => <ChatItemComponent item={item} />}
-          onScroll={handleScroll}
-          onEndReached={onEndReached}
-          onEndReachedThreshold={0.1}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              progressViewOffset={105}
-            />
-          }
-          contentInset={{ top: 105 }}
-          contentOffset={{ y: -105 }}
-          ListEmptyComponent={
-            <EmptyListComponent
-              iconName='wechat'
-              title="Aucune discussion"
-              description="Vous n’avez encore discuté avec personne."
-            />
-          }
-          ListFooterComponent={() =>
-            isLoading ? (
-              <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>Chargement...</Text>
-            ) : null
-          }
-        />
-      </SafeAreaView>
-    </View>
+      {/* Content */}
+      <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+        {showBackToTop && (
+          <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+            <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.primary, bottom: 30 }]}
+          onPress={() => navigation.navigate('ChatEntity')}
+        >
+          <Icon name="pencil-outline" size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+        </TouchableOpacity>
+
+        <SafeAreaView style={{ flex: 1 }}>
+          <Animated.FlatList
+            ref={flatListRef}
+            data={combinedData}
+            keyExtractor={item => (item.id ?? Math.random().toString()).toString()}
+            renderItem={({ item }) => <ChatItemComponent item={item} />}
+            onScroll={handleScroll}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                progressViewOffset={105}
+              />
+            }
+            contentInset={{ top: 105 }}
+            contentOffset={{ y: -105 }}
+            ListEmptyComponent={
+              <EmptyListComponent
+                iconName='wechat'
+                title="Aucune discussion"
+                description="Vous n’avez encore discuté avec personne."
+              />
+            }
+            ListFooterComponent={() =>
+              isLoading ? (
+                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>Chargement...</Text>
+              ) : null
+            }
+          />
+        </SafeAreaView>
+      </View>
+    </>
   );
 };
 
