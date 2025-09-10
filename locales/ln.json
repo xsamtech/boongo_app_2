@@ -152,6 +152,7 @@
             "end_at": "Mokolo/Ngonga ya suka",
             "is_online": "Milulu na Internet (Webinaire)",
             "event_place": "Esika ya milulu",
+            "event_place_address": "Adresse ya esika",
             "cover_url": "Bakisa couverture"
         }
     },
@@ -471,6 +472,66 @@
             "description": "koma moko ya ba partenaires na biso po ozala na makoki ya kobimisa misala na yo oyo ekozala komonana na bato banso. Mpe yango ekopesa yo avantage ya kozua mbongo selon ba consultations publiques.",
             "terms_link": "Svp fina na se pona komona ba conditions na biso.",
             "start_button": "koma partenaire"
+        }
+    },
+    "notifications": {
+        "payment": {
+            "succeed": "Kofuta mbongo esimbi.",
+            "failed": "Kofuta mbongo esimbi te."
+        },
+        "message": {
+            "to_organization": "{{ username }} atindi message na organisation {{ organisation_name }}.",
+            "to_event": "{{ username }} atindi message na milulu « {{ event_title }} »."
+        },
+        "user": {
+            "new": "Boyeyi malamu na Boongo ! Tanga ba conditions ya kosalela pona osalela plateforme malamu.",
+            "back": "Bozongi malamu na Boongo ! Kende kotala politique ya confidentialité na biso, po tango mosusu ebonguani."
+        },
+        "partnership": {
+            "partner": "{{ username }} alingi akoma partenaire.",
+            "sponsor": "{{ username }} alingi a sponsoriser plateforme."
+        },
+        "event": {
+            "new": "{{ organisation_name }} akeli milulu ya sika.",
+            "title_changed": "{{ organisation_name }} abongoli kombo ya milulu « {{ former_event_title }} » ekomi « {{ event_title }} ».",
+            "request_for_membership": "{{ username }} alingi azala na milulu « {{ event_title }} ».",
+            "expulsion": "Balongoli yo na milulu « {{ event_title }} ».",
+            "separation": "{{ username }} abimi na milulu « {{ event_title }} ».",
+            "invitation": {
+                "speaker": "{{ organisation_name }} abengisi yo na milulu « {{ event_title }} lokola molobi.",
+                "member": "{{ organisation_name }} abengisi yo na milulu « {{ event_title }}."
+            }
+        },
+        "circle": {
+            "request_for_membership": "{{ username }} alingi akota na cercle ya masolo « {{ circle_name }} ».",
+            "expulsion": "Balongoli yo na cercle ya masolo « {{ circle_name }} ».",
+            "separation": "{{ username }} abimi na cercle ya masolo « {{ circle_name }} ».",
+            "invitation": {
+                "admin": "{{ username }} abengisi yo na cercle ya masolo « {{ circle_name }} » lokola mokambi.",
+                "member": "{{ username }} abengisi yo na cercle ya masolo « {{ circle_name }} »."
+            }
+        },
+        "work": {
+            "subscription": {
+                "one": "{{ username }} amikomisi pona kotala œuvre na yo.",
+                "two": "{{ username }} na membre mosusu bamikomisi pona kotala œuvre na yo.",
+                "many": "{{ count }} membres bamikomisi pona kotala œuvre na yo."
+            },
+            "consultation": {
+                "one": "{{ username }} atali œuvre na yo.",
+                "two": "{{ username }} na membre mosusu batali œuvre na yo.",
+                "many": "{{ count }} membres batali œuvre na yo."
+            },
+            "like": {
+                "one": "{{ username }} alingi œuvre na yo.",
+                "two": "{{ username }} na membre mosusu balingi œuvre na yo.",
+                "many": "{{ count }} membres balingi œuvre na yo."
+            },
+            "publishing": {
+                "one": "{{ username }} atié œuvre ya sika.",
+                "two": "{{ username }} na membre mosusu batié ba œuvres ya sika.",
+                "many": "{{ count }} membres batié ba œuvres ya sika."
+            }
         }
     }
 }

@@ -151,7 +151,8 @@
             "start_at": "Start Date/Time",
             "end_at": "End Date/Time",
             "is_online": "Online Event (Webinar)",
-            "event_place": "Event location",
+            "event_place": "Event place",
+            "event_place_address": "Place address",
             "cover_url": "Add a cover"
         }
     },
@@ -471,6 +472,66 @@
             "description": "Become one of our partners to be able to publish your works which will be visible to all. And this will give you the advantage of acquiring money according to public consultations.",
             "terms_link": "Please click below to see our terms.",
             "start_button": "Become a partner"
+        }
+    },
+    "notifications": {
+        "payment": {
+            "succeed": "Your payment was successful.",
+            "failed": "Your payment failed."
+        },
+        "message": {
+            "to_organization": "{{ username }} sent a message to the organization {{ organisation_name }}.",
+            "to_event": "{{ username }} sent a message to the event \"{{ event_title }}\"."
+        },
+        "user": {
+            "new": "Welcome to Boongo! Please read our terms of use to better navigate the platform.",
+            "back": "Welcome back to Boongo! Please review our privacy policy, as we may have updated it."
+        },
+        "partnership": {
+            "partner": "{{ username }} wants to become a partner.",
+            "sponsor": "{{ username }} wants to sponsor the platform."
+        },
+        "event": {
+            "new": "{{ organisation_name }} created a new event.",
+            "title_changed": "{{ organisation_name }} changed the event title from \"{{ former_event_title }}\" to \"{{ event_title }}\".",
+            "request_for_membership": "{{ username }} wants to join your event \"{{ event_title }}\".",
+            "expulsion": "You have been removed from the event \"{{ event_title }}\".",
+            "separation": "{{ username }} has left your event \"{{ event_title }}\".",
+            "invitation": {
+                "speaker": "{{ organisation_name }} has invited you as a speaker to the event \"{{ event_title }}\".",
+                "member": "{{ organisation_name }} has invited you to the event \"{{ event_title }}\"."
+            }
+        },
+        "circle": {
+            "request_for_membership": "{{ username }} wants to join your discussion circle \"{{ circle_name }}\".",
+            "expulsion": "You have been removed from the discussion circle \"{{ circle_name }}\".",
+            "separation": "{{ username }} has left your discussion circle \"{{ circle_name }}\".",
+            "invitation": {
+                "admin": "{{ username }} has invited you as an administrator to the discussion circle \"{{ circle_name }}\".",
+                "member": "{{ username }} has invited you to the discussion circle \"{{ circle_name }}\"."
+            }
+        },
+        "work": {
+            "subscription": {
+                "one": "{{ username }} subscribed to view your work.",
+                "two": "{{ username }} and one other member subscribed to view your work.",
+                "many": "{{ count }} members subscribed to view your work."
+            },
+            "consultation": {
+                "one": "{{ username }} viewed your work.",
+                "two": "{{ username }} and one other member viewed your work.",
+                "many": "{{ count }} members viewed your work."
+            },
+            "like": {
+                "one": "{{ username }} liked your work.",
+                "two": "{{ username }} and one other member liked your work.",
+                "many": "{{ count }} members liked your work."
+            },
+            "publishing": {
+                "one": "{{ username }} published a work.",
+                "two": "{{ username }} and one other member published works.",
+                "many": "{{ count }} members published works."
+            }
         }
     }
 }

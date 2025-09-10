@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar, ToastAndroid } from 'react-native'
 import * as RNLocalize from 'react-native-localize';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
@@ -416,6 +416,8 @@ const EventScreen = () => {
   const { event_id } = route.params;
   // =============== Get data ===============
   const [selectedEvent, setSelectedEvent] = useState({});
+  const [isMember, setIsMember] = useState(false);
+  const [loading, setLoading] = useState(true);
   const startAt = new Date(selectedEvent.start_at || '1900-01-01 00:00:00');
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // Array of abbreviated months
@@ -457,6 +459,34 @@ const EventScreen = () => {
       default:
         return null;
     }
+  };
+
+  // Get current event
+  useEffect(() => {
+    getEvent();
+  }, [selectedEvent]);
+
+  const getEvent = () => {
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/event/${event_id}`,
+      headers: {
+        'X-localization': 'fr',
+        'Authorization': `Bearer ${userInfo.api_token}`,
+      }
+    };
+
+    axios(config)
+      .then(res => {
+        const eventData = res.data.data;
+
+        setSelectedEvent(eventData);
+
+        return eventData;
+      })
+      .catch(error => {
+        console.log(error);
+      });
   };
 
   // Get system language
@@ -516,32 +546,52 @@ const EventScreen = () => {
     setIndex(newIndex);
   };
 
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
+  // Toggle membership
+  const handleToggleMembership = (user_id, work_id) => {
+    setLoading(true);
 
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
+    if (isMember) {
+      // If the work is already liked, we cancel the like
+      axios.delete(`${API.boongo_url}/like/unlike_entity/${user_id}/work/${work_id}`, {
+        headers: {
+          'Authorization': `Bearer ${userInfo.api_token}`,
+          'X-localization': getLanguage(),
+        }
+      }).then(res => {
+        const message = res.data.message;
 
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
+        ToastAndroid.show(message, ToastAndroid.LONG);
+        console.log(message);
 
-        setSelectedEvent(eventData);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
+        // Update likes counter and status
+        setLikeCount(likeCount - 1); // Decrement
+        setHasLiked(false); // User no longer likes
+        setLoading(false);
+      }).catch(error => {
+        handleApiError(error);
       });
+
+    } else {
+      // If the work is not yet liked, we love it
+      axios.post(`${API.boongo_url}/like`, { user_id: user_id, for_work_id: work_id }, {
+        headers: {
+          'Authorization': `Bearer ${userInfo.api_token}`,
+          'X-localization': getLanguage(),
+        }
+      }).then(res => {
+        const message = res.data.message;
+
+        ToastAndroid.show(message, ToastAndroid.LONG);
+        console.log(message);
+
+        // Update likes counter and status
+        setLikeCount(likeCount + 1); // Increment
+        setHasLiked(true); // The user likes the work
+        setLoading(false);
+      }).catch(error => {
+        handleApiError(error);
+      });
+    }
   };
 
   // Custom "TabBar"
@@ -570,6 +620,14 @@ const EventScreen = () => {
             </View>
             <Text style={{ fontSize: 28, fontWeight: '400', color: COLORS.black, lineHeight: PADDING.p10, maxWidth: '75%', marginLeft: PADDING.p02 }}>{selectedEvent.event_title || '...'}</Text>
           </View>
+
+          {selectedEvent && (
+            <View style={{ paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', borderRadius: 37 / 2 }} onPress={() => navigation.goBack()}>
+                <Icon name='chevron-left' size={41} color='black' />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </Animated.View>
       <Animated.View

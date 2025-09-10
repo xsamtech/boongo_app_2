@@ -487,6 +487,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [eventPlace, setEventPlace] = useState('');
+  const [eventPlaceAddress, setEventPlaceAddress] = useState('');
   const [imageData, setImageData] = useState(null);
   const [isOnline, setIsOnline] = useState(false);
   const flatListRef = listRef || useRef(null);
@@ -685,7 +686,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             data={combinedData}
             extraData={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
-            renderItem={({ item }) => (<EventItemComponent item={item} event_id={item.id} event_title={item.event_title} event_profile={item.cover_url} />)}
+            renderItem={({ item }) => (<EventItemComponent item={item} />)}
             horizontal={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}
@@ -802,14 +803,25 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
                 {/* Champ de lieu ou URL */}
                 {!isOnline && (
-                  <TextInput
-                    style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
-                    label={t('event.data.event_place')}
-                    value={eventPlace}
-                    placeholder={t('event.data.event_place')}
-                    placeholderTextColor={COLORS.dark_secondary}
-                    onChangeText={setEventPlace}
-                  />
+                  <>
+                    <TextInput
+                      style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                      label={t('event.data.event_place')}
+                      value={eventPlace}
+                      placeholder={t('event.data.event_place')}
+                      placeholderTextColor={COLORS.dark_secondary}
+                      onChangeText={setEventPlace}
+                    />
+
+                    <TextInput
+                      style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+                      label={t('event.data.event_place_address')}
+                      value={eventPlaceAddress}
+                      placeholder={t('event.data.event_place_address')}
+                      placeholderTextColor={COLORS.dark_secondary}
+                      onChangeText={setEventPlaceAddress}
+                    />
+                  </>
                 )}
                 {/* {isOnline && (
                   <TextInput
@@ -1275,9 +1287,9 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }
 
   // =============== Event item ===============
-  const EventItemComponent = ({ item, event_id, event_title, event_profile }) => {
+  const EventItemComponent = ({ item }) => {
     return (
-      <Pressable onPress={() => { navigation.navigate('NewChat', { chat_entity: 'event', chat_entity_id: event_id, chat_entity_name: event_title, chat_entity_profile: event_profile }) }} style={{
+      <Pressable onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{
         flexDirection: 'row',
         alignItems: 'center',
         padding: PADDING.p03,
@@ -1325,7 +1337,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             data={combinedData}
             extraData={combinedData}
             keyExtractor={(item, index) => `${item.id || 'no-id'}-${index}`}
-            renderItem={({ item }) => (<EventItemComponent item={item} event_id={item.id} event_title={item.event_title} event_profile={item.cover_url} />)}
+            renderItem={({ item }) => (<EventItemComponent item={item} />)}
             horizontal={false}
             showsVerticalScrollIndicator={false}
             onScroll={handleScroll}

@@ -228,6 +228,32 @@ const HeaderComponent = ({ title }) => {
       </>
     );
   }
+
+  if (route.name === 'Notifications') {
+    return (
+      <>
+        {/* Status bar */}
+        <StatusBar barStyle='dark-content' backgroundColor={COLORS.primary} />
+
+        {/* Content */}
+        <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white }]}>
+          {/* Brand */}
+          <View style={{ flexDirection: 'row' }}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon name='chevron-left' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
+            </TouchableOpacity>
+            <LogoText width={115} height={31} style={{ marginLeft: PADDING.p01 }} />
+            {title ?
+              <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
+              : ''}
+            <TouchableOpacity style={{ alignSelf: 'flex-end' }}>
+              <Icon name='dots-vertical' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </>
+    );
+  }
 };
 
 export default HeaderComponent;

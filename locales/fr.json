@@ -152,6 +152,7 @@
             "end_at": "Date/Heure de fin",
             "is_online": "Événement en ligne (Webinaire)",
             "event_place": "Lieu de l’événement",
+            "event_place_address": "Adresse du lieu",
             "cover_url": "Ajouter une couverture"
         }
     },
@@ -471,6 +472,66 @@
             "description": "Devenez un de nos partenaires pour pouvoir publier vos ouvrages qui seront visibles par tous. Et cela vous donnera l’avantage d’acquérir de l’argent selon les consultations du public.",
             "terms_link": "Veuillez cliquer ci-dessous pour voir nos conditions.",
             "start_button": "Devenir partenaire"
+        }
+    },
+    "notifications": {
+        "payment": {
+            "succeed": "Votre paiement a réussi.",
+            "failed": "Votre paiement a échoué."
+        },
+        "message": {
+            "to_organization": "{{ username }} a envoyé un message à l’organisation {{ organisation_name }}.",
+            "to_event": "{{ username }} a envoyé un message à l’événement « {{ event_title }} »."
+        },
+        "user": {
+            "new": "Bienvenue sur Boongo ! Veuillez lire nos conditions d’utilisation pour mieux utiliser la plateforme.",
+            "back": "Bon retour sur Boongo ! Veuillez consulter notre politique de confidentialité, car nous avons peut-être mis à jour."
+        },
+        "partnership": {
+            "partner": "{{ username }} veut devenir partenaire.",
+            "sponsor": "{{ username }} veut sponsoriser la plateforme."
+        },
+        "event": {
+            "new": "{{ organisation_name }} a créé un nouvel événement.",
+            "title_changed": "{{ organisation_name }} a changé le nom de l’événement « {{ former_event_title }} » en « {{ event_title }} ».",
+            "request_for_membership": "{{ username }} veut adhérer à votre événement « {{ event_title }} ».",
+            "expulsion": "Vous avez été rétiré de l’événement « {{ event_title }} ».",
+            "separation": "{{ username }} a quitté votre événement « {{ event_title }} ».",
+            "invitation": {
+                "speaker": "{{ organisation_name }} vous a invité en tant que speaker à l’événement « {{ event_title }}.",
+                "member": "{{ organisation_name }} vous a invité à l’événement « {{ event_title }}."
+            }
+        },
+        "circle": {
+            "request_for_membership": "{{ username }} veut adhérer à votre cercle de discussion « {{ circle_name }} ».",
+            "expulsion": "Vous avez été rétiré du cercle de discussion « {{ circle_name }} ».",
+            "separation": "{{ username }} a quitté votre cercle de discussion « {{ circle_name }} ».",
+            "invitation": {
+                "admin": "{{ username }} vous a invité en tant qu’administrateur au cercle de discussion « {{ circle_name }} ».",
+                "member": "{{ username }} vous a invité au cercle de discussion « {{ circle_name }} »."
+            }
+        },
+        "work": {
+            "subscription": {
+                "one": "{{ username }} a souscrit à la consultation de votre œuvre.",
+                "two": "{{ username }} et un autre membre ont souscrit à la consultation de votre œuvre.",
+                "many": "{{ count }} membres ont souscrit à la consultation de votre œuvre."
+            },
+            "consultation": {
+                "one": "{{ username }} a consulté votre œuvre.",
+                "two": "{{ username }} et un autre membre ont consulté votre œuvre.",
+                "many": "{{ count }} membres ont consulté votre œuvre."
+            },
+            "like": {
+                "one": "{{ username }} a aimé votre œuvre.",
+                "two": "{{ username }} et un autre membre ont aimé votre œuvre.",
+                "many": "{{ count }} membres ont aimé votre œuvre."
+            },
+            "publishing": {
+                "one": "{{ username }} a publié une œuvre.",
+                "two": "{{ username }} et un autre membre ont publié des œuvres.",
+                "many": "{{ count }} membres ont publié des œuvres."
+            }
         }
     }
 }
