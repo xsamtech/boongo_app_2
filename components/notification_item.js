@@ -6,7 +6,8 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import Icon from 'react-native-vector-icons/FontAwesome6';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FaIcon from 'react-native-vector-icons/FontAwesome6';
 import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import { getTranslationKeyFromAlias } from '../utils/notificationMapper';
 import useColors from '../hooks/useColors';
@@ -18,6 +19,13 @@ const NotificationItemComponent = ({ item, onPress }) => {
     const navigation = useNavigation();
     // =============== Language ===============
     const { t } = useTranslation();
+
+    // =============== First letter uppercase ===============
+    const ucfirst = (str) => {
+        if (!str) return str;
+
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
 
     // =============== Message ===============
     let message = '';
@@ -64,12 +72,13 @@ const NotificationItemComponent = ({ item, onPress }) => {
     };
 
     return (
-        <TouchableOpacity style={{ flex: 1, paddingVertical: PADDING.p00, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-                <Icon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s09} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
-                <Text style={{ color: COLORS.black }}>{message}</Text>
+        <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+            <Icon name='circle' size={10} color={COLORS.info} style={{ position: 'absolute', top: PADDING.p02, right: PADDING.p02 }} />
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <FaIcon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
+                <Text style={{ width: '90%', fontWeight: (item.text_content ? '300' : '500'), color: COLORS.black }} numberOfLines={3}>{message}</Text>
             </View>
-            <Text style={{ fontSize: TEXT_SIZE.label, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{item.created_at_explicit}</Text>
+            <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
         </TouchableOpacity>
     );
 };

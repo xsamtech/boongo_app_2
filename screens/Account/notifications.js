@@ -239,7 +239,7 @@ const NotificationsScreen = () => {
               onEndReached={onEndReached}
               onEndReachedThreshold={0.1}
               scrollEventThrottle={16}
-              contentContainerStyle={{ paddingTop: 40 }}
+              contentContainerStyle={{ paddingTop: 0 }}
               windowSize={10}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={0} />}
               ListEmptyComponent={<EmptyListComponent iconName='bell-outline' title={t('empty_list.title')} description={t('empty_list.title')} />}
