@@ -78,9 +78,8 @@ const NotificationsScreen = () => {
 
     try {
       const response = await axios.get(`${API.boongo_url}/notification/select_by_status_user/23/${userInfo.id}`, { headers: mHeaders });
-      const notificationData = response.data.data;
+      const grouped = groupNotificationsGlobally(response.data.data);
 
-      const grouped = groupNotificationsGlobally(notificationData);
       setNotifications(grouped);
     } catch (error) {
       console.error('Erreur lors du fetch des notifications récentes:', error);
@@ -94,14 +93,15 @@ const NotificationsScreen = () => {
     try {
       const response = await axios.get(`${API.boongo_url}/read_notification/select_by_user/${userInfo.id}?page=${pageToFetch}`, { headers: mHeaders });
 
-      const notificationData = response.data.data;
-
       if (pageToFetch === 1) {
-        setReadNotifications(notificationData);
+        setReadNotifications(response.data.data);
+
       } else {
-        setReadNotifications(prev => [...prev, ...notificationData]);
+        setReadNotifications(prev => [...prev, ...response.data.data]);
       }
 
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
     } catch (error) {
       console.error('Erreur lors du fetch des notifications lues:', error);
     }
