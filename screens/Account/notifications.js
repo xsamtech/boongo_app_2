@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { View, Text, FlatList, RefreshControl, Dimensions, TouchableOpacity, ToastAndroid } from 'react-native';
+import { View, Text, FlatList, RefreshControl, Dimensions, TouchableOpacity, ToastAndroid, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -216,7 +216,7 @@ const NotificationsScreen = () => {
     <>
       {/* Header */}
       <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
-        <HeaderComponent title={t('navigation.establishment.title')} />
+        <HeaderComponent title={t('navigation.notification')} />
       </View>
 
       {/* Content */}

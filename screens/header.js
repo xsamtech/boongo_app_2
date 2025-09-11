@@ -242,14 +242,14 @@ const HeaderComponent = ({ title }) => {
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon name='chevron-left' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
             </TouchableOpacity>
-            <LogoText width={115} height={31} style={{ marginLeft: PADDING.p01 }} />
+            <Logo width={30} height={30} style={{ marginRight: PADDING.p01 }} />
             {title ?
               <Text style={{ fontSize: 20, fontWeight: '500', color: COLORS.black }}>{title}</Text>
               : ''}
-            <TouchableOpacity style={{ alignSelf: 'flex-end' }}>
-              <Icon name='dots-vertical' size={34} color={COLORS.black} style={{ marginTop: -5 }} />
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity style={{ alignSelf: 'flex-end' }}>
+            <Icon name='dots-vertical' size={34} color={COLORS.black} style={{ marginTop: -5, marginRight: -5 }} />
+          </TouchableOpacity>
         </View>
       </>
     );
