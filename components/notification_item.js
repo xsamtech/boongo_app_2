@@ -48,7 +48,7 @@ const NotificationItemComponent = ({ item, onPress }) => {
         const translationKey = getTranslationKeyFromAlias(item.type.alias, entity);
 
         message = t(translationKey, {
-            username: `${item.from_user?.firstname} ${item.from_user?.lastname}`,
+            username: `${item.from?.firstname} ${item.from?.lastname}`,
             event_title: item.event?.event_title,
             organisation_name: item.organization?.org_name,
             circle_name: item.circle?.circle_name,
