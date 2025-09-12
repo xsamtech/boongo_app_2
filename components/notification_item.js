@@ -71,16 +71,29 @@ const NotificationItemComponent = ({ item, onPress }) => {
         return iconParts[iconParts.length - 1].replace(/^fa-/, '');  // Remove "fa-" if necessary
     };
 
-    return (
-        <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
-            <Icon name='circle' size={10} color={COLORS.info} style={{ position: 'absolute', top: PADDING.p02, right: PADDING.p02 }} />
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <FaIcon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
-                <Text style={{ width: '90%', fontWeight: (item.text_content ? '300' : '500'), color: COLORS.black }} numberOfLines={3}>{message}</Text>
-            </View>
-            <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
-        </TouchableOpacity>
-    );
+    if (item.type) {
+        return (
+            <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+                <Icon name='circle' size={10} color={COLORS.info} style={{ position: 'absolute', top: PADDING.p02, right: PADDING.p02 }} />
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <FaIcon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
+                    <Text style={{ width: '90%', fontWeight: '500', color: COLORS.black }} numberOfLines={3}>{message}</Text>
+                </View>
+                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
+            </TouchableOpacity>
+        );
+
+    } else {
+        return (
+            <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <FaIcon name={cleanIconName(item.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
+                    <Text style={{ width: '90%', fontWeight: '300', color: COLORS.black }} numberOfLines={3}>{message}</Text>
+                </View>
+                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
+            </TouchableOpacity>
+        );
+    }
 };
 
 export default NotificationItemComponent;

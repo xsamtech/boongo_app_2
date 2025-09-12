@@ -72,41 +72,6 @@ const NotificationsScreen = () => {
     }
   };
 
-  // =============== Load real-time notifications ===============
-  const fetchRecentNotifications = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await axios.get(`${API.boongo_url}/notification/select_by_status_user/23/${userInfo.id}`, { headers: mHeaders });
-      const grouped = groupNotificationsGlobally(response.data.data);
-
-      setNotifications(grouped);
-    } catch (error) {
-      console.error('Erreur lors du fetch des notifications récentes:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // =============== Load old paginated notifications (optional if you want infinite scroll) ===============
-  const fetchOldNotifications = async (pageToFetch = 1) => {
-    try {
-      const response = await axios.get(`${API.boongo_url}/read_notification/select_by_user/${userInfo.id}?page=${pageToFetch}`, { headers: mHeaders });
-
-      if (pageToFetch === 1) {
-        setReadNotifications(response.data.data);
-
-      } else {
-        setReadNotifications(prev => [...prev, ...response.data.data]);
-      }
-
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      console.error('Erreur lors du fetch des notifications lues:', error);
-    }
-  };
-
   // =============== Handle on notification press ===============
   const handleNotificationPress = async (item) => {
     const isUnread = !item.text_content; // ⬅️ Unread notifications do not have "text_content"
@@ -202,8 +167,48 @@ const NotificationsScreen = () => {
     }
   };
 
+  // =============== Load real-time notifications ===============
+  const fetchRecentNotifications = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(`${API.boongo_url}/notification/select_by_status_user/22/${userInfo.id}`, { headers: mHeaders });
+      const grouped = groupNotificationsGlobally(response.data.data);
+
+      setNotifications(grouped);
+    } catch (error) {
+      console.error('Erreur lors du fetch des notifications récentes:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =============== Load old paginated notifications (optional if you want infinite scroll) ===============
+  const fetchOldNotifications = async (pageToFetch = 1) => {
+    try {
+      const response = await axios.get(`${API.boongo_url}/read_notification/select_by_user/${userInfo.id}?page=${pageToFetch}`, { headers: mHeaders });
+
+      if (pageToFetch === 1) {
+        setReadNotifications(response.data.data);
+
+      } else {
+        setReadNotifications(prev => [...prev, ...response.data.data]);
+      }
+
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      console.error('Erreur lors du fetch des notifications lues:', error);
+    }
+  };
+
   useEffect(() => {
-    fetchRecentNotifications();
+    const interval = setInterval(() => {
+      fetchRecentNotifications();
+      fetchOldNotifications(page);
+    }, 3000); // toutes les 3 sec
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -242,7 +247,7 @@ const NotificationsScreen = () => {
               contentContainerStyle={{ paddingTop: 0 }}
               windowSize={10}
               refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={0} />}
-              ListEmptyComponent={<EmptyListComponent iconName='bell-outline' title={t('empty_list.title')} description={t('empty_list.title')} />}
+              ListEmptyComponent={<EmptyListComponent iconName='bell-outline' title={t('empty_list.title')} description='' />}
               ListFooterComponent={() =>
                 isLoading ? (
                   <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>{t('loading')}</Text>
