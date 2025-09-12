@@ -203,6 +203,11 @@ const NotificationsScreen = () => {
   };
 
   useEffect(() => {
+    fetchRecentNotifications();
+    fetchOldNotifications(1);
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       fetchRecentNotifications();
       fetchOldNotifications(page);
