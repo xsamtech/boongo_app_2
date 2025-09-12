@@ -107,26 +107,49 @@ export const groupNotificationsGlobally = (notifications) => {
     const groupedMap = new Map();
 
     notifications.forEach((notif) => {
-        const key = `${notif.type.alias}-${notif.circle_id || 'null'}-${notif.event_id || 'null'}`;
+        let entityId = 'null';
+
+        // Définir l'ID d'entité principal en fonction de l'alias
+        switch (notif.type.alias) {
+            case 'subscription_notif':
+            case 'work_consultation_notif':
+            case 'liked_work_notif':
+            case 'liked_message_notif':
+                entityId = notif.work_id || 'null';
+                break;
+            case 'new_event_notif':
+            case 'event_title_changed_notif':
+            case 'invited_as_speaker_notif':
+            case 'message_in_event_notif':
+                entityId = notif.event_id || 'null';
+                break;
+            case 'invitation_notif':
+            case 'membership_request_notif':
+            case 'expulsion_notif':
+            case 'separation_notif':
+                entityId = notif.circle_id || 'null';
+                break;
+            default:
+                entityId = 'global'; // pour les notifs génériques
+                break;
+        }
+
+        const key = `${notif.type.alias}-${entityId}`;
 
         if (!groupedMap.has(key)) {
-            // Initialize a group
             groupedMap.set(key, {
                 ...notif,
                 group_count: 1,
                 from_users: [notif.from_user],
             });
         } else {
-            // Add to existing group
             const group = groupedMap.get(key);
             group.group_count += 1;
             group.from_users.push(notif.from_user);
-            // We keep the most recent (so we don't replace `created_at`)
             groupedMap.set(key, group);
         }
     });
 
-    // Transform into array with entity ("one", "two", "many")
     const result = Array.from(groupedMap.values()).map((group) => {
         const count = group.group_count;
 
@@ -136,7 +159,6 @@ export const groupNotificationsGlobally = (notifications) => {
         };
     });
 
-    // Sort by creation date (desc)
     result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return result;

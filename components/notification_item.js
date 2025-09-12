@@ -3,12 +3,12 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FaIcon from 'react-native-vector-icons/FontAwesome6';
-import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
+import { IMAGE_SIZE, PADDING } from '../tools/constants';
 import { getTranslationKeyFromAlias } from '../utils/notificationMapper';
 import useColors from '../hooks/useColors';
 
@@ -33,7 +33,7 @@ const NotificationItemComponent = ({ item, onPress }) => {
     if (item.text_content) {
         // ✅ Notification already read: use text_content
         message = t(item.text_content, {
-            username: `${item.from_user?.firstname} ${item.from_user?.lastname}`,
+            username: `${item.from?.firstname} ${item.from?.lastname}`,
             event_title: item.event?.event_title,
             organisation_name: item.organization?.org_name,
             circle_name: item.circle?.circle_name,
@@ -73,25 +73,25 @@ const NotificationItemComponent = ({ item, onPress }) => {
 
     if (item.type) {
         return (
-            <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+            <Pressable style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
                 <Icon name='circle' size={10} color={COLORS.info} style={{ position: 'absolute', top: PADDING.p02, right: PADDING.p02 }} />
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                     <FaIcon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
-                    <Text style={{ width: '90%', fontWeight: '500', color: COLORS.black }} numberOfLines={3}>{message}</Text>
+                    <Text style={{ width: '85%', fontWeight: '500', color: COLORS.black }} numberOfLines={3}>{message}</Text>
                 </View>
-                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
-            </TouchableOpacity>
+                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }}>{ucfirst(item.created_at_explicit)}</Text>
+            </Pressable>
         );
 
     } else {
         return (
-            <TouchableOpacity style={{ flex: 1, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <Pressable style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                     <FaIcon name={cleanIconName(item.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
-                    <Text style={{ width: '90%', fontWeight: '300', color: COLORS.black }} numberOfLines={3}>{message}</Text>
+                    <Text style={{ width: '85%', fontWeight: '300', color: COLORS.black }} numberOfLines={3}>{message}</Text>
                 </View>
-                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, alignSelf: 'flex-end' }}>{ucfirst(item.created_at_explicit)}</Text>
-            </TouchableOpacity>
+                <Text style={{ fontSize: 12, color: COLORS.dark_secondary, position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }}>{ucfirst(item.created_at_explicit)}</Text>
+            </Pressable>
         );
     }
 };
