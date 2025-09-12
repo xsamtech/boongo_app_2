@@ -206,7 +206,7 @@ const NotificationsScreen = () => {
     const interval = setInterval(() => {
       fetchRecentNotifications();
       fetchOldNotifications(page);
-    }, 3000); // toutes les 3 sec
+    }, 10000); // toutes les 10 sec
 
     return () => clearInterval(interval);
   }, []);
