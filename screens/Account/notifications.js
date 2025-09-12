@@ -115,8 +115,8 @@ const NotificationsScreen = () => {
         redirectURL = `${WEB.boongo_url}/messages/${item.circle_id}`;
 
       } else {
-        redirectScreen = 'Account';
-        redirectURL = `${WEB.boongo_url}/account`;
+        redirectScreen = 'About';
+        redirectURL = `${WEB.boongo_url}/about/terms_of_use`;
       }
 
       // ✅ Adds a safety feature in case redirectScreen is always empty

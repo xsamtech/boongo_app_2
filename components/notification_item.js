@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -73,25 +73,25 @@ const NotificationItemComponent = ({ item, onPress }) => {
 
     if (item.type) {
         return (
-            <Pressable style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+            <TouchableOpacity style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
                 <Icon name='circle' size={10} color={COLORS.info} style={{ position: 'absolute', top: PADDING.p02, right: PADDING.p02 }} />
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                     <FaIcon name={cleanIconName(item.type.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
                     <Text style={{ width: '85%', fontWeight: '500', color: COLORS.black }} numberOfLines={3}>{message}</Text>
                 </View>
                 <Text style={{ fontSize: 12, color: COLORS.dark_secondary, position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }}>{ucfirst(item.created_at_explicit)}</Text>
-            </Pressable>
+            </TouchableOpacity>
         );
 
     } else {
         return (
-            <Pressable style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
+            <TouchableOpacity style={{ flex: 1, height: 85, backgroundColor: COLORS.white, marginBottom: 1, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p01 }} onPress={() => onPress(item)}>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
                     <FaIcon name={cleanIconName(item.icon)} size={IMAGE_SIZE.s07} color={COLORS.black} style={{ marginRight: PADDING.p01 }} />
                     <Text style={{ width: '85%', fontWeight: '300', color: COLORS.black }} numberOfLines={3}>{message}</Text>
                 </View>
                 <Text style={{ fontSize: 12, color: COLORS.dark_secondary, position: 'absolute', bottom: PADDING.p01, right: PADDING.p01 }}>{ucfirst(item.created_at_explicit)}</Text>
-            </Pressable>
+            </TouchableOpacity>
         );
     }
 };
