@@ -74,32 +74,29 @@ const NotificationsScreen = () => {
 
   // =============== Handle on notification press ===============
   const handleNotificationPress = async (item) => {
-    const isUnread = !item.text_content; // ⬅️ Unread notifications do not have "text_content"
+    const isUnread = !item.text_content;
 
     let redirectScreen = '';
     let redirectURL = '';
     let redirectParams = {};
     let translationKey = '';
 
-    // === If the notification is NOT read ===
     if (isUnread) {
-      // Determines the entity (useful for generating the translation key)
+      // ========== Déterminer l'entité pour la traduction ==========
       let entity = null;
 
       if (['subscription_notif', 'work_consultation_notif', 'liked_work_notif', 'liked_message_notif'].includes(item.type.alias)) {
         entity = item.group_entity || 'one';
-
       } else if (item.circle_id) {
         entity = 'circle';
-
       } else if (item.event_id) {
         entity = 'event';
       }
 
-      // Translate key
+      // ========== Traduction dynamique ==========
       translationKey = getTranslationKeyFromAlias(item.type.alias, entity);
 
-      // Determine redirection
+      // ========== Déterminer la redirection ==========
       if (item.work_id || item.like_id) {
         redirectScreen = 'WorkData';
         redirectParams = { itemId: item.work_id || item.id };
@@ -119,51 +116,82 @@ const NotificationsScreen = () => {
         redirectURL = `${WEB.boongo_url}/about/terms_of_use`;
       }
 
-      // ✅ Adds a safety feature in case redirectScreen is always empty
       if (!redirectScreen) {
         redirectScreen = 'Account';
         redirectURL = `${WEB.boongo_url}/account`;
       }
 
-      // 🔁 Mark as read and send `text_content`, `screen`, `redirect_url`
+      // ========== Trouver l'entité clé (work_id, like_id, event_id, circle_id) ==========
+      let entityKey = null;
+      let entityValue = null;
+
+      if (item.work_id) {
+        entityKey = 'work_id';
+        entityValue = item.work_id;
+      } else if (item.like_id) {
+        entityKey = 'like_id';
+        entityValue = item.like_id;
+      } else if (item.event_id) {
+        entityKey = 'event_id';
+        entityValue = item.event_id;
+      } else if (item.circle_id) {
+        entityKey = 'circle_id';
+        entityValue = item.circle_id;
+      }
+
+      // ========== Filtrer les notifications similaires non lues ==========
+      const matchingNotifs = notifications.filter((notif) => {
+        const sameAlias = notif.type.alias === item.type.alias;
+        const sameEntity = entityKey && notif[entityKey] === entityValue;
+        return sameAlias && sameEntity;
+      });
+
+      const ids = matchingNotifs.map((n) => n.id).join(',');
+
+      console.log('🔔 IDs à marquer comme lus :', ids);
+
+      // 🔁 Marquer comme lue côté API (commenté pour l’instant)
       try {
-        await axios.put(`${API.boongo_url}/notification/switch_status/${item.id}/23`, { text_content: translationKey, screen: redirectScreen, redirect_url: redirectURL, }, { headers: mHeaders });
-
-        // After marking as successfully read
-        setNotifications((prev) => prev.filter((n) => n.id !== item.id));
-
-        // Reloads page 1 of read notifications (option 1: cleaner but a bit slower)
+        /*
+        await axios.put(`${API.boongo_url}/notification/switch_status/${ids}/23`, {
+          text_content: translationKey,
+          screen: redirectScreen,
+          redirect_url: redirectURL,
+        }, {
+          headers: mHeaders
+        });
+  
+        // Mettre à jour le state local
+        const updated = notifications.filter(n => !matchingNotifs.includes(n));
+        setNotifications(updated);
+  
+        // Recharger les notifications lues
         fetchOldNotifications(1);
+        */
       } catch (error) {
         console.error('Erreur lors de la mise à jour de la notification:', error);
       }
     }
 
-    // === Redirection ===
-    if (isUnread) {
-      // We use what we determined above
-      try {
+    // ========== Redirection ==========
+    try {
+      if (isUnread) {
         navigation.navigate(redirectScreen, redirectParams);
-      } catch (error) {
-        ToastAndroid.show(`Erreur navigation vers « ${redirectScreen} » ${error}`);
-        console.warn('Erreur navigation vers', redirectScreen, error);
-        navigation.navigate('Account'); // fallback
-      }
-
-    } else {
-      // 🔁 Notification already read → use screen directly
-      if (item.screen === 'WorkData') {
-        navigation.navigate('WorkData', { itemId: item.entity_id });
-
-      } else if (item.screen === 'Event') {
-        navigation.navigate('Event', { event_id: item.entity_id });
-
-      } else if (item.screen === 'ChatEntity') {
-        navigation.navigate('ChatEntity');
-
       } else {
-        navigation.navigate(item.screen || 'Account');
+        if (item.screen === 'WorkData') {
+          navigation.navigate('WorkData', { itemId: item.entity_id });
+        } else if (item.screen === 'Event') {
+          navigation.navigate('Event', { event_id: item.entity_id });
+        } else if (item.screen === 'ChatEntity') {
+          navigation.navigate('ChatEntity');
+        } else {
+          navigation.navigate(item.screen || 'Account');
+        }
       }
+    } catch (error) {
+      ToastAndroid.show(`Erreur navigation vers « ${redirectScreen} » ${error}`);
+      console.warn('Erreur navigation vers', redirectScreen, error);
+      navigation.navigate('Account'); // Fallback
     }
   };
 
