@@ -28,6 +28,7 @@ const NotificationsScreen = () => {
   const { userInfo } = useContext(AuthContext);
   // =============== Get data ===============
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [rawUnreadNotifications, setRawUnreadNotifications] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
   const [combinedNotifications, setCombinedNotifications] = useState([]);
@@ -87,8 +88,10 @@ const NotificationsScreen = () => {
 
       if (['subscription_notif', 'work_consultation_notif', 'liked_work_notif', 'liked_message_notif'].includes(item.type.alias)) {
         entity = item.group_entity || 'one';
+
       } else if (item.circle_id) {
         entity = 'circle';
+
       } else if (item.event_id) {
         entity = 'event';
       }
@@ -128,22 +131,29 @@ const NotificationsScreen = () => {
       if (item.work_id) {
         entityKey = 'work_id';
         entityValue = item.work_id;
+
       } else if (item.like_id) {
         entityKey = 'like_id';
         entityValue = item.like_id;
+
       } else if (item.event_id) {
         entityKey = 'event_id';
         entityValue = item.event_id;
+
       } else if (item.circle_id) {
         entityKey = 'circle_id';
         entityValue = item.circle_id;
       }
 
       // ========== Filtrer les notifications similaires non lues ==========
-      const matchingNotifs = notifications.filter((notif) => {
+      const matchingNotifs = rawUnreadNotifications.filter((notif) => {
         const sameAlias = notif.type.alias === item.type.alias;
-        const sameEntity = entityKey && notif[entityKey] === entityValue;
-        return sameAlias && sameEntity;
+        const sameWork = item.work_id && notif.work_id === item.work_id;
+        const sameLike = item.like_id && notif.like_id === item.like_id;
+        const sameEvent = item.event_id && notif.event_id === item.event_id;
+        const sameCircle = item.circle_id && notif.circle_id === item.circle_id;
+
+        return sameAlias && (sameWork || sameLike || sameEvent || sameCircle);
       });
 
       const ids = matchingNotifs.map((n) => n.id).join(',');
@@ -177,13 +187,17 @@ const NotificationsScreen = () => {
     try {
       if (isUnread) {
         navigation.navigate(redirectScreen, redirectParams);
+
       } else {
         if (item.screen === 'WorkData') {
           navigation.navigate('WorkData', { itemId: item.entity_id });
+
         } else if (item.screen === 'Event') {
           navigation.navigate('Event', { event_id: item.entity_id });
+
         } else if (item.screen === 'ChatEntity') {
           navigation.navigate('ChatEntity');
+
         } else {
           navigation.navigate(item.screen || 'Account');
         }
@@ -201,7 +215,13 @@ const NotificationsScreen = () => {
 
     try {
       const response = await axios.get(`${API.boongo_url}/notification/select_by_status_user/22/${userInfo.id}`, { headers: mHeaders });
-      const grouped = groupNotificationsGlobally(response.data.data);
+      const notificationData = response.data.data;
+
+      // ⏺️ We keep the originals ungrouped
+      setRawUnreadNotifications(notificationData);
+
+      // ⏺️ And we normally group for display
+      const grouped = groupNotificationsGlobally(notificationData);
 
       setNotifications(grouped);
     } catch (error) {

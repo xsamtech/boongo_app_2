@@ -3,13 +3,14 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useEffect, useState, useRef, useContext } from 'react';
-import { View, Text, SafeAreaView, RefreshControl, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, RefreshControl, Animated, TouchableOpacity, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useColors from '../../hooks/useColors';
 import { AuthContext } from '../../contexts/AuthContext';
-import { API, IMAGE_SIZE, PADDING } from '../../tools/constants';
+import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
 import homeStyles from '../style';
 import ChatItemComponent from '../../components/chat_item';
 import EmptyListComponent from '../../components/empty_list';
@@ -33,35 +34,81 @@ const ChatsScreen = () => {
   const flatListRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  const fetchDiscussions = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
-
-    setIsLoading(true);
-
+  // Load discussions from local storage
+  const fetchDiscussions = async () => {
     try {
-      const response = await axios.get(`${API.boongo_url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
-        headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` }, params: { page: pageToFetch }
-      });
+      setIsLoading(true);
+      const allKeys = await AsyncStorage.getAllKeys();
+      const chatKeys = allKeys.filter(k => k.startsWith('chat:'));
+      const metaKeys = allKeys.filter(k => k.startsWith('chatmeta:'));
 
-      const data = response.data.data || [];
-
-      if (pageToFetch === 1) {
-        setDiscussions(data);
-
-      } else {
-        setDiscussions(prev => [...prev, ...data]);
+      const metas = {};
+      for (let key of metaKeys) {
+        const raw = await AsyncStorage.getItem(key);
+        if (raw) {
+          const data = JSON.parse(raw);
+          metas[key.replace('chatmeta:', 'chat:')] = data; // map to corresponding chat key
+        }
       }
 
-      setLastPage(response.data.lastPage || 1);
-      setAd(response.data.ad || null);
+      const result = [];
+      for (let key of chatKeys) {
+        const raw = await AsyncStorage.getItem(key);
+        const messages = raw ? JSON.parse(raw) : [];
+        if (messages.length > 0) {
+          const last = messages[0];
+          const meta = metas[key] || {};
 
-    } catch (error) {
-      console.error(error);
+          result.push({
+            id: key,
+            keyName: key,
+            lastMessage: last.message_content,
+            date: last.created_at,
+            chat_entity: meta.chat_entity,
+            chat_entity_id: meta.chat_entity_id,
+            chat_entity_name: meta.chat_entity_name || (last.user?.firstname ?? 'Utilisateur'),
+            chat_entity_profile: meta.chat_entity_profile || last.user?.avatar_url || null,
+          });
+        }
+      }
 
+      result.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setDiscussions(result);
+    } catch (err) {
+      console.warn('Error loading local discussions:', err);
     } finally {
       setIsLoading(false);
     }
   };
+  // const fetchDiscussions = async (pageToFetch = 1) => {
+  //   if (isLoading || pageToFetch > lastPage) return;
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     const response = await axios.get(`${API.boongo_url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
+  //       headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` }, params: { page: pageToFetch }
+  //     });
+
+  //     const data = response.data.data || [];
+
+  //     if (pageToFetch === 1) {
+  //       setDiscussions(data);
+
+  //     } else {
+  //       setDiscussions(prev => [...prev, ...data]);
+  //     }
+
+  //     setLastPage(response.data.lastPage || 1);
+  //     setAd(response.data.ad || null);
+
+  //   } catch (error) {
+  //     console.error(error);
+
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     fetchDiscussions(1);
@@ -127,7 +174,46 @@ const ChatsScreen = () => {
             ref={flatListRef}
             data={combinedData}
             keyExtractor={item => (item.id ?? Math.random().toString()).toString()}
-            renderItem={({ item }) => <ChatItemComponent item={item} />}
+            // renderItem={({ item }) => <ChatItemComponent item={item} />}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('NewChat', {
+                    chat_entity: item.chat_entity,
+                    chat_entity_id: item.chat_entity_id,
+                    chat_entity_name: item.chat_entity_name,
+                    chat_entity_profile: item.chat_entity_profile,
+                  })
+                }
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: COLORS.white,
+                  padding: PADDING.p01,
+                  marginVertical: 4,
+                  borderRadius: 8,
+                }}
+              >
+                <Image
+                  source={{ uri: item.chat_entity_profile }}
+                  style={{
+                    width: IMAGE_SIZE.s08,
+                    height: IMAGE_SIZE.s08,
+                    borderRadius: IMAGE_SIZE.s08 / 2,
+                    marginRight: 10,
+                    backgroundColor: COLORS.light_secondary,
+                  }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: 'bold', color: COLORS.black }}>
+                    {item.chat_entity_name}
+                  </Text>
+                  <Text style={{ color: COLORS.dark_secondary }} numberOfLines={1}>
+                    {item.lastMessage}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
             onScroll={handleScroll}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}

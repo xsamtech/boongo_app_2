@@ -7,6 +7,7 @@ import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoid
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFS from 'react-native-fs';
@@ -48,6 +49,18 @@ const NewChatScreen = ({ route }) => {
 
   // Local storage key (1-1 user)
   const chatKey = `chat:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
+  // Save chat metadata locally for display in ChatsScreen
+  const metaKey = `chatmeta:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
+  useEffect(() => {
+    const meta = {
+      chat_entity,
+      chat_entity_id,
+      chat_entity_name,
+      chat_entity_profile,
+    };
+    AsyncStorage.setItem(metaKey, JSON.stringify(meta)).catch(console.warn);
+  }, [chat_entity, chat_entity_id]);
+
   // Signaling roomName (1-1)
   const roomName = (() => {
     if (chat_entity === 'user') {
@@ -240,6 +253,28 @@ const NewChatScreen = ({ route }) => {
       });
   }, [showEmojis]);
 
+  // =====================
+  // Request camera + mic permissions
+  // =====================
+  const requestAVPermissions = async () => {
+    try {
+      const permissions = [
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      ];
+
+      const granted = await PermissionsAndroid.requestMultiple(permissions);
+
+      const cameraGranted = granted[PermissionsAndroid.PERMISSIONS.CAMERA] === PermissionsAndroid.RESULTS.GRANTED;
+      const audioGranted = granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === PermissionsAndroid.RESULTS.GRANTED;
+
+      return cameraGranted && audioGranted;
+    } catch (err) {
+      console.warn('Permission request error:', err);
+      return false;
+    }
+  };
+
   // =============== Send message ===============
   const handleSend = async () => {
     setIsLoading(true);
@@ -412,10 +447,23 @@ const NewChatScreen = ({ route }) => {
               <TouchableOpacity
                 onPress={async () => {
                   try {
+                    const hasPermission = await requestAVPermissions();
+                    if (!hasPermission) {
+                      ToastAndroid.show('Permission caméra/micro refusée', ToastAndroid.LONG);
+                      return;
+                    }
+
                     const s = await rtc?.enableAV({ audio: true, video: true });
-                    setLocalStream(s);
-                    setShowCall(true);
-                  } catch (e) { console.warn(e); }
+                    if (s) {
+                      setLocalStream(s);
+                      setShowCall(true);
+                    } else {
+                      ToastAndroid.show('Échec du démarrage de la caméra/micro', ToastAndroid.LONG);
+                    }
+                  } catch (e) {
+                    console.warn('Error launching call:', e);
+                    ToastAndroid.show('Erreur de permission ou d’accès caméra/micro', ToastAndroid.LONG);
+                  }
                 }}
               >
                 <Icon name='phone-plus' size={23} color={COLORS.black} />
@@ -456,7 +504,7 @@ const NewChatScreen = ({ route }) => {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      maxWidth: 100,
+                      maxWidth: 300,
                       backgroundColor: COLORS.white,
                       borderRadius: PADDING.p01,
                       padding: PADDING.p01,

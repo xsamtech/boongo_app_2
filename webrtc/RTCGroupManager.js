@@ -33,15 +33,33 @@ export default class RTCGroupManager {
     }
 
     sendTextMessage(msgObj) {
-        Object.values(this.peers).forEach((rtc) => rtc.sendTextMessage(msgObj));
+        Object.values(this.peers).forEach((rtc) => {
+            if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
+                rtc.sendTextMessage(msgObj);
+            } else {
+                console.warn(`⚠️ Peer not ready for text message`);
+            }
+        });
     }
 
     sendFile(file) {
-        Object.values(this.peers).forEach((rtc) => rtc.sendFile(file));
+        Object.values(this.peers).forEach((rtc) => {
+            if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
+                rtc.sendFile(file);
+            } else {
+                console.warn(`⚠️ Peer not ready for file transfer`);
+            }
+        });
     }
 
     closeAll() {
-        Object.values(this.peers).forEach((rtc) => rtc.close());
+        Object.values(this.peers).forEach((rtc) => {
+            try {
+                rtc.close();
+            } catch (err) {
+                console.warn('Error closing peer:', err);
+            }
+        });
         this.peers = {};
     }
 }

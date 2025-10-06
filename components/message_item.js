@@ -118,7 +118,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
         if (hasExternalDocuments) {
             return item.documents.map((file, index) => (
                 <Pressable key={index} onPress={() => FileViewer.open(file.file_url)} style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: 10, padding: PADDING.p02, marginTop: 10 }}>
-                    <Text style={{ color: isOwnMessage ? COLORS.white : COLORS.black, fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>
+                    <Text style={{ color: isOwnMessage ? COLORS.black : COLORS.white, fontSize: TEXT_SIZE.normal, fontWeight: '500' }}>
                         {file.file_name || t('document')}
                     </Text>
                     <Text
@@ -366,7 +366,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
                             )}
 
                             {/* 3) Display for a note about a work */}
-                            {isDocMessage && (
+                            {isDocMessage && item.doc_uri ? (
                                 <Pressable
                                     onPress={handlePress}
                                     style={{ flexDirection: 'column', borderWidth: 1, borderColor: COLORS.light_secondary, borderRadius: PADDING.p01 }}>
@@ -374,7 +374,7 @@ const MessageItem = ({ item, isOwnMessage }) => {
                                     <Text style={{ fontSize: TEXT_SIZE.label }}>{`${t('page')}: ${item.doc_page}`}</Text>
                                     <Text style={{ fontSize: TEXT_SIZE.label }}>{item.doc_note}</Text>
                                 </Pressable>
-                            )}
+                            ) : null}
 
                             {/* 4) Displaying likes */}
                             {renderLike()}

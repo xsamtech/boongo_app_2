@@ -2,46 +2,38 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, mediaDevices, } from 'react-native-webrtc';
+import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, mediaDevices } from 'react-native-webrtc';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
 const ICE_CONFIG = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        // Tu peux ajouter ton/tes TURN ici pour fiabiliser en 4G/CGNAT
+        // You can add your TURN servers here for better reliability (4G/CGNAT)
     ],
 };
 
-/**
- * Signalisation: on utilise Echo private channel + whisper :
- * - channel.listenForWhisper('signal', handler)
- * - channel.whisper('signal', payload)
- *
- * roomName: un identifiant déterministe partagé par les 2 parties
- *   ex: webrtc.user.<minId>-<maxId>
- */
 export default class RTCManager {
     constructor({ echo, roomName, localUserId, onMessage, onFile, onPeerState, onRemoteStream }) {
         this.echo = echo;
         this.roomName = roomName;
         this.localUserId = localUserId;
-        this.onMessage = onMessage;      // (msgObject) -> void
-        this.onFile = onFile;            // ({name, mime, path}) -> void
-        this.onPeerState = onPeerState;  // (state) -> void
-        this.onRemoteStream = onRemoteStream; // (MediaStream) -> void
+        this.onMessage = onMessage;
+        this.onFile = onFile;
+        this.onPeerState = onPeerState;
+        this.onRemoteStream = onRemoteStream;
 
         this.pc = null;
         this.dc = null;
-        this.fileRecv = null; // {meta, chunks: []}
+        this.fileRecv = null;
         this.channel = null;
+        this.isReady = false;
     }
 
-    // Abonnement au canal de signalisation
+    // === Signaling setup ===
     attachSignaling() {
         this.channel = this.echo.private(this.roomName);
 
-        // Réception des signaux
         this.channel.listenForWhisper('signal', async (payload) => {
             const { type, from, data } = payload || {};
             if (from === this.localUserId) return;
@@ -63,7 +55,9 @@ export default class RTCManager {
                     if (this.pc) {
                         try {
                             await this.pc.addIceCandidate(new RTCIceCandidate(data));
-                        } catch { }
+                        } catch (err) {
+                            console.warn('ICE candidate error:', err);
+                        }
                     }
                     break;
             }
@@ -71,7 +65,8 @@ export default class RTCManager {
     }
 
     whisper(type, data) {
-        this.channel && this.channel.whisper('signal', { type, from: this.localUserId, data });
+        if (!this.channel) return;
+        this.channel.whisper('signal', { type, from: this.localUserId, data });
     }
 
     async ensurePC() {
@@ -84,19 +79,19 @@ export default class RTCManager {
         };
 
         this.pc.onconnectionstatechange = () => {
-            this.onPeerState && this.onPeerState(this.pc.connectionState);
+            if (!this.pc) return;
+            const state = this.pc.connectionState || 'unknown';
+            this.onPeerState && this.onPeerState(state);
         };
 
-        // DataChannel côté callee (réception)
         this.pc.ondatachannel = (e) => {
             this.dc = e.channel;
             this.bindDataChannel();
         };
 
-        // Remote stream (audio/vidéo)
         this.pc.ontrack = (event) => {
             const [stream] = event.streams || [];
-            stream && this.onRemoteStream && this.onRemoteStream(stream);
+            if (stream) this.onRemoteStream && this.onRemoteStream(stream);
         };
 
         return this.pc;
@@ -104,14 +99,18 @@ export default class RTCManager {
 
     bindDataChannel() {
         if (!this.dc) return;
-        this.dc.onopen = () => this.onPeerState && this.onPeerState('datachannel-open');
-        this.dc.onclose = () => this.onPeerState && this.onPeerState('datachannel-close');
+
+        this.dc.onopen = () => {
+            this.isReady = true;
+            this.onPeerState && this.onPeerState('datachannel-open');
+        };
+
+        this.dc.onclose = () => {
+            this.isReady = false;
+            this.onPeerState && this.onPeerState('datachannel-close');
+        };
+
         this.dc.onmessage = async (e) => {
-            // Protocole simple:
-            // - {kind:'text', payload:{...}}
-            // - {kind:'file-meta', payload:{name,mime,size,transferId}}
-            // - {kind:'file-chunk', payload:{transferId, base64}}
-            // - {kind:'file-end', payload:{transferId}}
             try {
                 const msg = JSON.parse(e.data);
 
@@ -139,15 +138,15 @@ export default class RTCManager {
                     this.fileRecv = null;
                     return;
                 }
-            } catch {
-                // message non JSON -> ignorer
+            } catch (err) {
+                console.warn('Invalid DataChannel message', err);
             }
         };
     }
 
-    // Appelé par l'initiateur
     async connectAsCaller() {
         await this.ensurePC();
+        if (!this.pc) return;
         this.dc = this.pc.createDataChannel('chat');
         this.bindDataChannel();
 
@@ -156,36 +155,49 @@ export default class RTCManager {
         this.whisper('offer', offer);
     }
 
-    // Ajout audio/vidéo local et envoi au pair
     async enableAV({ audio = true, video = true } = {}) {
         await this.ensurePC();
         const stream = await mediaDevices.getUserMedia({ audio, video });
-        stream.getTracks().forEach((t) => this.pc.addTrack(t, stream));
-        return stream; // pour afficher le local preview
+        stream.getTracks().forEach((t) => this.pc && this.pc.addTrack(t, stream));
+        return stream;
     }
 
     close() {
-        try { this.dc && this.dc.close(); } catch { }
-        try { this.pc && this.pc.close(); } catch { }
+        try {
+            if (this.dc) this.dc.close();
+        } catch (e) {
+            console.warn('Error closing DC:', e);
+        }
+
+        try {
+            if (this.pc) this.pc.close();
+        } catch (e) {
+            console.warn('Error closing PC:', e);
+        }
+
         this.dc = null;
         this.pc = null;
+        this.isReady = false;
     }
 
-    // ----------- Envoi de message texte -----------
+    // === Safe send message ===
     async sendTextMessage(messageObj) {
-        // messageObj : {id, message_content, user:{id,...}, created_at, ...}
-        if (this.dc && this.dc.readyState === 'open') {
+        if (!this.dc || this.dc.readyState !== 'open') {
+            console.warn('⚠️ DataChannel not ready, message not sent.');
+            return;
+        }
+        try {
             this.dc.send(JSON.stringify({ kind: 'text', payload: messageObj }));
+        } catch (err) {
+            console.warn('Error sending text message:', err);
         }
     }
 
-    // ----------- Envoi de fichier (chunké) -----------
-    /**
-     * file: { path, name, mime } (depuis un picker)
-     * chunkSize: ~64KB par défaut
-     */
     async sendFile({ path, name, mime }, chunkSize = 64 * 1024) {
-        if (!this.dc || this.dc.readyState !== 'open') return;
+        if (!this.dc || this.dc.readyState !== 'open') {
+            console.warn('⚠️ DataChannel not ready, file not sent.');
+            return;
+        }
 
         const transferId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
         const base64 = await RNFS.readFile(path, 'base64');
@@ -195,10 +207,10 @@ export default class RTCManager {
             const chunk = base64.substring(i, i + chunkSize);
             this.dc.send(JSON.stringify({ kind: 'file-chunk', payload: { transferId, base64: chunk } }));
         }
+
         this.dc.send(JSON.stringify({ kind: 'file-end', payload: { transferId } }));
     }
 
-    // ----------- Stockage local (append) -----------
     static async appendLocalMessage(chatKey, msg) {
         const raw = await AsyncStorage.getItem(chatKey);
         const arr = raw ? JSON.parse(raw) : [];

@@ -2,10 +2,11 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Image, Pressable, SafeAreaView, Linking, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { AuthContext } from '../contexts/AuthContext';
 import useColors from '../hooks/useColors';
 import { IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,10 +15,12 @@ import homeStyles from '../screens/style';
 const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_profile, doc_title, doc_page, doc_note }) => {
     // =============== Colors ===============
     const COLORS = useColors();
-    // =============== Navigation ===============
-    const navigation = useNavigation();
     // =============== Language ===============
     const { t } = useTranslation();
+    // =============== Navigation ===============
+    const navigation = useNavigation();
+    // =============== Get contexts ===============
+    const { userInfo } = useContext(AuthContext);
 
     const handlePress = () => {
         navigation.navigate('NewChat', { chat_entity: entity, chat_entity_id: entity_id, chat_entity_name: entity_name, chat_entity_profile: entity_profile, doc_title: doc_title, doc_page: doc_page, doc_note: doc_note });
@@ -93,7 +96,7 @@ const EntityItemComponent = ({ item, entity, entity_id, entity_name, entity_prof
                         }}
                     />
                     <View style={{ flex: 1 }}>
-                        <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{`${item.firstname} ${item.lastname}`}</Text>
+                        <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{item.id === userInfo.id ? t('you') : `${item.firstname} ${item.lastname}`}</Text>
                         <Text numberOfLines={1} style={{ color: COLORS.dark_secondary }}>{`@${item.username}`}</Text>
                     </View>
                     <Icon name="chevron-right" size={IMAGE_SIZE.s05} color={COLORS.black} />
