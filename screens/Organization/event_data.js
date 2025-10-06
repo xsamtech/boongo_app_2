@@ -613,7 +613,7 @@ const EventScreen = () => {
           <Image source={{ uri: selectedEvent.cover_url || `${WEB.boongo_url}/assets/img/banner-event.png` }} style={{ width: Dimensions.get('window').width, height: 250, marginTop: -20, marginBottom: PADDING.p00 }} />
 
           {/* Title */}
-          <View style={{ flexDirection: 'row', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'center', paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
+          <View style={{ flexDirection: 'row', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'center', marginBottom: PADDING.p03, paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
             <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.black, width: 60, height: 70, borderRadius: PADDING.p01 }}>
               <Text style={{ fontSize: 19, fontWeight: '300', color: COLORS.warning, textTransform: 'uppercase' }}>{startingMonth}</Text>
               <Text style={{ fontSize: 40, fontWeight: '400', color: COLORS.white, marginTop: -12 }}>{startingDay}</Text>
@@ -621,13 +621,12 @@ const EventScreen = () => {
             <Text style={{ fontSize: 28, fontWeight: '400', color: COLORS.black, lineHeight: PADDING.p10, maxWidth: '75%', marginLeft: PADDING.p02 }}>{selectedEvent.event_title || '...'}</Text>
           </View>
 
-          {selectedEvent && (
-            <View style={{ paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', width: 37, height: 37, backgroundColor: 'rgba(200,200,200,0.5)', borderRadius: 37 / 2 }} onPress={() => navigation.goBack()}>
-                <Icon name='chevron-left' size={41} color='black' />
-              </TouchableOpacity>
-            </View>
-          )}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }}>
+              <Icon name='star-circle-outline' size={34} color={COLORS.dark_secondary}/>
+            <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.i_m_not_participating')}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Animated.View>
       <Animated.View

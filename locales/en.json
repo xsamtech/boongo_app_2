@@ -147,6 +147,8 @@
         "chat": "Chat",
         "create": "Create an event",
         "update": "Edit the event",
+        "i_participate": "I participate",
+        "i_m_not_participating": "I am not participating",
         "data": {
             "event_title": "Event title",
             "event_description": "Event details",

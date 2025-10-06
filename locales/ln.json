@@ -147,6 +147,8 @@
         "chat": "Masolo",
         "create": "Kela milulu",
         "update": "Bongola milulu",
+        "i_participate": "Nakozala",
+        "i_m_not_participating": "Nakozala te",
         "data": {
             "event_title": "Kombo ya milulu",
             "event_description": "Lobela oyo etali milulu",
