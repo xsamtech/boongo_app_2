@@ -189,17 +189,16 @@ const ChatsScreen = () => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   backgroundColor: COLORS.white,
-                  padding: PADDING.p01,
-                  marginVertical: 4,
-                  borderRadius: 8,
+                  padding: PADDING.p05,
+                  marginBottom: 2,
                 }}
               >
                 <Image
                   source={{ uri: item.chat_entity_profile }}
                   style={{
-                    width: IMAGE_SIZE.s08,
-                    height: IMAGE_SIZE.s08,
-                    borderRadius: IMAGE_SIZE.s08 / 2,
+                    width: IMAGE_SIZE.s12,
+                    height: IMAGE_SIZE.s12,
+                    borderRadius: IMAGE_SIZE.s12 / 2,
                     marginRight: 10,
                     backgroundColor: COLORS.light_secondary,
                   }}
