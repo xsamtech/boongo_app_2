@@ -1,15 +1,32 @@
 /**
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
+ *
+ * NewChatScreen.js
+ * Updated to use RTCManager with peerId and robust signaling.
+ * Comments in English.
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation, ToastAndroid, } from 'react-native';
+import {
+  View,
+  TextInput,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  UIManager,
+  LayoutAnimation,
+  ToastAndroid,
+} from 'react-native';
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import axios from 'axios';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js/react-native';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -22,22 +39,16 @@ import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
 
 const NewChatScreen = ({ route }) => {
-  // =============== Get parameters ===============
+  // =============== Params =
   const { chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile, doc_title, doc_page, doc_note } = route.params || {};
 
-  // =============== Colors ===============
+  // =============== Colors / hooks =
   const COLORS = useColors();
-
-  // =============== Language ===============
   const { t } = useTranslation();
-
-  // =============== Navigation ===============
   const navigation = useNavigation();
-
-  // =============== Contexts ===============
   const { userInfo } = useContext(AuthContext);
 
-  // =============== States ===============
+  // =============== States =
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
@@ -57,11 +68,11 @@ const NewChatScreen = ({ route }) => {
   const [inputHeight, setInputHeight] = useState(44);
   const [isLoading, setIsLoading] = useState(false);
 
-  // =============== Chat key (local storage) ===============
+  // =============== Local storage keys =
   const chatKey = `chat:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
   const metaKey = `chatmeta:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
 
-  // =============== Save chat metadata locally ===============
+  // =============== Save chat metadata locally =
   useEffect(() => {
     const meta = {
       chat_entity,
@@ -72,14 +83,14 @@ const NewChatScreen = ({ route }) => {
     AsyncStorage.setItem(metaKey, JSON.stringify(meta)).catch(console.warn);
   }, [chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile]);
 
-  // =============== Enable LayoutAnimation (Android) ===============
+  // =============== Enable LayoutAnimation (Android) =
   useEffect(() => {
     if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, []);
 
-  // =============== Keyboard handling ===============
+  // =============== Keyboard handling =
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardOffset(30));
     const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardOffset(0));
@@ -89,7 +100,7 @@ const NewChatScreen = ({ route }) => {
     };
   }, []);
 
-  // =============== Echo + WebRTC init ===============
+  // =============== Echo + WebRTC init =
   useEffect(() => {
     if (!userInfo?.api_token || !userInfo?.id) return;
 
@@ -115,11 +126,10 @@ const NewChatScreen = ({ route }) => {
     });
 
     echo.connector.pusher.connection.bind('connected', () => {
-      const socketId = echo.socketId();
-      console.log('📡 Socket ID connected:', socketId);
+      console.log('Echo connected, socketId=', echo.socketId());
     });
 
-    // Channel selection
+    // choose channel to listen for normal MessageSent events
     let channelName = '';
     let channel = null;
 
@@ -144,15 +154,15 @@ const NewChatScreen = ({ route }) => {
         return;
     }
 
+    // Listen incoming normal messages sent by backend (if any)
     channel.listen('MessageSent', async (e) => {
       console.log('📡 New message received:', e.message);
       setMessages((prev) => [e.message, ...prev]);
 
-      // 🧠 Save meta info if this chat was not opened before
+      // Save chat meta if missing (for recipient)
       try {
-        const metaKey = `chatmeta:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
-        const exists = await AsyncStorage.getItem(metaKey);
-        if (!exists) {
+        const metaExists = await AsyncStorage.getItem(metaKey);
+        if (!metaExists) {
           const meta = {
             chat_entity,
             chat_entity_id: e.message.user?.id || chat_entity_id,
@@ -163,16 +173,14 @@ const NewChatScreen = ({ route }) => {
             chat_entity_profile: e.message.user?.avatar_url || chat_entity_profile || null,
           };
           await AsyncStorage.setItem(metaKey, JSON.stringify(meta));
-          console.log('💾 Chat meta saved for received message:', meta);
         }
       } catch (err) {
-        console.warn('Failed to save chat meta:', err);
+        console.warn('Failed to save chat meta on recv', err);
       }
     });
 
-
     // =============================
-    // 🎥 WebRTC 1-to-1
+    // WebRTC 1-to-1
     // =============================
     if (chat_entity === 'user') {
       const a = Math.min(userInfo.id, chat_entity_id);
@@ -180,11 +188,12 @@ const NewChatScreen = ({ route }) => {
       const roomName = `webrtc.user.${a}-${b}`;
       const isCaller = userInfo.id < chat_entity_id;
 
-      console.log('🔗 Room:', roomName, '| Caller?', isCaller);
+      console.log('NewChat: room=', roomName, 'isCaller=', isCaller, 'peerId=', chat_entity_id);
 
       const rtcMgr = new RTCManager({
         echo,
         roomName,
+        peerId: chat_entity_id, // IMPORTANT: target peer id for signaling whispers
         localUserId: userInfo.id,
         onMessage: async (msgObj) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
@@ -205,29 +214,38 @@ const NewChatScreen = ({ route }) => {
         onRemoteStream: (stream) => setRemoteStream(stream),
       });
 
+      // Attach signaling (listens on chat.{localUserId})
       rtcMgr.attachSignaling();
 
-      // Only lower ID initiates
-      if (isCaller) rtcMgr.connectAsCaller().catch(console.warn);
+      // Initiate offer only if this client is the "caller"
+      if (isCaller) {
+        rtcMgr.connectAsCaller().catch(console.warn);
+      }
 
       setRtc(rtcMgr);
 
       return () => {
-        echo.leave(channelName);
+        try {
+          echo.leave(channelName);
+        } catch (e) {}
         rtcMgr.close();
       };
     }
 
     // =============================
-    // 🧩 Group chat (circle)
+    // Group chat (circle) mesh
     // =============================
     if (chat_entity === 'circle') {
       const roomName = `webrtc.circle.${chat_entity_id}`;
+
+      // TODO: fetch actual members list via API
+      const members = []; // e.g. [userId1, userId2...]
+
       const rtcGrp = new RTCGroupManager({
         echo,
         roomName,
         localUserId: userInfo.id,
-        members: [],
+        members,
         onMessage: async (msgObj) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
           setMessages(next);
@@ -250,13 +268,15 @@ const NewChatScreen = ({ route }) => {
       setRtcGroup(rtcGrp);
 
       return () => {
-        echo.leave(channelName);
+        try {
+          echo.leave(channelName);
+        } catch (e) {}
         rtcGrp.closeAll();
       };
     }
   }, [userInfo, chat_entity, chat_entity_id]);
 
-  // =============== Load local messages ===============
+  // =============== Load local messages on open =
   useEffect(() => {
     (async () => {
       const local = await RTCManager.loadLocalMessages(chatKey);
@@ -264,45 +284,77 @@ const NewChatScreen = ({ route }) => {
     })();
   }, [chatKey]);
 
-  // =============== Handle send ===============
+  // =============== Handle send (text + files) =
   const handleSend = async () => {
-    if (!text.trim()) return;
+    // nothing to send
+    if (!text.trim() && files.length === 0) return;
 
     setIsLoading(true);
 
-    const messageObj = {
-      id: Date.now(),
-      message_content: text,
-      user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
-      created_at: new Date().toISOString(),
-      answered_for: answeredFor,
-      type_id: 27,
-    };
-
     try {
-      const next = await RTCManager.appendLocalMessage(chatKey, messageObj);
-      setMessages(next);
+      // 1) send text message if any
+      if (text.trim()) {
+        const messageObj = {
+          id: Date.now(),
+          message_content: text,
+          user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+          created_at: new Date().toISOString(),
+          answered_for: answeredFor,
+          type_id: 27,
+        };
 
-      if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
-        rtc.sendTextMessage(messageObj);
-      } else if (rtcGroup) {
-        rtcGroup.broadcastTextMessage(messageObj);
-      } else {
-        console.warn('⚠️ No active RTC channel to send message.');
+        // persist local + display
+        const next = await RTCManager.appendLocalMessage(chatKey, messageObj);
+        setMessages(next);
+
+        // send via dc or group manager
+        if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
+          rtc.sendTextMessage(messageObj);
+        } else if (rtcGroup) {
+          rtcGroup.broadcastTextMessage(messageObj);
+        } else {
+          console.warn('No active RTC channel to send text');
+        }
       }
-    } catch (err) {
-      console.error('Error sending message:', err);
-    } finally {
+
+      // 2) send files (if any) — one message per file
+      for (let f of files) {
+        const fileMsg = {
+          id: Date.now() + Math.random(),
+          message_content: `📎 ${f.name}`,
+          user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+          created_at: new Date().toISOString(),
+          documents: [{ file_url: f.uri, file_name: f.name, mime: f.type || f.mime }],
+          type_id: 28,
+        };
+
+        const next2 = await RTCManager.appendLocalMessage(chatKey, fileMsg);
+        setMessages(next2);
+
+        // send actual bytes via rtc
+        const path = f.uri.replace('file://', '');
+        if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
+          await rtc.sendFile({ path, name: f.name, mime: f.type || f.mime });
+        } else if (rtcGroup) {
+          rtcGroup.broadcastFile({ path, name: f.name, mime: f.type || f.mime });
+        } else {
+          console.warn('No active RTC channel to send file');
+        }
+      }
+
+      // cleanup
       setText('');
+      setFiles([]);
+    } catch (err) {
+      console.warn('Error in handleSend:', err);
+    } finally {
       setIsLoading(false);
     }
   };
 
-  // =============== File Picker ===============
+  // =============== File picker helpers =
   const acceptedExtensions = ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov', 'mkv', 'webm', 'pdf', 'mp3', 'wav'];
-
-  const filterValidFiles = (files) =>
-    files.filter((file) => acceptedExtensions.includes(file.name.split('.').pop().toLowerCase()));
+  const filterValidFiles = (files) => files.filter((file) => acceptedExtensions.includes(file.name.split('.').pop().toLowerCase()));
 
   const pickFiles = async () => {
     if (isPicking) return;
@@ -325,14 +377,14 @@ const NewChatScreen = ({ route }) => {
         setFiles((prev) => [...prev, ...validFiles]);
       }
     } catch (err) {
-      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) console.log('Annulé.');
-      else console.error('Erreur sélection:', err);
+      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) console.log('User canceled file pick');
+      else console.error('File pick error:', err);
     } finally {
       setIsPicking(false);
     }
   };
 
-  // =============== Render Call UI ===============
+  // =============== Call UI =
   if (showCall) {
     return (
       <CallScreen
@@ -349,7 +401,7 @@ const NewChatScreen = ({ route }) => {
     );
   }
 
-  // =============== Truncate long file name ===============
+  // =============== Helpers: filename truncation & icon =
   const truncateFileName = (name, maxLength = 30) => {
     if (name.length <= maxLength) return name;
     const start = name.slice(0, 15);
@@ -366,13 +418,9 @@ const NewChatScreen = ({ route }) => {
     return 'file-outline';
   };
 
-  // =============== UI ===============
+  // =============== UI render =
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={keyboardOffset}
-    >
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={keyboardOffset}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
           {/* Header */}
@@ -383,11 +431,10 @@ const NewChatScreen = ({ route }) => {
               </TouchableOpacity>
               <Image source={{ uri: chat_entity_profile }} style={{ width: IMAGE_SIZE.s08, height: IMAGE_SIZE.s08, marginRight: PADDING.p01, borderRadius: IMAGE_SIZE.s13 / 2, borderWidth: 1, borderColor: COLORS.light_secondary }} />
               <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>
-                {chat_entity_name && chat_entity_name.length > 25
-                  ? chat_entity_name.slice(0, 25) + '...'
-                  : chat_entity_name || 'Utilisateur inconnu'}
+                {chat_entity_name && chat_entity_name.length > 25 ? chat_entity_name.slice(0, 25) + '...' : chat_entity_name || 'Utilisateur inconnu'}
               </Text>
             </View>
+
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity
                 onPress={async () => {
@@ -396,12 +443,14 @@ const NewChatScreen = ({ route }) => {
                     setLocalStream(s);
                     setShowCall(true);
                   } catch (e) {
-                    console.warn(e);
+                    console.warn('enableAV error:', e);
+                    ToastAndroid.show('Permission or device error for camera/mic', ToastAndroid.LONG);
                   }
                 }}
               >
                 <Icon name='phone-plus' size={23} color={COLORS.black} />
               </TouchableOpacity>
+
               <TouchableOpacity style={{ marginLeft: PADDING.p01 }} onPress={pickFiles}>
                 <Icon name='paperclip' size={23} color={COLORS.black} />
               </TouchableOpacity>
@@ -412,16 +461,12 @@ const NewChatScreen = ({ route }) => {
           <FlatList
             data={messages}
             keyExtractor={(item, index) => item.id?.toString() || `msg-${index}`}
-            renderItem={({ item }) => (
-              item && item.user && (
-                <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} />
-              )
-            )}
+            renderItem={({ item }) => (item && item.user ? <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} /> : null)}
             inverted
             style={{ flex: 1, padding: PADDING.p01 }}
           />
 
-          {/* Selected files */}
+          {/* Selected files preview */}
           {files.length > 0 && (
             <>
               <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.selected_files')}</Text>
@@ -433,15 +478,8 @@ const NewChatScreen = ({ route }) => {
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: 4 }}>
                     <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
                     <Text style={{ flex: 1, color: COLORS.black }}>{truncateFileName(item.name)}</Text>
-                    <TouchableOpacity
-                      style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8 }}
-                      onPress={() => {
-                        const updated = [...files];
-                        updated.splice(index, 1);
-                        setFiles(updated);
-                      }}
-                    >
-                      <Icon name="close" size={16} color="white" />
+                    <TouchableOpacity style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8 }} onPress={() => { const updated = [...files]; updated.splice(index, 1); setFiles(updated); }}>
+                      <Icon name='close' size={16} color='white' />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -449,7 +487,7 @@ const NewChatScreen = ({ route }) => {
             </>
           )}
 
-          {/* Input */}
+          {/* Input + send */}
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PADDING.p01 }}>
             <View style={{ flex: 1, position: 'relative' }}>
               <TextInput
@@ -470,10 +508,8 @@ const NewChatScreen = ({ route }) => {
                 style={[homeStyles.authInput, { height: Math.max(44, inputHeight), maxHeight: 120, marginBottom: 0, borderRadius: PADDING.p08, borderColor: COLORS.dark_secondary, color: COLORS.black, textAlignVertical: 'top' }]}
               />
             </View>
-            <TouchableOpacity
-              onPress={handleSend}
-              style={{ backgroundColor: COLORS.success, marginLeft: 8, width: 44, height: 44, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}
-            >
+
+            <TouchableOpacity onPress={handleSend} style={{ backgroundColor: COLORS.success, marginLeft: 8, width: 44, height: 44, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}>
               <Icon name='send' size={23} color='white' />
             </TouchableOpacity>
           </View>
