@@ -2,140 +2,89 @@
  * @author Xanders
  * @see https://team.xsamtech.com/xanderssamoth
  */
-import React, { useEffect, useState, useRef, useContext } from 'react';
-import { View, Text, SafeAreaView, RefreshControl, Animated, TouchableOpacity, Image } from 'react-native';
+import React, { useContext, useEffect, useState, useRef } from 'react';
+import { View, Text, SafeAreaView, Animated, TouchableOpacity, RefreshControl, FlatList, ToastAndroid, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import useColors from '../../hooks/useColors';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import { AuthContext } from '../../contexts/AuthContext';
-import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../../tools/constants';
+import { API, IMAGE_SIZE, PADDING } from '../../tools/constants';
+import useColors from '../../hooks/useColors';
 import homeStyles from '../style';
-import ChatItemComponent from '../../components/chat_item';
 import EmptyListComponent from '../../components/empty_list';
+import ChatItemComponent from '../../components/chat_item';
 import HeaderComponent from '../header';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js/react-native';
 
 const ChatsScreen = () => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Get contexts ===============
+  // =============== Context ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get data ===============
+  // =============== States ===============
   const [discussions, setDiscussions] = useState([]);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [ad, setAd] = useState(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const flatListRef = useRef(null);
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  // Load discussions from local storage
-  const fetchDiscussions = async () => {
+  // =============== Load local discussions (AsyncStorage) ===============
+  const loadLocalDiscussions = async () => {
     try {
-      setIsLoading(true);
-      const allKeys = await AsyncStorage.getAllKeys();
-      const chatKeys = allKeys.filter(k => k.startsWith('chat:'));
-      const metaKeys = allKeys.filter(k => k.startsWith('chatmeta:'));
+      const keys = await AsyncStorage.getAllKeys();
+      const metas = keys.filter((k) => k.startsWith('chatmeta:'));
+      const chats = [];
 
-      const metas = {};
-      for (let key of metaKeys) {
-        const raw = await AsyncStorage.getItem(key);
-        if (raw) {
-          const data = JSON.parse(raw);
-          metas[key.replace('chatmeta:', 'chat:')] = data; // map to corresponding chat key
-        }
-      }
+      for (const key of metas) {
+        const metaStr = await AsyncStorage.getItem(key);
+        const meta = JSON.parse(metaStr);
 
-      const result = [];
-      for (let key of chatKeys) {
-        const raw = await AsyncStorage.getItem(key);
-        const messages = raw ? JSON.parse(raw) : [];
-        if (messages.length > 0) {
-          const last = messages[0];
-          const meta = metas[key] || {};
+        if (meta && meta.chat_entity && meta.chat_entity_id) {
+          const chatKey = `chat:${meta.chat_entity}:${meta.chat_entity_id}:with:${userInfo.id}`;
+          const msgs = await AsyncStorage.getItem(chatKey);
 
-          result.push({
-            id: key,
-            keyName: key,
-            lastMessage: last.message_content,
-            date: last.created_at,
-            chat_entity: meta.chat_entity,
-            chat_entity_id: meta.chat_entity_id,
-            chat_entity_name: meta.chat_entity_name || (last.user?.firstname ?? 'Utilisateur'),
-            chat_entity_profile: meta.chat_entity_profile || last.user?.avatar_url || null,
+          let lastMessage = null;
+          let latest_at = null;
+
+          if (msgs) {
+            const parsed = JSON.parse(msgs);
+            if (parsed.length > 0) {
+              // 🧠 The latest message is at index 0 (prepend style)
+              lastMessage = parsed[0];
+              latest_at = parsed[0]?.created_at || null;
+            }
+          }
+
+          chats.push({
+            ...meta,
+            lastMessage,
+            latest_at,
           });
         }
       }
 
-      result.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setDiscussions(result);
+      // Sort by most recent
+      chats.sort((a, b) => new Date(b.latest_at || 0) - new Date(a.latest_at || 0));
+
+      setDiscussions(chats);
     } catch (err) {
-      console.warn('Error loading local discussions:', err);
-    } finally {
-      setIsLoading(false);
+      console.error('❌ Error loading local discussions:', err);
     }
   };
-  // const fetchDiscussions = async (pageToFetch = 1) => {
-  //   if (isLoading || pageToFetch > lastPage) return;
 
-  //   setIsLoading(true);
-
-  //   try {
-  //     const response = await axios.get(`${API.boongo_url}/message/user_chats_list/fr/Discussion/${userInfo.id}`, {
-  //       headers: { 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` }, params: { page: pageToFetch }
-  //     });
-
-  //     const data = response.data.data || [];
-
-  //     if (pageToFetch === 1) {
-  //       setDiscussions(data);
-
-  //     } else {
-  //       setDiscussions(prev => [...prev, ...data]);
-  //     }
-
-  //     setLastPage(response.data.lastPage || 1);
-  //     setAd(response.data.ad || null);
-
-  //   } catch (error) {
-  //     console.error(error);
-
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  useEffect(() => {
-    fetchDiscussions(1);
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) fetchDiscussions(page);
-  }, [page]);
-
+  // =============== Refresh manually ===============
   const onRefresh = async () => {
     setRefreshing(true);
-    setPage(1);
-
-    await fetchDiscussions(1);
-
+    await loadLocalDiscussions();
     setRefreshing(false);
   };
 
-  const onEndReached = () => {
-    if (!isLoading && page < lastPage) setPage(prev => prev + 1);
-  };
-
+  // =============== Scroll to top ===============
   const scrollToTop = () => flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-
-  const combinedData = [...discussions];
-
-  if (ad) combinedData.push({ ...ad, id: 'ad', realId: ad.id });
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -148,99 +97,128 @@ const ChatsScreen = () => {
     }
   );
 
+  // =============== Listen to local message updates ===============
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadLocalDiscussions();
+    }, 2000); // check every 2s for changes in AsyncStorage
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // =============== Realtime Echo (Pusher) for new chats ===============
+  useEffect(() => {
+    if (!userInfo?.api_token || !userInfo?.id) return;
+
+    window.Pusher = Pusher;
+
+    const echo = new Echo({
+      broadcaster: 'pusher',
+      key: '39cd87aabfcac5d515e8',
+      cluster: 'mt1',
+      wsHost: 'ws-mt1.pusher.com',
+      wsPort: 443,
+      forceTLS: true,
+      encrypted: true,
+      enabledTransports: ['ws', 'wss'],
+      authEndpoint: `${API.boongo_url}/broadcasting/auth`,
+      auth: {
+        headers: {
+          Authorization: `Bearer ${userInfo.api_token}`,
+          'X-user-id': userInfo.id,
+          'X-localization': 'fr',
+        },
+      },
+    });
+
+    echo.private(`chat.${userInfo.id}`).listen('MessageSent', async (e) => {
+      console.log('📡 Message reçu (Realtime):', e.message);
+      ToastAndroid.show(`💬 Nouveau message de ${e.message.user?.firstname || 'Contact'}`, ToastAndroid.SHORT);
+      await loadLocalDiscussions();
+    });
+
+    return () => {
+      echo.leave(`chat.${userInfo.id}`);
+    };
+  }, [userInfo]);
+
+  // =============== Initial load ===============
+  useEffect(() => {
+    loadLocalDiscussions();
+  }, []);
+
+  // =============== Render ===============
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {/* Header */}
       <View style={{ paddingVertical: PADDING.p01, backgroundColor: COLORS.white }}>
         <HeaderComponent />
       </View>
 
-      {/* Content */}
-      <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-        {showBackToTop && (
-          <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-            <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.primary, bottom: 30 }]}
-          onPress={() => navigation.navigate('ChatEntity')}
-        >
-          <Icon name="pencil-outline" size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      {/* Floating buttons */}
+      {showBackToTop && (
+        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
+      )}
 
-        <SafeAreaView style={{ flex: 1 }}>
-          <Animated.FlatList
-            ref={flatListRef}
-            data={combinedData}
-            keyExtractor={item => (item.id ?? Math.random().toString()).toString()}
-            // renderItem={({ item }) => <ChatItemComponent item={item} />}
-            renderItem={({ item }) => (
-              <TouchableOpacity
+      <TouchableOpacity
+        style={[homeStyles.floatingButton, { backgroundColor: COLORS.primary, bottom: 30 }]}
+        onPress={() => navigation.navigate('ChatEntity')}
+      >
+        <Icon name="pencil-outline" size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
+      </TouchableOpacity>
+
+      {/* Discussions list */}
+      <SafeAreaView style={{ flex: 1 }}>
+        <Animated.FlatList
+          ref={flatListRef}
+          data={discussions}
+          keyExtractor={(item) => (item.chat_entity_id ?? Math.random().toString()).toString()}
+          renderItem={({ item }) => {
+            const name =
+              item.chat_entity_name && item.chat_entity_name !== 'undefined'
+                ? item.chat_entity_name
+                : 'Utilisateur inconnu';
+            const avatar =
+              item.chat_entity_profile && item.chat_entity_profile !== 'null'
+                ? item.chat_entity_profile
+                : 'https://cdn-icons-png.flaticon.com/512/847/847969.png'; // default avatar
+
+            return (
+              <ChatItemComponent
+                item={{
+                  ...item,
+                  chat_entity_name: name,
+                  chat_entity_profile: avatar,
+                }}
                 onPress={() =>
-                  navigation.navigate('NewChat', {
+                  navigation.navigate('NewChatScreen', {
                     chat_entity: item.chat_entity,
                     chat_entity_id: item.chat_entity_id,
-                    chat_entity_name: item.chat_entity_name,
-                    chat_entity_profile: item.chat_entity_profile,
+                    chat_entity_name: name,
+                    chat_entity_profile: avatar,
                   })
                 }
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: COLORS.white,
-                  padding: PADDING.p05,
-                  marginBottom: 2,
-                }}
-              >
-                <Image
-                  source={{ uri: item.chat_entity_profile }}
-                  style={{
-                    width: IMAGE_SIZE.s12,
-                    height: IMAGE_SIZE.s12,
-                    borderRadius: IMAGE_SIZE.s12 / 2,
-                    marginRight: 10,
-                    backgroundColor: COLORS.light_secondary,
-                  }}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontWeight: 'bold', color: COLORS.black }}>
-                    {item.chat_entity_name}
-                  </Text>
-                  <Text style={{ color: COLORS.dark_secondary }} numberOfLines={1}>
-                    {item.lastMessage}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            onScroll={handleScroll}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.1}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                progressViewOffset={105}
               />
-            }
-            contentInset={{ top: 105 }}
-            contentOffset={{ y: -105 }}
-            ListEmptyComponent={
-              <EmptyListComponent
-                iconName='wechat'
-                title="Aucune discussion"
-                description="Vous n’avez encore discuté avec personne."
-              />
-            }
-            ListFooterComponent={() =>
-              isLoading ? (
-                <Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01 }}>Chargement...</Text>
-              ) : null
-            }
-          />
-        </SafeAreaView>
-      </View>
-    </>
+            );
+          }}
+          onScroll={handleScroll}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />
+          }
+          contentInset={{ top: 105 }}
+          contentOffset={{ y: -105 }}
+          ListEmptyComponent={
+            <EmptyListComponent
+              iconName='wechat'
+              title="Aucune discussion"
+              description="Vous n’avez encore discuté avec personne."
+            />
+          }
+        />
+      </SafeAreaView>
+    </View>
   );
 };
 

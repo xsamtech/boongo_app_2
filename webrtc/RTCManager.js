@@ -183,14 +183,11 @@ export default class RTCManager {
     // === Safe send message ===
     async sendTextMessage(messageObj) {
         if (!this.dc || this.dc.readyState !== 'open') {
-            console.warn('⚠️ DataChannel not ready, message not sent.');
+            console.warn('⚠️ DataChannel not ready, cannot send.');
             return;
         }
-        try {
-            this.dc.send(JSON.stringify({ kind: 'text', payload: messageObj }));
-        } catch (err) {
-            console.warn('Error sending text message:', err);
-        }
+        console.log('📤 Sending message via DataChannel:', messageObj);
+        this.dc.send(JSON.stringify({ kind: 'text', payload: messageObj }));
     }
 
     async sendFile({ path, name, mime }, chunkSize = 64 * 1024) {

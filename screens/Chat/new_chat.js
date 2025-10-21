@@ -3,14 +3,12 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useState, useEffect, useContext } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation, ToastAndroid } from 'react-native';
+import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation, ToastAndroid, } from 'react-native';
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RNFS from 'react-native-fs';
 import axios from 'axios';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js/react-native';
@@ -26,16 +24,21 @@ import useColors from '../../hooks/useColors';
 const NewChatScreen = ({ route }) => {
   // =============== Get parameters ===============
   const { chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile, doc_title, doc_page, doc_note } = route.params || {};
+
   // =============== Colors ===============
   const COLORS = useColors();
+
   // =============== Language ===============
   const { t } = useTranslation();
+
   // =============== Navigation ===============
   const navigation = useNavigation();
-  // =============== Get contexts ===============
+
+  // =============== Contexts ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get data ===============
-  const [keyboardOffset, setKeyboardOffset] = useState(0); // Manage the "TextInput" position when the keyboard appears/disappears
+
+  // =============== States ===============
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [messages, setMessages] = useState([]);
   const [files, setFiles] = useState([]);
   const [isPicking, setIsPicking] = useState(false);
@@ -47,10 +50,18 @@ const NewChatScreen = ({ route }) => {
   const [remoteStream, setRemoteStream] = useState(null);
   const [showCall, setShowCall] = useState(false);
 
-  // Local storage key (1-1 user)
+  const [text, setText] = useState('');
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [emojis, setEmojis] = useState([]);
+  const [answeredFor, setAnsweredFor] = useState(null);
+  const [inputHeight, setInputHeight] = useState(44);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // =============== Chat key (local storage) ===============
   const chatKey = `chat:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
-  // Save chat metadata locally for display in ChatsScreen
   const metaKey = `chatmeta:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
+
+  // =============== Save chat metadata locally ===============
   useEffect(() => {
     const meta = {
       chat_entity,
@@ -59,45 +70,26 @@ const NewChatScreen = ({ route }) => {
       chat_entity_profile,
     };
     AsyncStorage.setItem(metaKey, JSON.stringify(meta)).catch(console.warn);
-  }, [chat_entity, chat_entity_id]);
+  }, [chat_entity, chat_entity_id, chat_entity_name, chat_entity_profile]);
 
-  // Signaling roomName (1-1)
-  const roomName = (() => {
-    if (chat_entity === 'user') {
-      const a = Math.min(userInfo.id, chat_entity_id);
-      const b = Math.max(userInfo.id, chat_entity_id);
-      return `webrtc.user.${a}-${b}`;
-    }
-    return `webrtc.${chat_entity}.${chat_entity_id}`;
-  })();
-
-  const [text, setText] = useState('');
-  const [showEmojis, setShowEmojis] = useState(false);
-  const [emojis, setEmojis] = useState([]);
-  const [answeredFor, setAnsweredFor] = useState(null);
-  const [inputHeight, setInputHeight] = useState(44);
-  const [isLoading, setIsLoading] = useState(false);
-  const endpoint = `${API.boongo_url}/message/selected_chat/fr/Discussion/${userInfo.id}/${chat_entity}/${chat_entity_id}`;
-
-  // Fixing the error is often related to using LayoutAnimation or Keyboard.scheduleLayoutAnimation()
+  // =============== Enable LayoutAnimation (Android) ===============
   useEffect(() => {
     if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, []);
 
-  // Listen to the keyboard opening/closing
+  // =============== Keyboard handling ===============
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', () => { setKeyboardOffset(30); });
-    const hideSub = Keyboard.addListener('keyboardDidHide', () => { setKeyboardOffset(0); });
-
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardOffset(30));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardOffset(0));
     return () => {
       showSub.remove();
       hideSub.remove();
     };
   }, []);
 
-  // Distinguish 1-to-1 (RTCManager) and groups (RTCGroupManager)
+  // =============== Echo + WebRTC init ===============
   useEffect(() => {
     if (!userInfo?.api_token || !userInfo?.id) return;
 
@@ -127,6 +119,7 @@ const NewChatScreen = ({ route }) => {
       console.log('📡 Socket ID connected:', socketId);
     });
 
+    // Channel selection
     let channelName = '';
     let channel = null;
 
@@ -151,16 +144,43 @@ const NewChatScreen = ({ route }) => {
         return;
     }
 
-    channel.listen('MessageSent', (e) => {
+    channel.listen('MessageSent', async (e) => {
       console.log('📡 New message received:', e.message);
       setMessages((prev) => [e.message, ...prev]);
+
+      // 🧠 Save meta info if this chat was not opened before
+      try {
+        const metaKey = `chatmeta:${chat_entity}:${chat_entity_id}:with:${userInfo.id}`;
+        const exists = await AsyncStorage.getItem(metaKey);
+        if (!exists) {
+          const meta = {
+            chat_entity,
+            chat_entity_id: e.message.user?.id || chat_entity_id,
+            chat_entity_name:
+              e.message.user?.firstname && e.message.user?.lastname
+                ? `${e.message.user.firstname} ${e.message.user.lastname}`
+                : chat_entity_name || 'Utilisateur',
+            chat_entity_profile: e.message.user?.avatar_url || chat_entity_profile || null,
+          };
+          await AsyncStorage.setItem(metaKey, JSON.stringify(meta));
+          console.log('💾 Chat meta saved for received message:', meta);
+        }
+      } catch (err) {
+        console.warn('Failed to save chat meta:', err);
+      }
     });
 
+
     // =============================
-    // 🎯 WebRTC init
+    // 🎥 WebRTC 1-to-1
     // =============================
     if (chat_entity === 'user') {
-      const roomName = `webrtc.user.${Math.min(userInfo.id, chat_entity_id)}-${Math.max(userInfo.id, chat_entity_id)}`;
+      const a = Math.min(userInfo.id, chat_entity_id);
+      const b = Math.max(userInfo.id, chat_entity_id);
+      const roomName = `webrtc.user.${a}-${b}`;
+      const isCaller = userInfo.id < chat_entity_id;
+
+      console.log('🔗 Room:', roomName, '| Caller?', isCaller);
 
       const rtcMgr = new RTCManager({
         echo,
@@ -186,7 +206,10 @@ const NewChatScreen = ({ route }) => {
       });
 
       rtcMgr.attachSignaling();
-      rtcMgr.connectAsCaller().catch(console.warn);
+
+      // Only lower ID initiates
+      if (isCaller) rtcMgr.connectAsCaller().catch(console.warn);
+
       setRtc(rtcMgr);
 
       return () => {
@@ -195,15 +218,16 @@ const NewChatScreen = ({ route }) => {
       };
     }
 
+    // =============================
+    // 🧩 Group chat (circle)
+    // =============================
     if (chat_entity === 'circle') {
       const roomName = `webrtc.circle.${chat_entity_id}`;
-      const members = []; // ⚠️ fetch circle members from API
-
       const rtcGrp = new RTCGroupManager({
         echo,
         roomName,
         localUserId: userInfo.id,
-        members,
+        members: [],
         onMessage: async (msgObj) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
           setMessages(next);
@@ -212,7 +236,7 @@ const NewChatScreen = ({ route }) => {
           const msg = {
             id: Date.now(),
             message_content: `📎 ${name}`,
-            user: { id: 0 }, // TODO: add "from" in RTCManager for sender
+            user: { id: 0 },
             created_at: new Date().toISOString(),
             documents: [{ file_url: 'file://' + path, file_name: name, mime }],
           };
@@ -232,7 +256,7 @@ const NewChatScreen = ({ route }) => {
     }
   }, [userInfo, chat_entity, chat_entity_id]);
 
-  // Selected chat (Messages list)
+  // =============== Load local messages ===============
   useEffect(() => {
     (async () => {
       const local = await RTCManager.loadLocalMessages(chatKey);
@@ -240,129 +264,49 @@ const NewChatScreen = ({ route }) => {
     })();
   }, [chatKey]);
 
-  // Emojis
-  useEffect(() => {
-    if (!showEmojis || emojis.length > 0) return;
-
-    axios.get(`https://emoji-api.com/emojis?access_key=${API.open_emoji_key}`)
-      .then(res => {
-        setEmojis(res.data.slice(0, 500));
-      })
-      .catch(error => {
-        console.error(t('error'), error);
-      });
-  }, [showEmojis]);
-
-  // =====================
-  // Request camera + mic permissions
-  // =====================
-  const requestAVPermissions = async () => {
-    try {
-      const permissions = [
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-      ];
-
-      const granted = await PermissionsAndroid.requestMultiple(permissions);
-
-      const cameraGranted = granted[PermissionsAndroid.PERMISSIONS.CAMERA] === PermissionsAndroid.RESULTS.GRANTED;
-      const audioGranted = granted[PermissionsAndroid.PERMISSIONS.RECORD_AUDIO] === PermissionsAndroid.RESULTS.GRANTED;
-
-      return cameraGranted && audioGranted;
-    } catch (err) {
-      console.warn('Permission request error:', err);
-      return false;
-    }
-  };
-
-  // =============== Send message ===============
+  // =============== Handle send ===============
   const handleSend = async () => {
+    if (!text.trim()) return;
+
     setIsLoading(true);
 
-    // nothing to send
-    if (!text.trim() && files.length === 0) {
-      setIsLoading(false);
-      return;
-    }
+    const messageObj = {
+      id: Date.now(),
+      message_content: text,
+      user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
+      created_at: new Date().toISOString(),
+      answered_for: answeredFor,
+      type_id: 27,
+    };
 
-    // ========== 1. build text message ==========
-    if (text.trim()) {
-      const messageObj = {
-        id: Date.now(),
-        message_content: text,
-        user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
-        created_at: new Date().toISOString(),
-        answered_for: answeredFor,
-        type_id: 27,
-      };
-
-      // display + persist
+    try {
       const next = await RTCManager.appendLocalMessage(chatKey, messageObj);
       setMessages(next);
 
-      // send via DataChannel
-      if (rtc) rtc.sendTextMessage(messageObj);
-      else if (rtcGroup) rtcGroup.sendTextMessage(messageObj);
-    }
-
-    // ========== 2. build file messages ==========
-    for (let f of files) {
-      const fileMsg = {
-        id: Date.now() + Math.random(),
-        message_content: `📎 ${f.name}`,
-        user: { id: userInfo.id, avatar_url: userInfo.avatar_url || null },
-        created_at: new Date().toISOString(),
-        documents: [{ file_url: f.uri, file_name: f.name, mime: f.type }],
-        type_id: 28, // optional: a type to distinguish file msgs
-      };
-
-      const next = await RTCManager.appendLocalMessage(chatKey, fileMsg);
-      setMessages(next);
-
-      if (rtc) {
-        rtc.sendFile({ path: f.uri.replace('file://', ''), name: f.name, mime: f.type });
+      if (rtc && rtc.dc && rtc.dc.readyState === 'open') {
+        rtc.sendTextMessage(messageObj);
       } else if (rtcGroup) {
-        rtcGroup.sendFile({ path: f.uri.replace('file://', ''), name: f.name, mime: f.type });
+        rtcGroup.broadcastTextMessage(messageObj);
+      } else {
+        console.warn('⚠️ No active RTC channel to send message.');
       }
+    } catch (err) {
+      console.error('Error sending message:', err);
+    } finally {
+      setText('');
+      setIsLoading(false);
     }
-
-    // ========== 3. cleanup ==========
-    setText('');
-    setFiles([]); // empty preview
-    setIsLoading(false);
   };
 
-  // =============== File handling ===============
-  const truncateFileName = (name, maxLength = 30) => {
-    if (name.length <= maxLength) return name;
-    const start = name.slice(0, 15);
-    const end = name.slice(-12);
-    return `${start} ... ${end}`;
-  };
-
-  const getIconName = (fileName) => {
-    const ext = fileName.split('.').pop().toLowerCase();
-    if (['jpg', 'jpeg', 'png'].includes(ext)) return 'file-image-outline';
-    if (['mp4', 'avi', 'mov', 'mkv', 'webm'].includes(ext)) return 'television-play';
-    if (['pdf'].includes(ext)) return 'file-document-outline';
-    if (['mp3', 'wav'].includes(ext)) return 'microphone-outline';
-    return 'file-outline';
-  };
-
+  // =============== File Picker ===============
   const acceptedExtensions = ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov', 'mkv', 'webm', 'pdf', 'mp3', 'wav'];
 
-  const filterValidFiles = (files) => {
-    return files.filter(file => {
-      const ext = file.name.split('.').pop().toLowerCase();
-      return acceptedExtensions.includes(ext);
-    });
-  };
+  const filterValidFiles = (files) =>
+    files.filter((file) => acceptedExtensions.includes(file.name.split('.').pop().toLowerCase()));
 
   const pickFiles = async () => {
     if (isPicking) return;
-
     setIsPicking(true);
-
     try {
       const selectedFiles = await pick({
         mode: 'import',
@@ -372,28 +316,23 @@ const NewChatScreen = ({ route }) => {
 
       const validFiles = filterValidFiles(selectedFiles);
       const totalFiles = files.length + validFiles.length;
-
       if (totalFiles > MAX_FILES) {
         const allowedToAdd = MAX_FILES - files.length;
         const limitedFiles = validFiles.slice(0, allowedToAdd);
-
-        setFiles(prev => [...prev, ...limitedFiles]);
-        ToastAndroid.show(`Max ${MAX_FILES} files`, ToastAndroid.LONG);
+        setFiles((prev) => [...prev, ...limitedFiles]);
+        ToastAndroid.show(`Max ${MAX_FILES} fichiers`, ToastAndroid.LONG);
       } else {
-        setFiles(prev => [...prev, ...validFiles]);
+        setFiles((prev) => [...prev, ...validFiles]);
       }
     } catch (err) {
-      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) {
-        console.log('Cancelled.');
-
-      } else {
-        console.error('File pick error:', err);
-      }
+      if (isErrorWithCode(err) && err.code === errorCodes.userCancelled) console.log('Annulé.');
+      else console.error('Erreur sélection:', err);
     } finally {
       setIsPicking(false);
     }
   };
 
+  // =============== Render Call UI ===============
   if (showCall) {
     return (
       <CallScreen
@@ -410,14 +349,24 @@ const NewChatScreen = ({ route }) => {
     );
   }
 
-  if (!endpoint) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.light_secondary }}>
-        <Text style={{ fontSize: TEXT_SIZE.header }}>{t('error_message.no_addressee_selected')}</Text>
-      </View>
-    );
-  }
+  // =============== Truncate long file name ===============
+  const truncateFileName = (name, maxLength = 30) => {
+    if (name.length <= maxLength) return name;
+    const start = name.slice(0, 15);
+    const end = name.slice(-12);
+    return `${start} ... ${end}`;
+  };
 
+  const getIconName = (fileName) => {
+    const ext = fileName.split('.').pop().toLowerCase();
+    if (['jpg', 'jpeg', 'png'].includes(ext)) return 'file-image-outline';
+    if (['mp4', 'avi', 'mov', 'mkv', 'webm'].includes(ext)) return 'television-play';
+    if (['pdf'].includes(ext)) return 'file-document-outline';
+    if (['mp3', 'wav'].includes(ext)) return 'microphone-outline';
+    return 'file-outline';
+  };
+
+  // =============== UI ===============
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -426,43 +375,28 @@ const NewChatScreen = ({ route }) => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-
           {/* Header */}
-          <View style={[homeStyles.headerBanner, {
-            backgroundColor: COLORS.white,
-            paddingTop: PADDING.p02,
-            paddingBottom: PADDING.p02,
-            paddingLeft: 0
-          }]}>
+          <View style={[homeStyles.headerBanner, { backgroundColor: COLORS.white, paddingTop: PADDING.p02, paddingBottom: PADDING.p02, paddingLeft: 0 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Icon name='chevron-left' size={30} color={COLORS.black} />
               </TouchableOpacity>
               <Image source={{ uri: chat_entity_profile }} style={{ width: IMAGE_SIZE.s08, height: IMAGE_SIZE.s08, marginRight: PADDING.p01, borderRadius: IMAGE_SIZE.s13 / 2, borderWidth: 1, borderColor: COLORS.light_secondary }} />
               <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>
-                {chat_entity_name.length > 25 ? chat_entity_name.slice(0, 25) + '...' : chat_entity_name}
+                {chat_entity_name && chat_entity_name.length > 25
+                  ? chat_entity_name.slice(0, 25) + '...'
+                  : chat_entity_name || 'Utilisateur inconnu'}
               </Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <TouchableOpacity
                 onPress={async () => {
                   try {
-                    const hasPermission = await requestAVPermissions();
-                    if (!hasPermission) {
-                      ToastAndroid.show('Permission caméra/micro refusée', ToastAndroid.LONG);
-                      return;
-                    }
-
                     const s = await rtc?.enableAV({ audio: true, video: true });
-                    if (s) {
-                      setLocalStream(s);
-                      setShowCall(true);
-                    } else {
-                      ToastAndroid.show('Échec du démarrage de la caméra/micro', ToastAndroid.LONG);
-                    }
+                    setLocalStream(s);
+                    setShowCall(true);
                   } catch (e) {
-                    console.warn('Error launching call:', e);
-                    ToastAndroid.show('Erreur de permission ou d’accès caméra/micro', ToastAndroid.LONG);
+                    console.warn(e);
                   }
                 }}
               >
@@ -478,13 +412,11 @@ const NewChatScreen = ({ route }) => {
           <FlatList
             data={messages}
             keyExtractor={(item, index) => item.id?.toString() || `msg-${index}`}
-            renderItem={({ item }) => {
-              if (!item || !item.id || !item.user || !item.user.id) {
-                console.warn("Malformed message", item);
-                return null;
-              }
-              return <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} />;
-            }}
+            renderItem={({ item }) => (
+              item && item.user && (
+                <MessageItem item={item} isOwnMessage={item.user.id === userInfo.id} />
+              )
+            )}
             inverted
             style={{ flex: 1, padding: PADDING.p01 }}
           />
@@ -492,36 +424,17 @@ const NewChatScreen = ({ route }) => {
           {/* Selected files */}
           {files.length > 0 && (
             <>
-              {/* <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.selected_files')}</Text> */}
+              <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.selected_files')}</Text>
               <FlatList
                 data={files}
                 scrollEnabled={false}
                 keyExtractor={(item, index) => index.toString()}
-                style={{ flexGrow: 0, margin: 0 }}
                 renderItem={({ item, index }) => (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      maxWidth: 300,
-                      backgroundColor: COLORS.white,
-                      borderRadius: PADDING.p01,
-                      padding: PADDING.p01,
-                      marginVertical: 2,
-                    }}
-                  >
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.light_secondary, borderRadius: PADDING.p01, padding: PADDING.p01, marginVertical: 4 }}>
                     <Icon name={getIconName(item.name)} size={22} color={COLORS.black} style={{ marginRight: 8 }} />
-                    <Text style={{ flex: 1, color: COLORS.black }}>
-                      {truncateFileName(item.name)}
-                    </Text>
+                    <Text style={{ flex: 1, color: COLORS.black }}>{truncateFileName(item.name)}</Text>
                     <TouchableOpacity
-                      style={{
-                        backgroundColor: COLORS.danger,
-                        padding: 6,
-                        borderRadius: PADDING.p07,
-                        marginLeft: 8,
-                      }}
+                      style={{ backgroundColor: COLORS.danger, padding: 6, borderRadius: PADDING.p07, marginLeft: 8 }}
                       onPress={() => {
                         const updated = [...files];
                         updated.splice(index, 1);
@@ -536,41 +449,7 @@ const NewChatScreen = ({ route }) => {
             </>
           )}
 
-          {/* Emoji Panel */}
-          {showEmojis && (
-            <View style={{
-              width: 300,
-              height: 300,
-              backgroundColor: COLORS.white,
-              padding: 10,
-              alignSelf: 'flex-end',
-              borderTopWidth: 1,
-              borderTopColor: COLORS.dark_secondary
-            }}>
-              {emojis.length === 0 ?
-                (<View style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                  <Text style={{ fontSize: 24, color: COLORS.black }}>{t('loading')}</Text>
-                </View>)
-                :
-                (<FlatList
-                  data={emojis}
-                  keyExtractor={(item) => item.slug}
-                  numColumns={7}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={{ padding: 5, alignItems: 'center', justifyContent: 'center' }}
-                      onPress={() => setText(prev => prev + item.character)}
-                    >
-                      <Text style={{ fontSize: 24, color: COLORS.black }}>{item.character}</Text>
-                    </TouchableOpacity>
-                  )}
-                  showsVerticalScrollIndicator={false}
-                />)
-              }
-            </View>
-          )}
-
-          {/* Input + Send */}
+          {/* Input */}
           <View style={{ flexDirection: 'row', alignItems: 'flex-end', padding: PADDING.p01 }}>
             <View style={{ flex: 1, position: 'relative' }}>
               <TextInput
@@ -588,46 +467,16 @@ const NewChatScreen = ({ route }) => {
                 }}
                 placeholder={t('chat.write')}
                 placeholderTextColor={COLORS.black}
-                style={[
-                  homeStyles.authInput,
-                  {
-                    height: Math.max(44, inputHeight),
-                    maxHeight: 120,
-                    marginBottom: 0,
-                    borderRadius: PADDING.p08,
-                    borderColor: COLORS.dark_secondary,
-                    color: COLORS.black,
-                    textAlignVertical: 'top',
-                  }
-                ]}
+                style={[homeStyles.authInput, { height: Math.max(44, inputHeight), maxHeight: 120, marginBottom: 0, borderRadius: PADDING.p08, borderColor: COLORS.dark_secondary, color: COLORS.black, textAlignVertical: 'top' }]}
               />
-              <TouchableOpacity
-                style={{ position: 'absolute', top: PADDING.p01, right: PADDING.p01 }}
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setShowEmojis(prev => !prev);
-                }}
-              >
-                <Icon name={showEmojis ? 'close' : 'sticker-emoji'} size={25} color={COLORS.black} />
-              </TouchableOpacity>
             </View>
-
             <TouchableOpacity
               onPress={handleSend}
-              style={{
-                backgroundColor: COLORS.success,
-                marginLeft: 8,
-                width: 44,
-                height: 44,
-                borderRadius: 25,
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
+              style={{ backgroundColor: COLORS.success, marginLeft: 8, width: 44, height: 44, borderRadius: 25, justifyContent: 'center', alignItems: 'center' }}
             >
               <Icon name='send' size={23} color='white' />
             </TouchableOpacity>
           </View>
-
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

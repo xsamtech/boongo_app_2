@@ -260,7 +260,7 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
 
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -670,7 +670,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
       <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}>
@@ -1036,7 +1036,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
       <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.success }]} onPress={() => navigation.navigate('AddWork', { owner: 'organization', ownerId: selectedOrganization.id })}>
@@ -1321,7 +1321,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
       <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}>

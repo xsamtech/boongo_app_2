@@ -178,7 +178,7 @@ const Medias = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -323,7 +323,7 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 

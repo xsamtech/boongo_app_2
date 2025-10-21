@@ -25,8 +25,6 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
   // =============== Get parameters ===============
@@ -34,16 +32,10 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { event_id } = route.params;
   // =============== Get data ===============
   const [selectedEvent, setSelectedEvent] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [idCat, setIdCat] = useState(0);
-  const [works, setWorks] = useState([]);
-  const [ad, setAd] = useState(null);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [count, setCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const flatListRef = listRef || useRef(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [percent, setPercent] = useState('50%');
+  const scrollViewListRef = listRef || useRef(null);
 
   // Get current event
   useEffect(() => {
@@ -73,150 +65,86 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       });
   };
 
-  // ================= Get categories =================
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    const headers = {
-      'X-localization': 'fr',
-      Authorization: `Bearer ${userInfo.api_token}`,
-    };
-
-    try {
-      const res = await axios.get(`${API.boongo_url}/category/find_by_group/Catégorie%20pour%20œuvre`, { headers });
-      const data = res.data.data;
-      const itemAll = { id: 0, category_name: t('all_f'), category_name_fr: "Toutes", category_name_en: "All", category_name_ln: "Nioso", category_description: null, };
-
-      data.unshift(itemAll);
-      setCategories(data);
-      setIdCat(itemAll.id);
-
-    } catch (error) {
-      console.error('Erreur fetchCategories', error);
-    }
-  };
-
-  // ================= Fetch works when idCat or page changes =================
-  // useEffect(() => {
-  //   fetchWorks();
-  // }, [page, idCat]);
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (selectedEvent && selectedEvent.id) {
-        fetchWorks();
-      }
-    }, 5000);
-
-    return () => clearInterval(intervalId);
-  }, [selectedEvent, page, idCat]);
-
-  const fetchWorks = async () => {
-    if (isLoading || page > lastPage) return;
-    setIsLoading(true);
-
-    const qs = require('qs');
-    const url = `${API.boongo_url}/work/filter_by_categories?page=${page}`;
-    const params = {
-      'categories_ids[0]': idCat,
-      user_id: selectedEvent.id,
-    };
-    const headers = {
-      'X-localization': 'fr',
-      Authorization: `Bearer ${userInfo.api_token}`,
-      'X-user-id': userInfo.id,
-    };
-
-    try {
-      const response = await axios.post(url, qs.stringify(params), { headers });
-      const data = response.data.data || [];
-
-      setWorks(prev => (page === 1 ? data : [...prev, ...data]));
-      setAd(response.data.ad || null);
-      setLastPage(response.data.lastPage || page);
-      setCount(response.data.count || 0);
-
-      // console.log(response.data);
-
-    } catch (error) {
-      console.error('Erreur fetchWorks', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ================= Combined data =================
-  const combinedData = [...works];
-  if (ad) {
-    combinedData.push({ ...ad, id: 'ad', realId: ad.id });
-  }
-
   // ================= Handlers =================
   const onRefresh = async () => {
     setRefreshing(true);
-    setPage(1);
-    setWorks([]);
-    await fetchWorks();
     setRefreshing(false);
   };
 
-  const onEndReached = () => {
-    if (!isLoading && page < lastPage) {
-      setPage(prev => prev + 1);
-    }
-  };
-
   const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+    scrollViewListRef.current?.scrollTo({ y: 0, animated: true });
   };
 
-  const handleBadgePress = useCallback((id) => {
-    setIdCat(id);
-    setPage(1);
-    setWorks([]);
-    setLastPage(1);
-  }, []);
+  const ucfirst = (str) => {
+    if (!str) return str;
 
-  const CategoryItem = ({ item }) => {
-    const isSelected = idCat === item.id;
-    const Container = isSelected ? TouchableHighlight : TouchableOpacity;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
 
-    return (
-      <Container
-        key={item.id}
-        onPress={() => handleBadgePress(item.id)}
-        style={
-          isSelected
-            ? [homeStyles.categoryBadgeSelected, { backgroundColor: COLORS.white }]
-            : [homeStyles.categoryBadge, { backgroundColor: COLORS.warning }]
-        }
-        underlayColor={COLORS.light_secondary}
-      >
-        <Text
-          style={
-            isSelected
-              ? [homeStyles.categoryBadgeTextSelected, { color: COLORS.black }]
-              : [homeStyles.categoryBadgeText, { color: 'black' }]
-          }
-        >
-          {item.category_name}
-        </Text>
-      </Container>
-    );
+  const toggleText = () => {
+    setIsExpanded(!isExpanded);
+
+    !isExpanded ? setPercent('24%') : setPercent('50%');
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
-      <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-
-      </SafeAreaView>
+      <Animated.ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        ref={scrollViewListRef}
+        onScroll={handleScroll}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
+        style={{ flexDirection: 'row', width: Dimensions.get('window').width - 3, marginTop: headerHeight + TAB_BAR_HEIGHT, padding: 0 }}
+      >
+        <View style={{ backgroundColor: COLORS.white, padding: PADDING.p02 }}>
+          {selectedEvent.event_description && (
+            <View style={{ flexDirection: 'row', marginBottom: PADDING.p08 }}>
+              <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black, maxWidth: percent }} onPress={toggleText}>
+                {isExpanded ? selectedEvent.event_description : `${selectedEvent.event_description.slice(0, 100)}...`}
+              </Text>
+            </View>
+          )}
+          {selectedEvent.start_at && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
+              <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+              <View>
+                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black, maxWidth: '100%' }}>{t('event.data.start_at')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '100%' }}>{ucfirst(selectedEvent.start_at_explicit)}</Text>
+              </View>
+            </View>
+          )}
+          {selectedEvent.end_at && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
+              <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+              <View>
+                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black, maxWidth: '100%' }}>{t('event.data.end_at')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '100%' }}>{ucfirst(selectedEvent.end_at_explicit)}</Text>
+              </View>
+            </View>
+          )}
+          {selectedEvent.event_place && (
+            <View style={{ flexDirection: 'row', marginBottom: PADDING.p06 }}>
+              <Icon name='map-marker' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+              <View>
+                {selectedEvent.event_place && (
+                  <Text style={{ fontSize: 14, fontWeight: '400', color: COLORS.black, maxWidth: '80%' }}>{selectedEvent.event_place}</Text>
+                )}
+                {selectedEvent.event_place_address && (
+                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '80%' }}>{selectedEvent.event_place_address}</Text>
+                )}
+              </View>
+            </View>
+          )}
+        </View>
+      </Animated.ScrollView>
     </View>
   );
 };
@@ -390,8 +318,8 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
+        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -537,7 +465,7 @@ const EventScreen = () => {
 
     // Back to top according to selected tab
     if (newIndex === 0 && aboutListRef.current) {
-      aboutListRef.current.scrollToOffset({ offset, animated: true });
+      aboutListRef.current.scrollTo({ offset, animated: true });
 
     } else if (newIndex === 1 && chatListRef.current) {
       chatListRef.current.scrollToOffset({ offset, animated: true });
@@ -623,8 +551,8 @@ const EventScreen = () => {
 
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
             <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }}>
-              <Icon name='star-circle-outline' size={34} color={COLORS.dark_secondary}/>
-            <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.i_m_not_participating')}</Text>
+              <Icon name='star-circle-outline' size={34} color={COLORS.dark_secondary} />
+              <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.i_m_not_participating')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -647,7 +575,7 @@ const EventScreen = () => {
           inactiveColor={COLORS.dark_secondary}
         />
       </Animated.View>
-      <FloatingActionsButton />
+      {/* <FloatingActionsButton /> */}
     </>
   );
 

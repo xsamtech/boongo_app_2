@@ -149,7 +149,9 @@ const HeaderComponent = ({ title }) => {
               }
               {userInfo.last_organization ?
                 <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: 8 }}>
-                  <FaIcon name={cleanIconName(userInfo.last_organization.type.icon)} size={16} color={COLORS.black} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+                  {userInfo.last_organization.type && (
+                    <FaIcon name={cleanIconName(userInfo.last_organization.type.icon)} size={16} color={COLORS.black} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
+                  )}
                   <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, maxWidth: '75%' }}>
                     {userInfo.last_organization.org_name}
                   </Text>

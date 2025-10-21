@@ -134,6 +134,41 @@ const SettingsScreen = () => {
     { label: t('auth.gender.female'), value: 'F' }
   ]);
 
+  // CURRENCY dropdown
+  const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [currency, setCurrency] = useState(userInfo.currency.id);
+  const [currencyItems, setCurrencyItems] = useState([]);
+
+  useEffect(() => {
+    const config = {
+      method: 'GET',
+      url: `${API.boongo_url}/currency`,
+      headers: {
+        'X-localization': 'fr',
+        'X-user-id': userInfo.id,
+        Authorization: `Bearer ${userInfo.api_token}`,
+      }
+    };
+
+    axios(config)
+      .then(function (response) {
+        const count = Object.keys(response.data.data).length;
+        let currencyArray = [];
+
+        for (let i = 0; i < count; i++) {
+          currencyArray.push({
+            value: response.data.data[i].id,
+            label: `${response.data.data[i].currency_name} (${response.data.data[i].currency_acronym})`
+          })
+        }
+
+        setCurrencyItems(currencyArray);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
   // BIRTH DATE date-picker
   const [birthdate, setBirthdate] = useState(userInfo.birthdate);
   const [date, setDate] = useState(new Date());
@@ -212,6 +247,7 @@ const SettingsScreen = () => {
             style={[homeStyles.authInput, { height: 50 }]}
             borderColor={COLORS.dark_secondary}
             textStyle={{ color: COLORS.black }}
+            itemContainerStyle={{ backgroundColor: COLORS.white }}
             placeholderStyle={{ color: COLORS.black }}
             arrowIconStyle={{ tintColor: COLORS.black }}
             data={organizations}
@@ -269,7 +305,10 @@ const SettingsScreen = () => {
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.gender.label')}</Text>
           <DropDownPicker
             style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+            modalContentContainerStyle={{ backgroundColor: COLORS.white, zIndex: 1000 }}
+            searchContainerStyle={{ borderColor: COLORS.dark_secondary, zIndex: 1000 }}
             textStyle={{ color: COLORS.black }}
+            closeIconStyle={{ tintColor: COLORS.black }}
             placeholderStyle={{ color: COLORS.black }}
             arrowIconStyle={{ tintColor: COLORS.dark_secondary }}
             open={genderOpen}
@@ -280,7 +319,7 @@ const SettingsScreen = () => {
             setOpen={setGenderOpen}
             setValue={setGender}
             setItems={setGenderItems}
-            listMode="SCROLLVIEW" />
+            listMode="MODAL" />
 
           {/* Birth date */}
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.birthdate')}</Text>
@@ -316,7 +355,9 @@ const SettingsScreen = () => {
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.country.label')}</Text>
           <Dropdown
             style={[homeStyles.authInput, { height: 50 }]}
+            borderColor={COLORS.dark_secondary}
             textStyle={{ color: COLORS.black }}
+            itemContainerStyle={{ backgroundColor: COLORS.white }}
             placeholderStyle={{ color: COLORS.black }}
             arrowIconStyle={{ tintColor: COLORS.black }}
             data={countries}
@@ -387,6 +428,26 @@ const SettingsScreen = () => {
             placeholder={t('auth.phone')}
             placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setPhone(text)} />
+
+          {/* Gender  */}
+          <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('work.currency.title')}</Text>
+          <DropDownPicker
+            style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+            modalContentContainerStyle={{ backgroundColor: COLORS.white, zIndex: 1000 }}
+            searchContainerStyle={{ borderColor: COLORS.dark_secondary, zIndex: 1000 }}
+            textStyle={{ color: COLORS.black }}
+            closeIconStyle={{ tintColor: COLORS.black }}
+            placeholderStyle={{ color: COLORS.black }}
+            arrowIconStyle={{ tintColor: COLORS.dark_secondary }}
+            open={currencyOpen}
+            value={currency}
+            placeholder={t('work.currency.label')}
+            placeholderTextColor={COLORS.dark_secondary}
+            items={currencyItems}
+            setOpen={setCurrencyOpen}
+            setValue={setCurrency}
+            setItems={setCurrencyItems}
+            listMode="MODAL" />
 
           {/* Password */}
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('auth.password.label')}</Text>

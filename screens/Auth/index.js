@@ -30,7 +30,8 @@ const OnboardScreen = () => {
   }, []);
   // =============== Get data ===============
   const [isLoading, setIsLoading] = useState(false);
-  const slides = [{ id: 1, entity: 'work' }, { id: 2, entity: 'establishment' }, { id: 3, entity: 'government' }];
+  const slides = [{ id: 1, entity: 'home' }, { id: 2, entity: 'work' }, { id: 3, entity: 'establishment' }, { id: 4, entity: 'government' }];
+  // const slides = [{ id: 1, entity: 'home' }];
 
   const getImageSlide = (work) => {
     switch (work) {
@@ -40,8 +41,11 @@ const OnboardScreen = () => {
       case 'government':
         return (<Image style={{ width: 231, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-government.png')} />);
         break;
+      case 'work':
+        return (<Image style={{ width: 231, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-work.png')} />);
+        break;
       default:
-        return (<Image style={{ width: 280, height: 210, alignSelf: 'center' }} source={require('../../assets/img/share-work.png')} />);
+        return (<Image style={{ width: 320, height: 390, alignSelf: 'center' }} source={require('../../assets/img/share-home.png')} />);
         break;
     }
   };
@@ -53,7 +57,7 @@ const OnboardScreen = () => {
         {/* Onboard top */}
         <View style={[homeStyles.onboardTop, { backgroundColor: COLORS.white }]}>
           {/* Brand */}
-          <View style={{ marginBottom: 30 }}>
+          <View>
             <LogoText width={250} height={60} style={{ alignSelf: 'center' }} />
             <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
           </View>
@@ -61,9 +65,11 @@ const OnboardScreen = () => {
           {/* Slides */}
           <Carousel style={homeStyles.onboardSlide} autoplay={true} loop={true} showsControls={false} showsDots={true} autoplayInterval={10000}>
             {slides.map(item =>
-              <View key={item.id} style={homeStyles.onboardSlideItem}>
+              <View key={item.id} style={[homeStyles.onboardSlideItem, {marginTop: (item.entity !== 'home' ? 30 : 5)}]}>
                 {getImageSlide(item.entity)}
-                <Text style={[homeStyles.onboardSlideText, { color: COLORS.black }]}>{t('welcome_description.' + item.entity)}</Text>
+                {item.entity !== 'home' && (
+                  <Text style={[homeStyles.onboardSlideText, { color: COLORS.black }]}>{t('welcome_description.' + item.entity)}</Text>
+                )}
               </View>
             )}
           </Carousel>

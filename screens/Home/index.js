@@ -36,10 +36,6 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
-  };
-
   const fetchWorks = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
 
@@ -107,11 +103,6 @@ const News = ({ handleScroll, showBackToTop, listRef }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s07} style={{ color: 'black' }} />
-        </TouchableOpacity>
-      )}
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}>
           <Animated.FlatList
@@ -309,15 +300,6 @@ const Books = ({ handleScroll, showBackToTop, listRef }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
-        <TouchableOpacity
-          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
-          onPress={scrollToTop}
-        >
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s13} style={{ color: 'black' }} />
-        </TouchableOpacity>
-      )}
-
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         {/* <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}> */}
         {/* Books List */}
@@ -372,14 +354,14 @@ const HomeScreen = () => {
   // =============== Get data ===============
   const newsListRef = useRef(null);
   const booksListRef = useRef(null);
-  const [index, setIndex] = useState(0); // State for managing active tab index
+  const [index, setIndex] = useState(0); // Active tab
   const [showBackToTopByTab, setShowBackToTopByTab] = useState({ news: false, books: false });
   const scrollY = useRef(new Animated.Value(0)).current;
   const savedScrollOffsets = useRef({ news: 0, books: 0 });
 
   const headerTranslateY = scrollY.interpolate({
     inputRange: [0, 50],
-    outputRange: [0, -60], // The header hides at -60px
+    outputRange: [0, -60],
     extrapolate: 'clamp',
   });
 
@@ -391,27 +373,26 @@ const HomeScreen = () => {
   const renderScene = ({ route }) => {
     switch (route.key) {
       case 'news':
-        return <News handleScroll={handleScroll} showBackToTop={showBackToTopByTab.news} listRef={newsListRef} />;
+        return <News handleScroll={handleScroll} listRef={newsListRef} />;
       case 'books':
-        return <Books handleScroll={handleScroll} showBackToTop={showBackToTopByTab.books} listRef={booksListRef} />;
+        return <Books handleScroll={handleScroll} listRef={booksListRef} />;
       default:
         return null;
     }
   };
 
-  // Handle scrolling and show/hide the header
+  // Handle scrolling
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     {
       useNativeDriver: true,
       listener: (event) => {
         const offsetY = event.nativeEvent.contentOffset.y;
-        const currentTab = (index === 0 ? 'news' : 'books');
-
+        const currentTab = index === 0 ? 'news' : 'books';
         savedScrollOffsets.current[currentTab] = offsetY;
+        const isAtTop = offsetY <= 0;
 
-        const isAtTop = (offsetY <= 0);
-        setShowBackToTopByTab(prev => ({
+        setShowBackToTopByTab((prev) => ({
           ...prev,
           [currentTab]: !isAtTop,
         }));
@@ -419,22 +400,19 @@ const HomeScreen = () => {
     }
   );
 
-  // On "TabBar" index change
+  // On Tab change
   const handleIndexChange = (newIndex) => {
     const newTabKey = newIndex === 0 ? 'news' : 'books';
     const offset = savedScrollOffsets.current[newTabKey] || 0;
 
-    // Animate scrollY back to 0 smoothly (for header + tabbar)
     Animated.timing(scrollY, {
       toValue: offset,
-      duration: 300, // 300ms for smooth effect
+      duration: 300,
       useNativeDriver: true,
     }).start();
 
-    // Back to top according to selected tab
     if (newIndex === 0 && newsListRef.current) {
       newsListRef.current.scrollToOffset({ offset, animated: true });
-
     } else if (newIndex === 1 && booksListRef.current) {
       booksListRef.current.scrollToOffset({ offset, animated: true });
     }
@@ -442,31 +420,69 @@ const HomeScreen = () => {
     setIndex(newIndex);
   };
 
-  // Custom "TabBar"
+  // Custom TabBar
   const renderTabBar = (props) => (
     <>
-      <Animated.View style={{ transform: [{ translateY: headerTranslateY }], zIndex: 1000, position: 'absolute', top: 0, width: '100%', backgroundColor: COLORS.white, paddingTop: 20 }}>
+      <Animated.View
+        style={{
+          transform: [{ translateY: headerTranslateY }],
+          zIndex: 1000,
+          position: 'absolute',
+          top: 0,
+          width: '100%',
+          backgroundColor: COLORS.white,
+          paddingTop: 20,
+        }}
+      >
         <HeaderComponent />
         <TabBar
           {...props}
-          style={{ backgroundColor: COLORS.white, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 }}
+          style={{
+            backgroundColor: COLORS.white,
+            borderBottomWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          }}
           indicatorStyle={{ backgroundColor: COLORS.black }}
           activeColor={COLORS.black}
           inactiveColor={COLORS.dark_secondary}
         />
       </Animated.View>
-      <FloatingActionsButton />
     </>
   );
 
+  // Back to top handler
+  const handleBackToTop = () => {
+    if (index === 0 && newsListRef.current) {
+      newsListRef.current.scrollToOffset({ offset: 0, animated: true });
+    } else if (index === 1 && booksListRef.current) {
+      booksListRef.current.scrollToOffset({ offset: 0, animated: true });
+    }
+  };
+
   return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={handleIndexChange}
-      initialLayout={{ width: 100 }}
-      renderTabBar={renderTabBar} // Using the Custom TabBar
-    />
+    <>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={handleIndexChange}
+        initialLayout={{ width: 100 }}
+        renderTabBar={renderTabBar}
+      />
+
+      {/* === Bouton global BackToTop === */}
+      {showBackToTopByTab[index === 0 ? 'news' : 'books'] && (
+        <TouchableOpacity
+          onPress={handleBackToTop}
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
+        >
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
+        </TouchableOpacity>
+      )}
+
+      {/* === Floating Button === */}
+      <FloatingActionsButton />
+    </>
   );
 };
 

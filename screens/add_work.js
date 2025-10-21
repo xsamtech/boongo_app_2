@@ -73,7 +73,7 @@ const AddWorkScreen = () => {
       .then((response) => {
         const currencyList = response.data.data.map(item => ({
           value: item.id,
-          label: item.currency_name,
+          label: `${item.currency_name} (${item.currency_acronym})`,
         }));
 
         setCurrencies(currencyList);
@@ -97,23 +97,6 @@ const AddWorkScreen = () => {
         console.log(error);
       });
   }, []);
-
-  useEffect(() => {
-    // Check "isPublic" to update "consultationPrice"
-    if (isPublic === 1) {
-      setConsultationPrice(null);
-
-    } else {
-      // Check if there is an image or video
-      const hasMedia = files.some(file => {
-        const ext = file.name.split('.').pop().toLowerCase();
-
-        return ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov', 'mkv', 'webm'].includes(ext);
-      });
-
-      setConsultationPrice(hasMedia ? 2 : 1);
-    }
-  }, [isPublic, files]);
 
   // =============== Dynamically manage categories when a type is selected ===============
   const handleTypeChange = async (value) => {
@@ -404,15 +387,24 @@ const AddWorkScreen = () => {
         {/* Consultation info */}
         {isPublic === 0 && (
           <>
-            {/* Is visible only if isPublic === 0 */}
-            <View style={[homeStyles.messageContainer, { marginTop: PADDING.p00, marginBottom: PADDING.p01 }]}>
-              <Text style={[homeStyles.messageText, { textAlign: 'center' }]}>{t('work.is_public.description')}</Text>
-            </View>
+            {/* Price */}
+            <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.is_public.consult_price')}</Text>
+            <TextInput
+              keyboardType='numeric'
+              style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
+              value={consultationPrice || ''}
+              placeholder={t('work.is_public.consult_price')}
+              placeholderTextColor={COLORS.dark_secondary}
+              onChangeText={setConsultationPrice} />
 
             {/* Currency Dropdown */}
             <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('work.currency.title')}</Text>
             <Dropdown
               style={[homeStyles.authInput, { color: COLORS.black, height: 50, borderColor: COLORS.light_secondary }]}
+              borderColor={COLORS.dark_secondary}
+              textStyle={{ color: COLORS.black }}
+              containerStyle={{ backgroundColor: COLORS.white }}
+              activeColor={COLORS.white}
               selectedTextStyle={{ color: COLORS.black }}
               placeholderStyle={{ color: COLORS.dark_secondary }}
               data={currencies}

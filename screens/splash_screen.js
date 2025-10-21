@@ -3,32 +3,29 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
-import { Divider } from 'react-native-paper';
-import { useTranslation } from 'react-i18next';
-import { PADDING } from '../tools/constants';
-import FooterComponent from './footer';
-import useColors from '../hooks/useColors';
-import LogoText from '../assets/img/brand.svg';
-import homeStyles from './style';
+import { Image, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const SplashScreen = () => {
-  // =============== Colors ===============
-  const COLORS = useColors();
-  // =============== Language ===============
-  const { t } = useTranslation();
+  const gifBase64 = Image.resolveAssetSource(require('../assets/img/splash.gif')).uri;
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 50 }}>
-      <View style={{ marginBottom: 20, paddingHorizontal: 100 }}>
-        <LogoText width={300} height={72} />
-        <Text style={[homeStyles.slogan, { color: COLORS.black }]}>{t('slogan')}</Text>
-      </View>
-
-      <ActivityIndicator size='large' color={COLORS.link_color} />
-
-      <Divider style={[homeStyles.authDivider, { marginTop: PADDING.p07 }]} />
-      <FooterComponent color={COLORS.dark_secondary} />
+    <View style={{ flex: 1, backgroundColor: '#171614' }}>
+      <WebView
+        originWhitelist={['*']}
+        source={{
+          html: `
+            <html>
+              <body style="margin:0;padding:0;background-color:#171614;overflow:hidden;display:flex;justify-content:center;align-items:center;height:140vh;width:140vw;">
+                <img src="${gifBase64}"
+                     style="width:160%;height:340%;object-fit:contain;"/>
+              </body>
+            </html>`
+        }}
+        style={{ flex: 1 }}
+        scrollEnabled={false}
+        bounces={false}
+      />
     </View>
   );
 };

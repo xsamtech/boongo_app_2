@@ -317,8 +317,16 @@ const DrawerNav = () => {
 const App = () => {
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Get data ===============
+  // =============== Get contexts ===============
   const { userInfo, splashLoading } = useContext(AuthContext);
+  // =============== Get data ===============
+  const [showSplash, setShowSplash] = useState(true);
+
+  // ====== Gérer la durée du SplashScreen ======
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 4500); // 7 secondes
+    return () => clearTimeout(timer);
+  }, []);
 
   // =============== Lock screen orientation ===============
   useEffect(() => {
@@ -388,6 +396,11 @@ const App = () => {
   };
 
   if (splashLoading) {
+    return <SplashScreen />;
+  }
+
+  // ====== Affichage du Splash GIF (10 secondes) ======
+  if (showSplash) {
     return <SplashScreen />;
   }
 
