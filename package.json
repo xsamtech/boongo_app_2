@@ -12,6 +12,7 @@
   "dependencies": {
     "@freakycoder/react-native-text-area": "^0.1.5",
     "@likashefqet/react-native-image-zoom": "^4.3.0",
+    "@lowkey/react-native-gif": "^3.1.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/checkbox": "^0.5.17",
     "@react-native-community/datetimepicker": "^8.4.4",
