@@ -102,7 +102,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
-        style={{ flexDirection: 'row', width: Dimensions.get('window').width - 3, marginTop: headerHeight + TAB_BAR_HEIGHT, padding: 0 }}
+        style={{ flexDirection: 'row', width: Dimensions.get('window').width, marginTop: headerHeight + TAB_BAR_HEIGHT, padding: 0 }}
       >
         <View style={{ backgroundColor: COLORS.white, padding: PADDING.p02 }}>
           {selectedEvent.event_description && (
