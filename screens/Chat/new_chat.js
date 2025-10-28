@@ -7,21 +7,7 @@
  * Comments in English.
  */
 import React, { useState, useEffect, useContext } from 'react';
-import {
-  View,
-  TextInput,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  UIManager,
-  LayoutAnimation,
-  ToastAndroid,
-} from 'react-native';
+import { View, TextInput, FlatList, Text, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, UIManager, LayoutAnimation, ToastAndroid } from 'react-native';
 import { pick, types as docTypes, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -100,7 +86,7 @@ const NewChatScreen = ({ route }) => {
     };
   }, []);
 
-  // =============== Echo + WebRTC init =
+  // =============== Echo + WebRTC init ===============
   useEffect(() => {
     if (!userInfo?.api_token || !userInfo?.id) return;
 
@@ -126,10 +112,13 @@ const NewChatScreen = ({ route }) => {
     });
 
     echo.connector.pusher.connection.bind('connected', () => {
-      console.log('Echo connected, socketId=', echo.socketId());
+      const socketId = echo.socketId();
+      console.log('📡 Socket ID connecté :', socketId);
     });
 
-    // choose channel to listen for normal MessageSent events
+    // =========================================================
+    // 🎧 1. Canal principal selon le type d’entité (user, circle…)
+    // =========================================================
     let channelName = '';
     let channel = null;
 
@@ -154,23 +143,42 @@ const NewChatScreen = ({ route }) => {
         return;
     }
 
-    // Listen incoming normal messages sent by backend (if any)
-    channel.listen('MessageSent', async (e) => {
-      console.log('📡 New message received:', e.message);
-      setMessages((prev) => [e.message, ...prev]);
+    console.log('🛰️ Listening to channel:', channelName);
 
-      // Save chat meta if missing (for recipient)
+    // =========================================================
+    // 💬 2. Écoute des messages entrants (via backend Laravel)
+    // =========================================================
+    channel.listen('.MessageSent', async (e) => {
+      const msg = e.message || e.data?.message || e.payload?.message;
+      if (!msg) return console.warn('⚠️ Message malformé:', e);
+
+      console.log('📩 Message reçu:', msg);
+
+      // Sauvegarde locale
+      const next = await RTCManager.appendLocalMessage(chatKey, msg);
+      setMessages(next);
+
+      // 🔁 Accusé de réception Whisper (ack)
+      if (msg?.user?.id && msg?.id) {
+        channel.whisper('ack', {
+          from: userInfo.id,
+          to: msg.user.id,
+          message_id: msg.id,
+        });
+      }
+
+      // Sauvegarde meta (si pas déjà présent)
       try {
         const metaExists = await AsyncStorage.getItem(metaKey);
         if (!metaExists) {
           const meta = {
             chat_entity,
-            chat_entity_id: e.message.user?.id || chat_entity_id,
+            chat_entity_id: msg.user?.id || chat_entity_id,
             chat_entity_name:
-              e.message.user?.firstname && e.message.user?.lastname
-                ? `${e.message.user.firstname} ${e.message.user.lastname}`
+              msg.user?.firstname && msg.user?.lastname
+                ? `${msg.user.firstname} ${msg.user.lastname}`
                 : chat_entity_name || 'Utilisateur',
-            chat_entity_profile: e.message.user?.avatar_url || chat_entity_profile || null,
+            chat_entity_profile: msg.user?.avatar_url || chat_entity_profile || null,
           };
           await AsyncStorage.setItem(metaKey, JSON.stringify(meta));
         }
@@ -179,21 +187,32 @@ const NewChatScreen = ({ route }) => {
       }
     });
 
-    // =============================
-    // WebRTC 1-to-1
-    // =============================
+    // =========================================================
+    // ✅ 3. Écoute des accusés de réception (whispers "ack")
+    // =========================================================
+    channel.listenForWhisper('ack', (data) => {
+      console.log('📬 ACK Whisper reçu:', data);
+      if (data?.to === userInfo.id) {
+        ToastAndroid.show(`✅ Message reçu par utilisateur ${data.from}`, ToastAndroid.SHORT);
+      }
+    });
+
+    // =========================================================
+    // 🎥 4. WebRTC (1-to-1 ou Group)
+    // =========================================================
+
+    // --- WebRTC 1-to-1 ---
     if (chat_entity === 'user') {
       const a = Math.min(userInfo.id, chat_entity_id);
       const b = Math.max(userInfo.id, chat_entity_id);
       const roomName = `webrtc.user.${a}-${b}`;
       const isCaller = userInfo.id < chat_entity_id;
 
-      console.log('NewChat: room=', roomName, 'isCaller=', isCaller, 'peerId=', chat_entity_id);
+      console.log('🔗 WebRTC Room:', roomName, '| Caller?', isCaller);
 
       const rtcMgr = new RTCManager({
         echo,
         roomName,
-        peerId: chat_entity_id, // IMPORTANT: target peer id for signaling whispers
         localUserId: userInfo.id,
         onMessage: async (msgObj) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
@@ -214,38 +233,25 @@ const NewChatScreen = ({ route }) => {
         onRemoteStream: (stream) => setRemoteStream(stream),
       });
 
-      // Attach signaling (listens on chat.{localUserId})
       rtcMgr.attachSignaling();
-
-      // Initiate offer only if this client is the "caller"
-      if (isCaller) {
-        rtcMgr.connectAsCaller().catch(console.warn);
-      }
+      if (isCaller) rtcMgr.connectAsCaller().catch(console.warn);
 
       setRtc(rtcMgr);
 
       return () => {
-        try {
-          echo.leave(channelName);
-        } catch (e) {}
+        echo.leave(channelName);
         rtcMgr.close();
       };
     }
 
-    // =============================
-    // Group chat (circle) mesh
-    // =============================
+    // --- WebRTC Group (Circle) ---
     if (chat_entity === 'circle') {
       const roomName = `webrtc.circle.${chat_entity_id}`;
-
-      // TODO: fetch actual members list via API
-      const members = []; // e.g. [userId1, userId2...]
-
       const rtcGrp = new RTCGroupManager({
         echo,
         roomName,
         localUserId: userInfo.id,
-        members,
+        members: [],
         onMessage: async (msgObj) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msgObj);
           setMessages(next);
@@ -261,16 +267,15 @@ const NewChatScreen = ({ route }) => {
           const next = await RTCManager.appendLocalMessage(chatKey, msg);
           setMessages(next);
         },
-        onPeerState: (peerId, state) => console.log(`Peer ${peerId} → ${state}`),
+        onPeerState: (peerId, state) =>
+          console.log(`Peer ${peerId} → ${state}`),
       });
 
       rtcGrp.init();
       setRtcGroup(rtcGrp);
 
       return () => {
-        try {
-          echo.leave(channelName);
-        } catch (e) {}
+        echo.leave(channelName);
         rtcGrp.closeAll();
       };
     }
