@@ -179,14 +179,14 @@ const FloatingActionsButton = () => {
     return (
         <View style={styles.container}>
             {/* New message */}
-            <Animated.View style={[styles.contentContainer, fourthIcon, fourthWidthStyle, { backgroundColor: COLORS.primary }]}>
+            {/* <Animated.View style={[styles.contentContainer, fourthIcon, fourthWidthStyle, { backgroundColor: COLORS.primary }]}>
                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('Chats'); handlePress(); }}>
                     <View style={styles.iconContainer}>
                         <Icon name='chat-plus' size={IMAGE_SIZE.s06} color='white' />
                     </View>
                     <Animated.Text style={[styles.text, opacityText]}>{t('chat.new')}</Animated.Text>
                 </TouchableOpacity>
-            </Animated.View>
+            </Animated.View> */}
 
             {/* Add a work */}
             <Animated.View style={[styles.contentContainer, thirdIcon, thirdWidthStyle, { backgroundColor: COLORS.success }]}>

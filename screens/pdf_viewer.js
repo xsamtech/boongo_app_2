@@ -194,9 +194,9 @@ const SummaryScreenContent = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => deleteNote(item.id)} style={homeStyles.noteDeleteButton}>
           <Icon size={IMAGE_SIZE.s04} color={COLORS.dark_secondary} name='close' />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ChatEntity', { doc_title: item.doc_title, doc_page: item.id, doc_note: item.noteText })} style={homeStyles.noteShareButton}>
+        {/* <TouchableOpacity onPress={() => navigation.navigate('ChatEntity', { doc_title: item.doc_title, doc_page: item.id, doc_note: item.noteText })} style={homeStyles.noteShareButton}>
           <Icon size={IMAGE_SIZE.s04} color={COLORS.dark_secondary} name='share-variant' />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   };

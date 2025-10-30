@@ -96,28 +96,29 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       )}
 
       <Animated.ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ paddingTop: headerHeight + TAB_BAR_HEIGHT }}
         ref={scrollViewListRef}
         onScroll={handleScroll}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={headerHeight + TAB_BAR_HEIGHT} />}
-        style={{ flexDirection: 'row', width: Dimensions.get('window').width, marginTop: headerHeight + TAB_BAR_HEIGHT, padding: 0 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        style={{ flex: 1 }}
       >
         <View style={{ backgroundColor: COLORS.white, padding: PADDING.p02 }}>
           {selectedEvent.event_description && (
             <View style={{ flexDirection: 'row', marginBottom: PADDING.p08 }}>
-              <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black, maxWidth: percent }} onPress={toggleText}>
+              {/* <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black, maxWidth: percent }} onPress={toggleText}>
                 {isExpanded ? selectedEvent.event_description : `${selectedEvent.event_description.slice(0, 100)}...`}
-              </Text>
+              </Text> */}
+              <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black }}>{selectedEvent.event_description}</Text>
             </View>
           )}
           {selectedEvent.start_at && (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
               <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
-                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black, maxWidth: '100%' }}>{t('event.data.start_at')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '100%' }}>{ucfirst(selectedEvent.start_at_explicit)}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black }}>{t('event.data.start_at')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black }}>{ucfirst(selectedEvent.start_at_explicit)}</Text>
               </View>
             </View>
           )}
@@ -125,8 +126,8 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
               <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
-                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black, maxWidth: '100%' }}>{t('event.data.end_at')}</Text>
-                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '100%' }}>{ucfirst(selectedEvent.end_at_explicit)}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black }}>{t('event.data.end_at')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black }}>{ucfirst(selectedEvent.end_at_explicit)}</Text>
               </View>
             </View>
           )}
@@ -135,10 +136,10 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               <Icon name='map-marker' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
                 {selectedEvent.event_place && (
-                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '80%' }}>{selectedEvent.event_place}</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '90%' }}>{selectedEvent.event_place}</Text>
                 )}
                 {selectedEvent.event_place_address && (
-                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '80%' }}>{selectedEvent.event_place_address}</Text>
+                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '90%' }}>{selectedEvent.event_place_address}</Text>
                 )}
               </View>
             </View>
@@ -410,6 +411,11 @@ const EventScreen = () => {
 
         setSelectedEvent(eventData);
 
+        // Update "likeCount" and "hasLiked"
+        const isAlreadyMember = userInfo.events.some(event => event.id === eventData.id);
+
+        setIsMember(isAlreadyMember);
+
         return eventData;
       })
       .catch(error => {
@@ -475,12 +481,15 @@ const EventScreen = () => {
   };
 
   // Toggle membership
-  const handleToggleMembership = (user_id, work_id) => {
+  const handleToggleMembership = (user_id) => {
     setLoading(true);
+    console.log(`Event ID: ${selectedEvent.id}`);
+    console.log(`User ID: ${userInfo.id}`);
+    console.log(`User Token: ${userInfo.api_token}`);
 
     if (isMember) {
-      // If the work is already liked, we cancel the like
-      axios.delete(`${API.boongo_url}/like/unlike_entity/${user_id}/work/${work_id}`, {
+      // If user is already member, withdraw membership
+      axios.put(`${API.boongo_url}/user/update_user_membership/event/${selectedEvent.id}/remove/${user_id}`, {
         headers: {
           'Authorization': `Bearer ${userInfo.api_token}`,
           'X-localization': getLanguage(),
@@ -491,17 +500,16 @@ const EventScreen = () => {
         ToastAndroid.show(message, ToastAndroid.LONG);
         console.log(message);
 
-        // Update likes counter and status
-        setLikeCount(likeCount - 1); // Decrement
-        setHasLiked(false); // User no longer likes
+        // Update membership status
+        setIsMember(false);
         setLoading(false);
       }).catch(error => {
         handleApiError(error);
       });
 
     } else {
-      // If the work is not yet liked, we love it
-      axios.post(`${API.boongo_url}/like`, { user_id: user_id, for_work_id: work_id }, {
+      // If user is not a member, add membership
+      axios.put(`${API.boongo_url}/user/update_user_membership/event/${selectedEvent.id}/add/${user_id}`, {
         headers: {
           'Authorization': `Bearer ${userInfo.api_token}`,
           'X-localization': getLanguage(),
@@ -512,14 +520,28 @@ const EventScreen = () => {
         ToastAndroid.show(message, ToastAndroid.LONG);
         console.log(message);
 
-        // Update likes counter and status
-        setLikeCount(likeCount + 1); // Increment
-        setHasLiked(true); // The user likes the work
+        // Update membership status
+        setIsMember(true);
         setLoading(false);
       }).catch(error => {
         handleApiError(error);
       });
     }
+  };
+
+  const handleApiError = (error) => {
+    if (error.response) {
+      ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+      console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+    } else if (error.request) {
+      ToastAndroid.show('Erreur de connexion au serveur', ToastAndroid.LONG);
+
+    } else {
+      ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+    }
+
+    setLoading(false);
   };
 
   // Custom "TabBar"
@@ -550,9 +572,9 @@ const EventScreen = () => {
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }}>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }} onPress={() => handleToggleMembership(userInfo.id)}>
               <Icon name='star-circle-outline' size={34} color={COLORS.dark_secondary} />
-              <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{t('event.i_m_not_participating')}</Text>
+              <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{isMember ? t('event.i_participate'): t('event.i_m_not_participating')}</Text>
             </TouchableOpacity>
           </View>
         </View>

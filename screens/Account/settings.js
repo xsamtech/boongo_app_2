@@ -134,9 +134,13 @@ const SettingsScreen = () => {
     { label: t('auth.gender.female'), value: 'F' }
   ]);
 
+  const handleGenderChange = (item) => {
+    setGender(item.value);
+  };
+
   // CURRENCY dropdown
   const [currencyOpen, setCurrencyOpen] = useState(false);
-  const [currency, setCurrency] = useState(userInfo.currency.id);
+  const [currency, setCurrency] = useState(userInfo.currency ? userInfo.currency.id : null);
   const [currencyItems, setCurrencyItems] = useState([]);
 
   useEffect(() => {
@@ -168,6 +172,10 @@ const SettingsScreen = () => {
         console.log(error);
       });
   }, []);
+
+  const handleCurrencyChange = (item) => {
+    setCurrency(item.value);
+  };
 
   // BIRTH DATE date-picker
   const [birthdate, setBirthdate] = useState(userInfo.birthdate);
@@ -319,6 +327,7 @@ const SettingsScreen = () => {
             setOpen={setGenderOpen}
             setValue={setGender}
             setItems={setGenderItems}
+            onChangeItem={handleGenderChange}
             listMode="MODAL" />
 
           {/* Birth date */}
@@ -429,7 +438,7 @@ const SettingsScreen = () => {
             placeholderTextColor={COLORS.dark_secondary}
             onChangeText={text => setPhone(text)} />
 
-          {/* Gender  */}
+          {/* Currency  */}
           <Text style={{ color: COLORS.dark_secondary, paddingVertical: 5, paddingHorizontal: PADDING.horizontal }}>{t('work.currency.title')}</Text>
           <DropDownPicker
             style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
@@ -447,6 +456,7 @@ const SettingsScreen = () => {
             setOpen={setCurrencyOpen}
             setValue={setCurrency}
             setItems={setCurrencyItems}
+            onChangeItem={handleCurrencyChange}
             listMode="MODAL" />
 
           {/* Password */}
@@ -469,7 +479,7 @@ const SettingsScreen = () => {
 
           {/* Submit */}
           <Button style={[homeStyles.authButton, { backgroundColor: COLORS.primary, marginTop: 16 }]} onPress={() => {
-            update(userInfo.id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country, null, organization);
+            update(userInfo.id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country, currency, null, organization);
             navigation.navigate('Account'); }}>
             <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('update')}</Text>
           </Button>

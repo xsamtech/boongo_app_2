@@ -260,22 +260,24 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
-    const update = (id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id) => {
+    const update = (id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, currency_id, role_id, organization_id) => {
         setIsLoading(true);
+        console.log(`Currency ID send: ${currency_id}`);
 
         axios.put(`${API.boongo_url}/user/${id}`, {
-            id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, role_id, organization_id
+            id, firstname, lastname, surname, gender, birthdate, city, address_1, address_2, p_o_box, email, phone, username, password, confirm_password, country_id, currency_id, role_id, organization_id
         }, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         }).then(res => {
             const message = res.data.message;
             const userData = res.data.data;
 
+            console.log(`Currency ID received: ${userData.currency.id}`);
             setUserInfo(userData);
 
             AsyncStorage.setItem('userInfo', JSON.stringify(userData));
             ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-            console.log(`${message}`);
+            console.log(`Message: ${message}`);
 
             setIsLoading(false);
 
