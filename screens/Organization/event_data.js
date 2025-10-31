@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar, ToastAndroid } from 'react-native'
+import { View, TouchableOpacity, Animated, SafeAreaView, Dimensions, RefreshControl, TouchableHighlight, Text, Image, StatusBar, ToastAndroid, TextInput, LayoutAnimation } from 'react-native'
 import * as RNLocalize from 'react-native-localize';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,8 @@ import EmptyListComponent from '../../components/empty_list';
 import FloatingActionsButton from '../../components/floating_actions_button';
 import homeStyles from '../style';
 import useColors from '../../hooks/useColors';
+import Spinner from 'react-native-loading-spinner-overlay';
+import CommentItemComponent from '../../components/comment_item';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -165,12 +167,15 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const { event_id } = route.params;
   // =============== Get data ===============
   const [selectedEvent, setSelectedEvent] = useState({});
-  const [circles, setCircles] = useState([]);
+  const [comments, seComments] = useState([]);
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [count, setCount] = useState(0);
-  const [inputValue, setInputValue] = useState('');
+  const [text, setText] = useState('');
+  const [showEmojis, setShowEmojis] = useState(false);
+  const [inputHeight, setInputHeight] = useState(44);
+  const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
@@ -196,6 +201,10 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
         setSelectedEvent(eventData);
 
+        const isAlreadyMember = userInfo.events.some(event => event.id === eventData.id);
+
+        setIsMember(isAlreadyMember);
+
         return eventData;
       })
       .catch(error => {
@@ -203,53 +212,13 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       });
   };
 
-  // Fetch data from API
-  const fetchSearchData = async (searchTerm) => {
-    if (isLoading) return;
-
-    setIsLoading(true);
-
-    const qs = require('qs');
-    const params = {
-      data: searchTerm,
-      user_id: selectedEvent.id
-    };
-
-    try {
-      const response = await axios.post(
-        `${API.boongo_url}/circle/search`,
-        qs.stringify(params, { arrayFormat: 'brackets' }), // 👈 key here
-        {
-          headers: {
-            'X-localization': 'fr',
-            'Authorization': `Bearer ${userInfo.api_token}`,
-            'X-user-id': userInfo.id,
-            'Content-Type': 'application/x-www-form-urlencoded', // consistent
-          },
-        }
-      );
-
-      setAddressees(response.data.data);
-    } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle search event
-  const handleSearch = (text) => {
-    setInputValue(text);
-    fetchSearchData(text);
-  };
-
-  const fetchCircles = async (pageToFetch = 1) => {
+  const fetchComments = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
 
     setIsLoading(true);
 
-    const qs = require('qs');
-    const url = `${API.boongo_url}/user/member_groups/circle/${selectedEvent.id}/15?page=${pageToFetch}`;
+    // const qs = require('qs');
+    const url = `${API.boongo_url}/message/find_by_group/event/${selectedEvent.id}?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
@@ -259,10 +228,10 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       const response = await axios.get(url, { headers: mHeaders });
 
       if (pageToFetch === 1) {
-        setCircles(response.data.data);
+        seComments(response.data.data);
 
       } else {
-        setCircles(prev => [...prev, ...response.data.data]);
+        seComments(prev => [...prev, ...response.data.data]);
       }
 
       setAd(response.data.ad);
@@ -286,7 +255,7 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchCircles(1);
+    await fetchComments(1);
     setRefreshing(false);
   };
 
@@ -298,7 +267,7 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     }
   };
 
-  const combinedData = [...circles];
+  const combinedData = [...comments];
 
   if (ad) {
     combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
@@ -306,13 +275,13 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   useEffect(() => {
     if (selectedEvent && selectedEvent.id) {
-      fetchCircles(1); // Initial loading
+      fetchComments(1); // Initial loading
     }
   }, [selectedEvent]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchCircles(page);
+      fetchComments(page);
     }
   }, [page]);
 
@@ -325,7 +294,59 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Comments List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => <CommentItemComponent item={item} />}
+          horizontal={false}
+          showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: headerHeight + TAB_BAR_HEIGHT,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
+          ListEmptyComponent={<EmptyListComponent iconName="wechat" title={t('empty_list.title')} description={t('empty_list.description_comments_event')} />}
+          ListHeaderComponent={() => {
+            if (isMember) {
+              return (
+                <View style={{ flexGrow: 0, flexDirection: 'row' }}>
+                  <TextInput
+                    multiline
+                    value={text}
+                    onChangeText={setText}
+                    onContentSizeChange={(e) => {
+                      const newHeight = e.nativeEvent.contentSize.height;
+                      setInputHeight(Math.min(newHeight, 120));
+                    }}
+                    scrollEnabled={inputHeight >= 120}
+                    onFocus={() => {
+                      setShowEmojis(false);
+                      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                    }}
+                    placeholder={t('event.comment')}
+                    placeholderTextColor={COLORS.black}
+                    style={[homeStyles.authInput, { height: Math.max(44, inputHeight), maxHeight: 120, marginBottom: 0, borderRadius: PADDING.p08, borderColor: COLORS.dark_secondary, color: COLORS.black, textAlignVertical: 'top' }]}
+                  />
+                </View>
+              );
 
+            } else {
+              <View style={{ flexGrow: 0, padding: PADDING.p00, borderWidth: 1, borderColor: COLORS.dark_secondary, borderRadius: PADDING.p03 }}>
+                <Text style={{ fontSize: TEXT_SIZE.normal, textAlign: 'center', color: COLORS.black }}>{t('event.participate_before_comment')}</Text>
+              </View>
+            }
+          }
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
       </SafeAreaView>
     </View>
   );
@@ -339,14 +360,13 @@ const EventScreen = () => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get contexts ===============
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo, isLoading, addMembership, removeMembership } = useContext(AuthContext);
   // =============== Get parameters ===============
   const route = useRoute();
   const { event_id } = route.params;
   // =============== Get data ===============
   const [selectedEvent, setSelectedEvent] = useState({});
   const [isMember, setIsMember] = useState(false);
-  const [loading, setLoading] = useState(true);
   const startAt = new Date(selectedEvent.start_at || '1900-01-01 00:00:00');
 
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; // Array of abbreviated months
@@ -411,7 +431,6 @@ const EventScreen = () => {
 
         setSelectedEvent(eventData);
 
-        // Update "likeCount" and "hasLiked"
         const isAlreadyMember = userInfo.events.some(event => event.id === eventData.id);
 
         setIsMember(isAlreadyMember);
@@ -421,6 +440,17 @@ const EventScreen = () => {
       .catch(error => {
         console.log(error);
       });
+  };
+
+  const handleToggleMembership = (user_id, event_id) => {
+    if (isMember) {
+      removeMembership(user_id, event_id);
+      setIsMember(false);
+
+    } else {
+      addMembership(user_id, event_id);
+      setIsMember(true);
+    }
   };
 
   // Get system language
@@ -480,70 +510,6 @@ const EventScreen = () => {
     setIndex(newIndex);
   };
 
-  // Toggle membership
-  const handleToggleMembership = (user_id) => {
-    setLoading(true);
-    console.log(`Event ID: ${selectedEvent.id}`);
-    console.log(`User ID: ${userInfo.id}`);
-    console.log(`User Token: ${userInfo.api_token}`);
-
-    if (isMember) {
-      // If user is already member, withdraw membership
-      axios.put(`${API.boongo_url}/user/update_user_membership/event/${selectedEvent.id}/remove/${user_id}`, {
-        headers: {
-          'Authorization': `Bearer ${userInfo.api_token}`,
-          'X-localization': getLanguage(),
-        }
-      }).then(res => {
-        const message = res.data.message;
-
-        ToastAndroid.show(message, ToastAndroid.LONG);
-        console.log(message);
-
-        // Update membership status
-        setIsMember(false);
-        setLoading(false);
-      }).catch(error => {
-        handleApiError(error);
-      });
-
-    } else {
-      // If user is not a member, add membership
-      axios.put(`${API.boongo_url}/user/update_user_membership/event/${selectedEvent.id}/add/${user_id}`, {
-        headers: {
-          'Authorization': `Bearer ${userInfo.api_token}`,
-          'X-localization': getLanguage(),
-        }
-      }).then(res => {
-        const message = res.data.message;
-
-        ToastAndroid.show(message, ToastAndroid.LONG);
-        console.log(message);
-
-        // Update membership status
-        setIsMember(true);
-        setLoading(false);
-      }).catch(error => {
-        handleApiError(error);
-      });
-    }
-  };
-
-  const handleApiError = (error) => {
-    if (error.response) {
-      ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
-      console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
-
-    } else if (error.request) {
-      ToastAndroid.show('Erreur de connexion au serveur', ToastAndroid.LONG);
-
-    } else {
-      ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-    }
-
-    setLoading(false);
-  };
-
   // Custom "TabBar"
   const renderTabBar = (props) => (
     <>
@@ -571,10 +537,11 @@ const EventScreen = () => {
             <Text style={{ fontSize: 28, fontWeight: '400', color: COLORS.black, lineHeight: PADDING.p10, maxWidth: '75%', marginLeft: PADDING.p02 }}>{selectedEvent.event_title || '...'}</Text>
           </View>
 
+          {/* Participation button */}
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingVertical: PADDING.p01, borderTopWidth: 1, borderBottomWidth: 1, borderColor: COLORS.light_secondary }}>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }} onPress={() => handleToggleMembership(userInfo.id)}>
-              <Icon name='star-circle-outline' size={34} color={COLORS.dark_secondary} />
-              <Text style={{ fontSize: 16, fontWeight: '400', color: COLORS.dark_secondary, marginLeft: PADDING.p00 }}>{isMember ? t('event.i_participate'): t('event.i_m_not_participating')}</Text>
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 1, paddingHorizontal: 2, borderRadius: 37 / 2 }} onPress={() => handleToggleMembership(userInfo.id, selectedEvent.id)} disabled={isLoading}>
+              <Icon name={isMember ? 'star-circle' : 'star-circle-outline'} size={34} color={isMember ? COLORS.success : COLORS.dark_secondary} />
+              <Text style={{ fontSize: 16, fontWeight: '400', color: (isMember ? COLORS.success : COLORS.dark_secondary), marginLeft: PADDING.p00 }}>{isMember ? t('event.i_participate') : t('event.i_m_not_participating')}</Text>
             </TouchableOpacity>
           </View>
         </View>

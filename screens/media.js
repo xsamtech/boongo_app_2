@@ -3,14 +3,14 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, RefreshControl, TouchableOpacity, SafeAreaView, TouchableHighlight, Animated } from 'react-native';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, SafeAreaView, TouchableHighlight, Animated, Image } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, PADDING } from '../tools/constants';
+import { API, IMAGE_SIZE, PADDING } from '../tools/constants';
 import HeaderComponent from './header';
 import FloatingActionsButton from '../components/floating_actions_button';
 import EmptyListComponent from '../components/empty_list';
@@ -237,87 +237,15 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get contexts ===============
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo, removeFromCart, isLoading } = useContext(AuthContext);
   // =============== Get data ===============
-  const [favorites, setFavorites] = useState([]);
-  const [ad, setAd] = useState(null);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [count, setCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const favorites = userInfo.favorite_works;
   const flatListRef = listRef || useRef(null);
-
-  const fetchFavorites = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
-
-    setIsLoading(true);
-
-    const qs = require('qs');
-    const url = `${API.boongo_url}/work/favorites/${userInfo.id}?page=${pageToFetch}`;
-    const mHeaders = {
-      'X-localization': 'fr',
-      'Authorization': `Bearer ${userInfo.api_token}`
-    };
-
-    try {
-      const response = await axios.get(url, { headers: mHeaders });
-
-      if (pageToFetch === 1) {
-        setFavorites(response.data.data);
-
-      } else {
-        setFavorites(prev => [...prev, ...response.data.data]);
-      }
-
-      setAd(response.data.ad);
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const scrollToTop = () => {
     flatListRef.current.scrollToOffset({ offset: 0, animated: true });
   };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setPage(1);
-    await fetchCircles(1);
-    setRefreshing(false);
-  };
-
-  const onEndReached = () => {
-    if (!isLoading && page < lastPage) {
-      const nextPage = page + 1;
-
-      setPage(nextPage); // Update the page
-    }
-  };
-
-  const combinedData = [...favorites];
-
-  if (ad) {
-    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
-  }
-
-  useEffect(() => {
-    fetchFavorites(1); // Initial loading
-  }, []);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchFavorites(page);
-    }
-  }, [page]);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
@@ -328,7 +256,62 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       )}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-
+        {/* Favorites List */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={combinedData}
+          extraData={combinedData}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({ item }) => {
+            return (
+              <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
+                <Image source={{ uri: item.user.avatar_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: IMAGE_SIZE.s13 / 2, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
+                <View style={{ flexDirection: 'column', width: '70%' }}>
+                  <Text numberOfLines={4} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.work_content}</Text>
+                </View>
+                <TouchableOpacity
+                  style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
+                  onPress={() => { removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id); }}
+                >
+                  <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
+                  <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>
+                    {t('withdraw')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+          horizontal={false}
+          showsVerticalScrollIndicator={false}
+          alwaysBounceVertical={false}
+          onScroll={handleScroll}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.1}
+          scrollEventThrottle={16}
+          windowSize={10}
+          contentContainerStyle={{
+            paddingTop: 110,
+          }}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
+          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
+          ListHeaderComponent={
+            <>
+              <FlatList
+                data={categories}
+                keyExtractor={item => item.id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{ height: 40, flexGrow: 0 }}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  paddingHorizontal: PADDING.p00,
+                }}
+                renderItem={({ item }) => <CategoryItem item={item} />}
+              />
+            </>
+          }
+          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
+        />
       </SafeAreaView>
     </View>
   );

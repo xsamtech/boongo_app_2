@@ -81,6 +81,7 @@
     "empty_list": {
         "title": "The list is empty",
         "description_cart": "You haven’t added anything to your cart yet.",
+        "description_comments_event": "Here will be displayed all comments about the event.",
         "description_unpaid_consultation": "Here will be displayed the works for which you have not yet paid to view.",
         "description_unpaid_subscription": "You have no unpaid subscriptions.",
         "description_subscribers": "Here you will see people who have paid to view your works.",
@@ -149,6 +150,8 @@
         "update": "Edit the event",
         "i_participate": "I participate",
         "i_m_not_participating": "I am not participating",
+        "comment": "Comment...",
+        "participate_before_comment": "Please participate in the event before commenting.",
         "data": {
             "event_title": "Event title",
             "event_description": "Event details",

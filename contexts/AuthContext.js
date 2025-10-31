@@ -487,42 +487,42 @@ export const AuthProvider = ({ children }) => {
         return axios.put(`${API.boongo_url}/activation_code/activate_subscription/${user_id}/${code}/${partner_id}`, null, {
             headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
         })
-        .then(res => {
-            const message = res.data.message;
-            const userData = res.data.data.user;
-            const isCodeActive = userData.has_active_code; // Check here if the code has been activated
+            .then(res => {
+                const message = res.data.message;
+                const userData = res.data.data.user;
+                const isCodeActive = userData.has_active_code; // Check here if the code has been activated
 
-            if (isCodeActive) {
-                setUserInfo(userData);
-                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
-                console.log(`${message}`);
-            }
+                if (isCodeActive) {
+                    setUserInfo(userData);
+                    AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                    ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+                    console.log(`${message}`);
+                }
 
-            setIsLoading(false);
+                setIsLoading(false);
 
-            return isCodeActive; // Return true if the code is active
-        })
-        .catch(error => {
-            if (error.response) {
-                // The request was made and the server responded with a status code
-                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
-                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+                return isCodeActive; // Return true if the code is active
+            })
+            .catch(error => {
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                    console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
 
-            } else if (error.request) {
-                // The request was made but no response was received
-                ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    ToastAndroid.show(t('error') + ' ' + t('error_message.no_server_response'), ToastAndroid.LONG);
 
-            } else {
-                // An error occurred while configuring the query
-                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
-            }
+                } else {
+                    // An error occurred while configuring the query
+                    ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+                }
 
-            setIsLoading(false);
+                setIsLoading(false);
 
-            // If an error occurs, we return false
-            return false; 
-        });
+                // If an error occurs, we return false
+                return false;
+            });
     };
 
     const disableSubscriptionByCode = (user_id) => {
@@ -803,6 +803,86 @@ export const AuthProvider = ({ children }) => {
         });
     };
 
+    const addMembership = (user_id, event_id) => {
+        setIsLoading(true);
+
+        // If user is not a member, add membership
+        axios.put(`${API.boongo_url}/user/update_user_membership/event/${event_id}/add/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
+        }).then(res => {
+            // Update membership status
+            const success = res.data.success;
+
+            if (success) {
+                const message = res.data.message;
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                console.log(`${message}`);
+                setIsLoading(false);
+            }
+
+            setIsLoading(false);
+        }).catch(error => {
+            if (error.response) {
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                ToastAndroid.show('Erreur de connexion au serveur', ToastAndroid.LONG);
+
+            } else {
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
+    const removeMembership = (user_id, event_id) => {
+        setIsLoading(true);
+
+        // If user is already member, withdraw membership
+        axios.put(`${API.boongo_url}/user/update_user_membership/event/${event_id}/remove/${user_id}`, null, {
+            headers: { 'Authorization': `Bearer ${userInfo.api_token}`, 'X-localization': getLanguage() }
+        }).then(res => {
+            // Update membership status
+            const success = res.data.success;
+
+            if (success) {
+                const message = res.data.message;
+                const userData = res.data.data;
+
+                setUserInfo(userData);
+
+                AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+
+                console.log(`${message}`);
+                setIsLoading(false);
+            }
+
+            setIsLoading(false);
+        }).catch(error => {
+            if (error.response) {
+                ToastAndroid.show(`${error.response.data.message || error.response.data}`, ToastAndroid.LONG);
+                console.log(`${error.response.status} -> ${error.response.data.message || error.response.data}`);
+
+            } else if (error.request) {
+                ToastAndroid.show('Erreur de connexion au serveur', ToastAndroid.LONG);
+
+            } else {
+                ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+            }
+
+            setIsLoading(false);
+        });
+    };
+
     const login = (username, password) => {
         setIsLoading(true);
 
@@ -904,7 +984,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ isLoading, userInfo, paymentURL, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, resetPaymentURL, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase }}>
+            value={{ isLoading, userInfo, paymentURL, startRegisterInfo, endRegisterInfo, registerError, splashLoading, pushToken, login, logout, resetPaymentURL, startRegister, checkOTP, endRegister, update, updateAvatar, changePassword, changeRole, changeOrganization, changeStatus, activateSubscriptionByCode, disableSubscriptionByCode, validateSubscription, invalidateSubscription, validateConsultations, invalidateConsultations, addToCart, removeFromCart, purchase, addMembership, removeMembership }}>
             {children}
         </AuthContext.Provider>
     );

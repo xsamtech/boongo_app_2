@@ -81,6 +81,7 @@
     "empty_list": {
         "title": "Liste ezali pamba",
         "description_cart": "Obakisi nanu eloko te na kitunga na yo.",
+        "description_comments_event": "Awa okomona ba commentaires pona oyo etali événement.",
         "description_unpaid_consultation": "Awa ekolakisama misala oyo ofuti naino te mpo na kotala.",
         "description_unpaid_subscription": "Ozali nanu na abonnement o commander te.",
         "description_subscribers": "Awa okomona bato oyo bafutaki mpo na kotala misala na yo.",
@@ -149,6 +150,8 @@
         "update": "Bongola milulu",
         "i_participate": "Nakozala",
         "i_m_not_participating": "Nakozala te",
+        "comment": "Commenter ...",
+        "participate_before_comment": "Esengeli o participer na événement avant o commenter.",
         "data": {
             "event_title": "Kombo ya milulu",
             "event_description": "Lobela oyo etali milulu",

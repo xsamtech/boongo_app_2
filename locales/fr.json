@@ -81,6 +81,7 @@
     "empty_list": {
         "title": "La liste est vide",
         "description_cart": "Vous n’avez encore rien ajouté au panier",
+        "description_comments_event": "Ici seront affiché tous les commentaires à propos de l’événement.",
         "description_unpaid_consultation": "Ici seront affichées les oeuvres dont vous n’avez pas encore payées la consultation.",
         "description_unpaid_subscription": "Vous n’avez aucun abonnement non payé.",
         "description_subscribers": "Ici seront affichés les personnes qui ont payé pour consulter vos œuvres.",
@@ -149,6 +150,8 @@
         "update": "Editer l’événement",
         "i_participate": "Je participe",
         "i_m_not_participating": "Je ne participe pas",
+        "comment": "Commenter ...",
+        "participate_before_comment": "Veuillez participer à l’événement avant de commenter",
         "data": {
             "event_title": "Titre de l’événement",
             "event_description": "Détails sur l’événement",
