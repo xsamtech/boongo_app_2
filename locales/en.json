@@ -96,6 +96,7 @@
         "description_books": "Here, the books will be displayed which can be consulted by members.",
         "description_mags": "Here, the journals, newspapers or magazines which can be consulted by members will be displayed.",
         "description_medias": "Here, the medias will be displayed which can be consulted by members.",
+        "description_favoris": "Your favorite media will be displayed here for you to read whenever you want.",
         "description_maps": "Here, geographic maps will be displayed which can be consulted by members.",
         "description_user_works": "This member has not yet published any work.",
         "description_user_circles": "This member is not part of any discussion circle.",
@@ -247,8 +248,10 @@
         "link": "Pay to consult"
     },
     "add_to_cart": "Add to cart",
+    "add_to_favorite": "Add to favorite",
     "withdraw_from_cart": "Withdraw from cart",
     "already_ordered": "Already ordered",
+    "already_selected": "Déjà selected",
     "withdraw": "Withdraw",
     "pay": "Pay",
     "amount_to_pay": "Amount to pay:",

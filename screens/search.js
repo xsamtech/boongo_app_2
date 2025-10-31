@@ -176,7 +176,7 @@ const SearchScreen = () => {
       </TouchableOpacity>
 
       <Portal>
-        <Modal visible={showModal} onDismiss={() => setShowModal(false)}>
+        <Modal visible={showModal} onRequestClose={() => setShowModal(false)}>
           <ScrollView style={{ backgroundColor: COLORS.white, paddingVertical: PADDING.p02, paddingHorizontal: PADDING.p07 }}>
             {/* Type selection */}
             <Text style={[homeStyles.headingText, { color: COLORS.black }]}>{t('search_filter_type')}</Text>

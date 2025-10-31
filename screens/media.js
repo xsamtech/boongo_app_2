@@ -6,16 +6,19 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, SafeAreaView, TouchableHighlight, Animated, Image } from 'react-native';
 import { TabBar, TabView } from 'react-native-tab-view';
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import Video from 'react-native-video';
+import Sound from 'react-native-sound';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { API, IMAGE_SIZE, PADDING } from '../tools/constants';
+import { API, IMAGE_SIZE, PADDING, TEXT_SIZE } from '../tools/constants';
 import HeaderComponent from './header';
 import FloatingActionsButton from '../components/floating_actions_button';
 import EmptyListComponent from '../components/empty_list';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
+import Spinner from 'react-native-loading-spinner-overlay';
+import MediaItemComponent from '../components/media_item';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -173,14 +176,14 @@ const Medias = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
+      {/* {showBackToTop && (
         <TouchableOpacity
           style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
           onPress={scrollToTop}
         >
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
-      )}
+      )} */}
 
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         {/* <View style={[homeStyles.cardEmpty, { height: Dimensions.get('window').height, marginLeft: 0, paddingHorizontal: 2 }]}> */}
@@ -190,7 +193,7 @@ const Medias = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           data={combinedData}
           extraData={combinedData}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => <WorkItemComponent item={item} />}
+          renderItem={({ item }) => <MediaItemComponent item={item} />}
           horizontal={false}
           showsVerticalScrollIndicator={false}
           alwaysBounceVertical={false}
@@ -234,86 +237,148 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const COLORS = useColors();
   // =============== Language ===============
   const { t } = useTranslation();
-  // =============== Navigation ===============
-  const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo, removeFromCart, isLoading } = useContext(AuthContext);
   // =============== Get data ===============
-  const [loading, setLoading] = useState(false);
   const favorites = userInfo.favorite_works;
   const flatListRef = listRef || useRef(null);
 
-  const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+  // State pour la lecture de l'audio/vidéo et l'élément en cours
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState(null);
+  const [audio, setAudio] = useState(null); // Pour gérer l'audio avec react-native-sound
+  const [videoRef, setVideoRef] = useState(null); // Pour gérer la vidéo
+
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleNext = () => {
+    if (currentItemIndex < favorites.length - 1) {
+      setCurrentItemIndex(currentItemIndex + 1);
+    } else {
+      setCurrentItemIndex(0); // Revenir au début si c'est la dernière vidéo
+    }
+  };
+
+  const handleItemPress = (index, item) => {
+    setCurrentItemIndex(index);
+    if (item.video_url) {
+      videoRef.seek(0);
+      videoRef.play();
+    } else if (item.audio_url) {
+      playAudio(item.audio_url);
+    }
+    setIsPlaying(true);
+  };
+
+  const playAudio = (uri) => {
+    if (audio) {
+      audio.stop(); // Stoppe l’audio précédent avant de jouer un nouveau
+    }
+
+    const newAudio = new Sound(uri, null, (error) => {
+      if (error) {
+        console.log('Erreur de chargement audio', error);
+      } else {
+        newAudio.play(() => {
+          newAudio.release();
+          handleNext(); // Passe à l’élément suivant à la fin
+        });
+      }
+    });
+
+    setAudio(newAudio);
+    newAudio.play();
+  };
+
+  const stopAudio = () => {
+    if (audio) {
+      audio.stop();
+    }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-      {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
+    <>
+      {/* Spinner (for AuthContext requests) */}
+      <Spinner visible={isLoading} />
+
+      {/* Content */}
+      <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+        {/* {showBackToTop && (
+          <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
+            <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
+          </TouchableOpacity>
+        )} */}
+
+        {/* Contrôle global play/pause */}
+        <TouchableOpacity style={[homeStyles.floatingButton, { left: 20, bottom: 30, backgroundColor: COLORS.black }]} onPress={handlePlayPause}>
+          <Icon name={isPlaying ? 'pause' : 'play'} size={IMAGE_SIZE.s09} color={COLORS.white} />
         </TouchableOpacity>
+
+        <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
+          {/* Favorites List */}
+          <Animated.FlatList
+            ref={flatListRef}
+            data={favorites}
+            extraData={favorites}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => {
+              return (
+                <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
+                  <Image source={{ uri: item.user.avatar_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
+                  <View style={{ flexDirection: 'column', width: '70%' }}>
+                    <Text numberOfLines={1} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.work_content}</Text>
+                    <Text numberOfLines={1} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.video_url || item.audio_url}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity style={{ backgroundColor: COLORS.white, marginRight: PADDING.p00, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.danger }} onPress={() => { removeFromCart(userInfo.favorite_works_cart.id, item.id, null); }}>
+                      <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ backgroundColor: COLORS.white, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.link_color }} onPress={() => handleItemPress(index, item)}>
+                      <Icon name="play" size={20} color={COLORS.link_color} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            }}
+            horizontal={false}
+            showsVerticalScrollIndicator={false}
+            alwaysBounceVertical={false}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            windowSize={10}
+            contentContainerStyle={{
+              paddingTop: 110,
+            }}
+            ListEmptyComponent={<EmptyListComponent iconName="play-box-multiple-outline" title={t('empty_list.title')} description={t('empty_list.description_medias')} />}
+          />
+        </SafeAreaView>
+      </View>
+
+      {/* Player vidéo */}
+      {currentItemIndex !== null && favorites[currentItemIndex].video_url && (
+        <Video
+          source={{ uri: favorites[currentItemIndex].video_url }}
+          ref={ref => setVideoRef(ref)}
+          onEnd={handleNext}
+          paused={!isPlaying}
+          resizeMode="contain"
+          style={{ width: '100%', height: 200 }}
+        />
       )}
 
-      <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
-        {/* Favorites List */}
-        <Animated.FlatList
-          ref={flatListRef}
-          data={combinedData}
-          extraData={combinedData}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => {
-            return (
-              <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
-                <Image source={{ uri: item.user.avatar_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: IMAGE_SIZE.s13 / 2, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
-                <View style={{ flexDirection: 'column', width: '70%' }}>
-                  <Text numberOfLines={4} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.work_content}</Text>
-                </View>
-                <TouchableOpacity
-                  style={[homeStyles.workCmd, { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white, paddingVertical: 5, borderWidth: 1, borderColor: COLORS.light_secondary }]}
-                  onPress={() => { removeFromCart(userInfo.unpaid_subscription_cart.id, null, item.id); }}
-                >
-                  <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
-                  <Text style={{ color: COLORS.danger, fontWeight: '600', marginLeft: PADDING.p00 }}>
-                    {t('withdraw')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
+      {/* Player audio */}
+      {currentItemIndex !== null && favorites[currentItemIndex].audio_url && (
+        <Sound
+          source={{ uri: favorites[currentItemIndex].audio_url }}
+          shouldPlay={isPlaying}
+          onPlaybackStatusUpdate={status => {
+            if (status.didJustFinish) handleNext();
           }}
-          horizontal={false}
-          showsVerticalScrollIndicator={false}
-          alwaysBounceVertical={false}
-          onScroll={handleScroll}
-          onEndReached={onEndReached}
-          onEndReachedThreshold={0.1}
-          scrollEventThrottle={16}
-          windowSize={10}
-          contentContainerStyle={{
-            paddingTop: 110,
-          }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} progressViewOffset={105} />}
-          ListEmptyComponent={<EmptyListComponent iconName="book-open-page-variant-outline" title={t('empty_list.title')} description={t('empty_list.description_books')} />}
-          ListHeaderComponent={
-            <>
-              <FlatList
-                data={categories}
-                keyExtractor={item => item.id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{ height: 40, flexGrow: 0 }}
-                contentContainerStyle={{
-                  alignItems: 'center',
-                  paddingHorizontal: PADDING.p00,
-                }}
-                renderItem={({ item }) => <CategoryItem item={item} />}
-              />
-            </>
-          }
-          ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
         />
-      </SafeAreaView>
-    </View>
+      )}
+    </>
   );
 };
 
@@ -408,18 +473,41 @@ const MediaScreen = () => {
           inactiveColor={COLORS.dark_secondary}
         />
       </Animated.View>
-      <FloatingActionsButton />
     </>
   );
 
+  // Back to top handler
+  const handleBackToTop = () => {
+    if (index === 0 && newsListRef.current) {
+      newsListRef.current.scrollToOffset({ offset: 0, animated: true });
+    } else if (index === 1 && booksListRef.current) {
+      booksListRef.current.scrollToOffset({ offset: 0, animated: true });
+    }
+  };
+
   return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={handleIndexChange}
-      initialLayout={{ width: 100 }}
-      renderTabBar={renderTabBar} // Using the Custom TabBar
-    />
+    <>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        onIndexChange={handleIndexChange}
+        initialLayout={{ width: 100 }}
+        renderTabBar={renderTabBar} // Using the Custom TabBar
+      />
+
+      {/* === Bouton global BackToTop === */}
+      {showBackToTopByTab[index === 0 ? 'medias' : 'favorite'] && (
+        <TouchableOpacity
+          onPress={handleBackToTop}
+          style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]}
+        >
+          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
+        </TouchableOpacity>
+      )}
+
+      {/* === Floating Button === */}
+      <FloatingActionsButton />
+    </>
   );
 };
 

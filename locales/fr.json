@@ -96,6 +96,7 @@
         "description_books": "Ici, seront affichés les ouvrages qui pourront être consultés par les membres.",
         "description_mags": "Ici, seront affichés les revues, journaux ou magazines qui pourront être consultés par les membres.",
         "description_medias": "Ici, seront affichés les médias qui pourront être consultés par les membres.",
+        "description_favoris": "Vos médias favoris seront affichés ici pour être lus quand vous voulez.",
         "description_maps": "Ici, seront affichées les cartes géographiques qui pourront être consultées par les membres.",
         "description_user_works": "Ce membre n’a pas encore publié d’œuvre pour le moment.",
         "description_user_circles": "Ce membre ne fait partie d’aucun cercle de discussion.",
@@ -247,8 +248,10 @@
         "link": "Payer pour consulter"
     },
     "add_to_cart": "Ajouter au panier",
+    "add_to_favorite": "Ajouter aux favoris",
     "withdraw_from_cart": "Retirer du panier",
     "already_ordered": "Déjà commandé",
+    "already_selected": "Déjà sélectionné",
     "withdraw": "Retirer",
     "pay": "Payer",
     "amount_to_pay": "Montant à payer :",

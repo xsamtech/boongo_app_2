@@ -55,7 +55,7 @@ const WorkDataScreen = ({ route, navigation }) => {
   const [price, setPrice] = useState('');
   // Check if user has valid consultation if the work is not public
   const isPaid = work.is_public === 0 ? (userInfo.valid_consultations && userInfo.valid_consultations.some(consultation => consultation.id === work.id)) : false;
-  // Check if user has added subscription in the 
+  // Check if user has added work in the cart
   const isInCart = userInfo.unpaid_consultations && userInfo.unpaid_consultations.some(consultation => consultation.id === work.id);
 
   // =============== First letter uppercase ===============

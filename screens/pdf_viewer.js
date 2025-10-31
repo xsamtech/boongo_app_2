@@ -236,15 +236,30 @@ const SummaryScreenContent = ({ route, navigation }) => {
           {noteItem.id ? (
             <>
               <Modal animationType='slide' transparent={true} visible={modalVisible} onRequestClose={() => { setModalVisible(!modalVisible); }}>
-                <View style={homeStyles.modalBackground}>
-                  <View style={homeStyles.modalContainer}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                  <View style={{ width: 300, padding: 20, backgroundColor: COLORS.white, borderRadius: 10, alignItems: 'center' }}>
                     <TouchableOpacity style={[homeStyles.modalClose, { backgroundColor: 'rgba(255, 255, 255, 0)', }]} onPress={() => setModalVisible(false)}>
-                      <Icon style={homeStyles.noteButtonIcon} name='close' />
+                      <Icon style={homeStyles.noteButtonIcon} color={COLORS.black} name='close' />
                     </TouchableOpacity>
-                    <Text style={homeStyles.noteTitle}>{t('notepad.title_edit')}</Text>
+                    <Text style={[homeStyles.noteTitle, { color: COLORS.black }]}>{t('notepad.title_edit')}</Text>
                     <View style={homeStyles.noteForm}>
-                      <TextInput keyboardType="numeric" style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100 }]} placeholder={t('notepad.page_number')} value={noteItem.page.toString()} onChangeText={(text) => setNoteItem({ ...noteItem, page: text })} />
-                      <TextInput multiline={true} numberOfLines={5} style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100, height: 80, textAlignVertical: 'top' }]} placeholder={t('notepad.enter_note')} value={noteItem.noteText} onChangeText={(text) => setNoteItem({ ...noteItem, noteText: text })} />
+                      <TextInput
+                        keyboardType="numeric"
+                        style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100, color: COLORS.black, borderColor: COLORS.dark_secondary }]}
+                        placeholderTextColor={COLORS.dark_secondary}
+                        placeholder={t('notepad.page_number')}
+                        value={noteItem.page.toString()}
+                        onChangeText={(text) => setNoteItem({ ...noteItem, page: text })}
+                      />
+                      <TextInput
+                        multiline={true}
+                        numberOfLines={5}
+                        style={[homeStyles.noteInput, { width: Dimensions.get('window').width - 100, height: 80, color: COLORS.black, textAlignVertical: 'top', borderColor: COLORS.dark_secondary }]}
+                        placeholderTextColor={COLORS.dark_secondary}
+                        placeholder={t('notepad.enter_note')}
+                        value={noteItem.noteText}
+                        onChangeText={(text) => setNoteItem({ ...noteItem, noteText: text })}
+                      />
                       <TouchableOpacity style={[homeStyles.noteSubmit, { width: Dimensions.get('window').width - 100, backgroundColor: COLORS.warning }]} onPress={() => editNote(noteItem.id)}>
                         <Text style={{ textAlign: 'center', fontSize: 15, color: COLORS.black }}>{t('update')}</Text>
                       </TouchableOpacity>
