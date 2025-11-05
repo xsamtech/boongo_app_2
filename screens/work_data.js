@@ -226,7 +226,7 @@ const WorkDataScreen = ({ route, navigation }) => {
         method: 'GET',
         url: `${API.boongo_url}/work/${itemId}`,
         headers: {
-          'X-localization': 'fr',
+          'X-localization': getLanguage(),
           'X-user-id': userInfo.id,
           'X-ip-address': ip_address,
           'X-user-agent': UserAgent.getUserAgent(),

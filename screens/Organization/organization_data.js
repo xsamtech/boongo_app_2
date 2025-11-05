@@ -94,16 +94,21 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   }, [selectedOrganization]);
 
   const fetchPrograms = async () => {
-    try {
-      const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+    if (selectedOrganization.id && isLoaded === false) {
+      try {
+        const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
-      setPrograms(response.data.data); // Update programs list
-      setSelectedProgram(response.data.data[0]);
-      setIsLoaded(true);
-    } catch (error) {
-      console.error('Error fetching programs:', error);
-      setIsLoaded(false);
+        setPrograms(response.data.data); // Update programs list
+        setSelectedProgram(response.data.data[0]);
+        setIsLoaded(true);
+      } catch (error) {
+        console.log(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`);
+        console.error('Error fetching programs:', error);
+        setIsLoaded(false);
+      }
     }
+
+    setIsLoaded(false);
   };
 
   // Ajouter un nouveau programme via API
@@ -139,9 +144,12 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const onRefresh = async () => {
     setRefreshing(true);
     setPrograms([]);
-    await fetchPrograms();
+
+    if (selectedOrganization.id && isLoaded === false) {
+      await fetchPrograms();
+    }
+
     setRefreshing(false);
-    console.log(selectedProgram.files[0].file_url);
   };
 
   const scrollToTop = () => {
@@ -528,42 +536,47 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   // ================= Get events list =================
   useEffect(() => {
-    if (selectedOrganization.id) {
+    if (selectedOrganization && selectedOrganization.id) {
       fetchEvents(1); // INITIAL LOADING : Call fetchEvents once organization is available
     }
   }, [selectedOrganization]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchEvents(page);
+      if (selectedOrganization && selectedOrganization.id) {
+        fetchEvents(page);
+      }
     }
   }, [page]);
 
   const fetchEvents = async (pageToFetch = 1) => {
     if (isLoading || pageToFetch > lastPage) return;
 
-    try {
-      const response = await axios.get(`${API.boongo_url}/event/find_by_organization/${organization_id}?page=${pageToFetch}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+    if (selectedOrganization && selectedOrganization.id) {
+      try {
+        const response = await axios.get(`${API.boongo_url}/event/find_by_organization/${organization_id}?page=${pageToFetch}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
 
-      if (pageToFetch === 1) {
-        setEvents(response.data.data);
+        if (pageToFetch === 1) {
+          setEvents(response.data.data);
 
-      } else {
-        setEvents(prev => [...prev, ...response.data.data]);
+        } else {
+          setEvents(prev => [...prev, ...response.data.data]);
+        }
+
+        setAd(response.data.ad);
+        setLastPage(response.data.lastPage);
+        setCount(response.data.count);
+      } catch (error) {
+        if (error.response?.status === 429) {
+          console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+        } else {
+          console.error(error);
+        }
+      } finally {
       }
-
-      setAd(response.data.ad);
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   // =============== Handle Image Picker ===============
@@ -595,9 +608,6 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
     }).then(res => {
       const message = res.data.message;
-      const userData = res.data.data.user;
-
-      setStartRegisterInfo(userData);
 
       ToastAndroid.show(`${message}`, ToastAndroid.LONG);
       console.log(`${message}`);
@@ -632,7 +642,11 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchEvents(1);
+
+    if (selectedOrganization && selectedOrganization.id) {
+      await fetchEvents(1);
+    }
+
     setRefreshing(false);
   };
 
@@ -926,14 +940,16 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   // ================= Get events list =================
   useEffect(() => {
-    if (selectedOrganization.id) {
+    if (selectedOrganization && selectedOrganization.id) {
       fetchBooks(1); // INITIAL LOADING : Call fetchBooks once organization is available
     }
   }, [selectedOrganization]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchBooks(page);
+      if (selectedOrganization && selectedOrganization.id) {
+        fetchBooks(page);
+      }
     }
   }, [page]);
 
@@ -984,7 +1000,11 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     setRefreshing(true);
     setPage(1);
     setBooks([]);
-    await fetchBooks(1);
+
+    if (selectedOrganization && selectedOrganization.id) {
+      await fetchBooks(1);
+    }
+
     setRefreshing(false);
   };
 
@@ -997,6 +1017,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const scrollToTop = () => {
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
+
   const handleBadgePress = useCallback((id) => {
     setIdCat(id);
     setPage(1);
@@ -1156,14 +1177,16 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   // ================= Get events list =================
   useEffect(() => {
-    if (selectedOrganization.id) {
+    if (selectedOrganization && selectedOrganization.id) {
       fetchEvents(1); // INITIAL LOADING : Call fetchEvents once organization is available
     }
   }, [selectedOrganization]);
 
   useEffect(() => {
     if (page > 1) {
-      fetchEvents(page);
+      if (selectedOrganization && selectedOrganization.id) {
+        fetchEvents(page);
+      }
     }
   }, [page]);
 
@@ -1231,9 +1254,6 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       headers: { 'Authorization': `Bearer ${userInfo.api_token}` }
     }).then(res => {
       const message = res.data.message;
-      const userData = res.data.data.user;
-
-      setStartRegisterInfo(userData);
 
       ToastAndroid.show(`${message}`, ToastAndroid.LONG);
       console.log(`${message}`);
@@ -1268,7 +1288,11 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchEvents(1);
+
+    if (selectedOrganization && selectedOrganization.id) {
+      await fetchEvents(1);
+    }
+
     setRefreshing(false);
   };
 
@@ -1698,7 +1722,7 @@ const OrganizationDataScreen = () => {
               {selectedOrganization.address &&
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start', marginTop: 8 }}>
                   <Icon name='map-marker' size={16} color={COLORS.black} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
-                  <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, textAlign: 'center' }}>
+                  <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, textAlign: 'center', maxWidth: '80%' }}>
                     {selectedOrganization.address}
                   </Text>
                 </View>

@@ -40,8 +40,10 @@ import AccountScreen from './screens/Account';
 import SettingsScreen from './screens/Account/settings';
 import NotificationsScreen from './screens/Account/notifications';
 import SearchScreen from './screens/search';
-import NewChatScreen from './screens/Chat/new_chat';
-import BlockedContactsScreen from './screens/Chat/blocked_contacts';
+// import ChatEntityScreen from './screens/Chat/chat';
+// import ChatsScreen from './screens/Chat';
+// import NewChatScreen from './screens/Chat/new_chat';
+// import BlockedContactsScreen from './screens/Chat/blocked_contacts';
 import EstablishmentScreen from './screens/Organization/Establishment';
 import AddEstablishmentScreen from './screens/Organization/Establishment/add_establishment';
 import WorkDataScreen from './screens/work_data';
@@ -61,11 +63,10 @@ import QuizScreen from './screens/Organization/quiz';
 import AudioScreen from './screens/audio_screen';
 import SubscriptionScreen from './screens/subscriptions';
 import DictionaryScreen from './screens/dictionary';
-import ChatEntityScreen from './screens/Chat/chat';
 import ProfileScreen from './screens/profile';
 import MobileSubscribeScreen from './screens/subscribe_mobile';
 import BankCardSubscribeScreen from './screens/subscribe_bank_card';
-import ChatsScreen from './screens/Chat';
+import NewsDataScreen from './screens/news_data';
 
 // =============== Bottom tab ===============
 const BottomTab = createBottomTabNavigator();
@@ -278,10 +279,10 @@ const HomeStackNav = () => {
       <Stack.Screen name='Account' component={AccountScreen} />
       <Stack.Screen name='Notifications' component={NotificationsScreen} />
       <Stack.Screen name='Search' component={SearchScreen} />
-      <Stack.Screen name='Chats' component={ChatsScreen} />
+      {/* <Stack.Screen name='Chats' component={ChatsScreen} />
       <Stack.Screen name='NewChat' component={NewChatScreen} />
       <Stack.Screen name='ChatEntity' component={ChatEntityScreen} />
-      <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} />
+      <Stack.Screen name='BlockedContacts' component={BlockedContactsScreen} /> */}
       <Stack.Screen name='OrganizationData' component={OrganizationDataScreen} />
       <Stack.Screen name='OrganizationSettings' component={OrganizationSettingsScreen} />
       <Stack.Screen name='Establishment' component={EstablishmentScreen} />
@@ -295,6 +296,7 @@ const HomeStackNav = () => {
       <Stack.Screen name='Journal' component={JournalScreen} />
       <Stack.Screen name='Mapping' component={MappingScreen} />
       <Stack.Screen name='Media' component={MediaScreen} />
+      <Stack.Screen name='NewsData' component={NewsDataScreen} />
       <Stack.Screen name='WorkData' component={WorkDataScreen} />
       <Stack.Screen name='PDFViewer' component={PDFViewerScreen} />
       <Stack.Screen name='Audio' component={AudioScreen} />

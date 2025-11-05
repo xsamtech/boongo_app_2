@@ -81,14 +81,14 @@ const NewsItemComponent = ({ item }) => {
     }
 
     return (
-        <Pressable style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]}>
+        <TouchableOpacity style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p01, paddingHorizontal: PADDING.p03 }]} onPress={() => navigation.navigate('NewsData', { itemId: item.id })}>
             <View style={homeStyles.workDescTop}>
                 <Text style={[homeStyles.newsContent, { color: COLORS.black }]} numberOfLines={3}>{item.work_content}</Text>
                 <View style={[homeStyles.workTop, { paddingVertical: 0 }]}>
                     <View style={[homeStyles.workTop, { paddingVertical: 0 }]}>
-                        <Icon name={cleanIconName(item.organization.type.icon)} size={IMAGE_SIZE.s01} color={COLORS.danger} style={{ marginRight: PADDING.p00 }} />
+                        <Icon name={cleanIconName(item.organization_owner.type.icon)} size={IMAGE_SIZE.s01} color={COLORS.danger} style={{ marginRight: PADDING.p00 }} />
                         <Text style={[homeStyles.newsDate, { color: COLORS.dark_secondary }]}>
-                            {item.organization ? item.organization.org_acronym : limitCharacter(item.organization.org_name, 10)}
+                            {limitCharacter(item.organization_owner.org_name, 10)}
                         </Text>
                     </View>
                     <Text style={[homeStyles.newsDate, { color: COLORS.dark_secondary }]}>{item.updated_at_ago}</Text>
@@ -97,7 +97,7 @@ const NewsItemComponent = ({ item }) => {
             <View>
                 <Image source={{ uri: item.photo_url }} style={[homeStyles.newsImage, { borderColor: COLORS.light_secondary }]} />
             </View>
-        </Pressable>
+        </TouchableOpacity>
     );
 };
 

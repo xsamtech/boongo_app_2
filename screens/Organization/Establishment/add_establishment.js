@@ -111,7 +111,7 @@ const AddEstablishmentScreen = () => {
     formData.append('org_acronym', orgAcronym || '');
     formData.append('org_description', orgDescription || '');
     formData.append('id_number', idNumber || '');
-    formData.append('phone', (phoneCode && phone ? `${phoneCode}${phone}` : null));
+    formData.append('phone', (`${phoneCode}${phone}`));
     formData.append('email', email || '');
     formData.append('address', address || '');
     formData.append('p_o_box', p_o_box || '');
@@ -153,7 +153,7 @@ const AddEstablishmentScreen = () => {
       setImageData('');
 
       console.log(json);
-      navigation.navigate('OrganizationData', { organization_id: json.data.id });
+      navigation.navigate('OrganizationData', { organization_id: json.data.id, type: 'establishment' });
 
     } catch (error) {
       console.error('Error:', error);
@@ -313,7 +313,7 @@ const AddEstablishmentScreen = () => {
           autoCapitalize='none' />
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ width: (Dimensions.get('window').width / 2) - 29 }}>
+          <View style={{ width: (Dimensions.get('window').width / 2) - 48 }}>
             {/* P.O. box
             <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.p_o_box')}</Text> */}
             <TextInput
@@ -323,7 +323,7 @@ const AddEstablishmentScreen = () => {
               placeholderTextColor={COLORS.dark_secondary}
               onChangeText={setPOBox} />
           </View>
-          <View style={{ width: (Dimensions.get('window').width / 2) - 29 }}>
+          <View style={{ width: (Dimensions.get('window').width / 2) - 10 }}>
             {/* Year of creation
             <Text style={[homeStyles.authText, { color: COLORS.dark_secondary }]}>{t('navigation.establishment.data.year_of_creation')}</Text> */}
             <TextInput

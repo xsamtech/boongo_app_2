@@ -216,36 +216,40 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     if (isLoading || pageToFetch > lastPage) return;
 
     setIsLoading(true);
-
     // const qs = require('qs');
+
     const url = `${API.boongo_url}/message/find_by_group/event/${selectedEvent.id}?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
     };
 
-    try {
-      const response = await axios.get(url, { headers: mHeaders });
+    if (selectedEvent && selectedEvent.id) {
+      try {
+        const response = await axios.get(url, { headers: mHeaders });
 
-      if (pageToFetch === 1) {
-        seComments(response.data.data);
+        if (pageToFetch === 1) {
+          seComments(response.data.data);
 
-      } else {
-        seComments(prev => [...prev, ...response.data.data]);
+        } else {
+          seComments(prev => [...prev, ...response.data.data]);
+        }
+
+        setAd(response.data.ad);
+        setLastPage(response.data.lastPage);
+        setCount(response.data.count);
+      } catch (error) {
+        if (error.response?.status === 429) {
+          console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+        } else {
+          console.error(error);
+        }
+      } finally {
+        setIsLoading(false);
       }
-
-      setAd(response.data.ad);
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const scrollToTop = () => {
@@ -255,7 +259,11 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchComments(1);
+
+    if (selectedEvent && selectedEvent.id) {
+      await fetchComments(1);
+    }
+
     setRefreshing(false);
   };
 
@@ -281,7 +289,9 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   useEffect(() => {
     if (page > 1) {
-      fetchComments(page);
+      if (selectedEvent && selectedEvent.id) {
+        fetchComments(page);
+      }
     }
   }, [page]);
 

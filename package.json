@@ -32,13 +32,10 @@
     "get-video-id": "^4.1.7",
     "i18next": "^25.0.1",
     "install": "^0.13.0",
-    "laravel-echo": "^2.1.6",
     "lottie-react-native": "^7.2.2",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.48",
     "pinar": "^0.12.2",
-    "pusher": "^5.2.0",
-    "pusher-js": "^8.4.0",
     "qs": "^6.14.0",
     "react": "19.0.0",
     "react-gesture-handler": "^0.0.5",
@@ -82,10 +79,8 @@
     "react-native-user-agent": "^2.3.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^6.15.0",
-    "react-native-webrtc": "^124.0.6",
     "react-native-webview": "^13.13.5",
-    "react-native-youtube-iframe": "^2.3.0",
-    "socket.io-client": "^4.8.1"
+    "react-native-youtube-iframe": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

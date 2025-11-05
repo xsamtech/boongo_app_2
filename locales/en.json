@@ -354,6 +354,7 @@
                 "phone": "Phone number",
                 "email": "Email",
                 "p_o_box": "P.O. Box",
+                "year_of_creation": "Year of creation",
                 "website_url": "Website URL",
                 "choose_type": "Choose type"
             }
