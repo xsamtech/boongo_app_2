@@ -667,14 +667,14 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Event item ===============
   const EventItemComponent = ({ item }) => {
     return (
-      <Pressable onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{ flexDirection: 'row', alignItems: 'center', padding: PADDING.p03, backgroundColor: COLORS.white }}>
+      <TouchableOpacity onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{ flexDirection: 'row', alignItems: 'center', padding: PADDING.p03, backgroundColor: COLORS.white }}>
         <Image source={{ uri: item.cover_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
         <View style={{ flex: 1 }}>
           <Text numberOfLines={1} style={{ color: COLORS.black, fontSize: TEXT_SIZE.paragraph, fontWeight: '500' }}>{`${item.event_title}`}</Text>
           <Text numberOfLines={2} style={{ color: COLORS.dark_secondary }}>{`${item.event_description}`}</Text>
         </View>
         <Icon name="chevron-right" size={IMAGE_SIZE.s05} color={COLORS.black} />
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 
@@ -1194,35 +1194,39 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
     if (isLoading || pageToFetch > lastPage) return;
 
     const qs = require('qs');
-    const url = `${API.boongo_url}/work/filter_by_categories?page=${pageToFetch}`;
-    const mParams = { type_id: 33, status_id: 17 };
+    const url = `${API.boongo_url}/event/filter_for_organization/${selectedOrganization.id}?page=${pageToFetch}`;
+    const mParams = { category_id: 30 };
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
     };
 
-    try {
-      const response = await axios.post(url, qs.stringify(mParams), { headers: mHeaders });
+    if (selectedOrganization && selectedOrganization.id) {
+      try {
+        const response = await axios.post(url, qs.stringify(mParams), { headers: mHeaders });
 
-      if (pageToFetch === 1) {
-        setEvents(response.data.data);
+        if (pageToFetch === 1) {
+          setEvents(response.data.data);
 
-      } else {
-        setEvents(prev => [...prev, ...response.data.data]);
+        } else {
+          setEvents(prev => [...prev, ...response.data.data]);
+        }
+
+        setAd(response.data.ad);
+        setLastPage(response.data.lastPage);
+        setCount(response.data.count);
+      } catch (error) {
+        if (error.response?.status === 429) {
+          console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+        } else {
+          console.error(error);
+        }
+      } finally {
+        setIsLoading(false);
       }
-
-      setAd(response.data.ad);
-      setLastPage(response.data.lastPage);
-      setCount(response.data.count);
-    } catch (error) {
-      if (error.response?.status === 429) {
-        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-      } else {
-        console.error(error);
-      }
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   // =============== Handle Image Picker ===============
@@ -1313,7 +1317,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Event item ===============
   const EventItemComponent = ({ item }) => {
     return (
-      <Pressable onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{
+      <TouchableOpacity onPress={() => { navigation.navigate('Event', { event_id: item.id }) }} style={{
         flexDirection: 'row',
         alignItems: 'center',
         padding: PADDING.p03,
@@ -1335,7 +1339,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           <Text numberOfLines={2} style={{ color: COLORS.dark_secondary }}>{`${item.event_description}`}</Text>
         </View>
         <Icon name="chevron-right" size={IMAGE_SIZE.s05} color={COLORS.black} />
-      </Pressable>
+      </TouchableOpacity>
     );
   };
 

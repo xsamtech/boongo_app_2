@@ -138,7 +138,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               <Icon name='map-marker' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
                 {selectedEvent.event_place && (
-                  <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '90%' }}>{selectedEvent.event_place}</Text>
+                  <Text style={{ fontSize: 12, fontWeight: '500', color: COLORS.black }}>{selectedEvent.event_place}</Text>
                 )}
                 {selectedEvent.event_place_address && (
                   <Text style={{ fontSize: 14, fontWeight: '300', color: COLORS.black, maxWidth: '90%' }}>{selectedEvent.event_place_address}</Text>
