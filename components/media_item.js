@@ -3,7 +3,7 @@
  * @see https://team.xsamtech.com/xanderssamoth
  */
 import React, { useContext } from 'react';
-import { Image, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Linking, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -76,24 +76,24 @@ const MediaItemComponent = ({ item }) => {
     return (
         <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: PADDING.p00, padding: PADDING.p03 }]}>
             <View>
-                <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { borderColor: COLORS.light_secondary }]} onPress={() => navigation.navigate('WorkData', { itemId: item.id })} />
+                <Image source={{ uri: item.photo_url }} style={[homeStyles.workImage, { height: Dimensions.get('window').width / 3, borderColor: COLORS.light_secondary }]} onPress={() => navigation.navigate('WorkData', { itemId: item.id })} />
             </View>
             <View style={homeStyles.workDescTop}>
-                <Text style={[homeStyles.workTitle, { color: COLORS.black }]} numberOfLines={2} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_title}</Text>
-                <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_content}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: PADDING.p00 }}>
-                    <Icon name='heart-outline' size={IMAGE_SIZE.s04} color={COLORS.dark_secondary} style={{ marginRight: PADDING.p00 }} />
-                    <Text style={{ fontWeight: '400', color: COLORS.dark_secondary }}>{`${item.likes ? item.likes.length : 0} ${item.likes ? (item.likes.length > 1 ? t('likes') : t('like')) : t('like')}`}</Text>
-                </View>
+                <Text style={[homeStyles.workDescText, { fontWeight: '400', color: COLORS.black }]} numberOfLines={3}>{item.work_title}</Text>
+                {/* <Text style={[homeStyles.workContent, { color: COLORS.black }]} numberOfLines={3} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>{item.work_content}</Text> */}
+                <TouchableOpacity style={homeStyles.linkIcon} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
+                    <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('see_details')} </Text>
+                    <Icon name='chevron-right' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
+                </TouchableOpacity>
                 {isInCart ? (
                     <TouchableOpacity style={homeStyles.linkIcon} onPress={() => { removeFromCart(userInfo.favorite_works_cart.id, item.id, null); }} disabled={isLoading}>
                         <Icon name='check' size={IMAGE_SIZE.s05} color={COLORS.success} />
-                        <Text style={[homeStyles.link, { color: COLORS.success }]}>{t('already_selected')} </Text>
+                        <Text style={[homeStyles.link, { fontWeight: '400', color: COLORS.success }]}>{t('already_selected')} </Text>
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity style={homeStyles.linkIcon} onPress={() => { addToCart('favorite', userInfo.id, item.id, null); }} disabled={isLoading}>
-                        <Icon name='plus' size={IMAGE_SIZE.s05} color={COLORS.link_color} />
-                        <Text style={[homeStyles.link, { color: COLORS.link_color }]}>{t('add_to_favorite')} </Text>
+                        <Icon name='plus' size={IMAGE_SIZE.s05} color={COLORS.danger} />
+                        <Text style={[homeStyles.link, { fontWeight: '400', color: COLORS.danger }]}>{t('add_to_favorite')} </Text>
                     </TouchableOpacity>
                 )}
             </View>

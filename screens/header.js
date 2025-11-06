@@ -170,6 +170,7 @@ const HeaderComponent = ({ title }) => {
   }
 
   if (route.name === 'WorkData' ||
+    route.name === 'NewsData' ||
     route.name === 'VideoPlayer' ||
     route.name === 'Audio' ||
     route.name === 'PDFViewerContent' ||

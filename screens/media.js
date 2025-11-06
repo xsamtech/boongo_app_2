@@ -305,12 +305,6 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
 
       {/* Content */}
       <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
-        {/* {showBackToTop && (
-          <TouchableOpacity style={[homeStyles.floatingButton, { backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-            <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
-          </TouchableOpacity>
-        )} */}
-
         {/* Contrôle global play/pause */}
         <TouchableOpacity style={[homeStyles.floatingButton, { left: 20, bottom: 30, backgroundColor: COLORS.black }]} onPress={handlePlayPause}>
           <Icon name={isPlaying ? 'pause' : 'play'} size={IMAGE_SIZE.s09} color={COLORS.white} />
@@ -326,10 +320,9 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
             renderItem={({ item }) => {
               return (
                 <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
-                  <Image source={{ uri: item.user.avatar_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, marginRight: PADDING.p03, borderWidth: 1, borderColor: COLORS.light_secondary }} />
-                  <View style={{ flexDirection: 'column', width: '70%' }}>
-                    <Text numberOfLines={1} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.work_content}</Text>
-                    <Text numberOfLines={1} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '500', color: COLORS.black }}>{item.video_url || item.audio_url}</Text>
+                  <Image source={{ uri: item.photo_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, borderWidth: 1, borderColor: COLORS.light_secondary }} />
+                  <View style={{ flexDirection: 'column', width: '60%' }}>
+                    <Text numberOfLines={2} style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '400', color: COLORS.black }}>{item.work_content}</Text>
                   </View>
                   <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={{ backgroundColor: COLORS.white, marginRight: PADDING.p00, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.danger }} onPress={() => { removeFromCart(userInfo.favorite_works_cart.id, item.id, null); }}>

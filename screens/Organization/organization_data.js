@@ -25,7 +25,6 @@ import homeStyles from '../style';
 
 const TAB_BAR_HEIGHT = 48;
 
-// Schedule frame
 const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
@@ -61,57 +60,56 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   // ================= Get current organization =================
   useEffect(() => {
     getOrganization();
-  }, [selectedOrganization]);
+  }, []); // ✅ Correction : une seule fois au montage (avant: [selectedOrganization])
 
-  const getOrganization = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/organization/${organization_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const organizationData = res.data.data;
-
-        setSelectedOrganization(organizationData);
-
-        return organizationData;
-      })
-      .catch(error => {
-        console.log(error);
+  const getOrganization = async () => {
+    try {
+      const res = await axios.get(`${API.boongo_url}/organization/${organization_id}`, {
+        headers: {
+          'X-localization': 'fr',
+          'Authorization': `Bearer ${userInfo.api_token}`,
+        },
       });
+
+      const organizationData = res.data.data;
+      setSelectedOrganization(organizationData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // ================= Get programs =================
   useEffect(() => {
-    if (selectedOrganization.id && isLoaded === false) {
-      fetchPrograms(); // Call fetchPrograms once organization is available
+    if (selectedOrganization.id && !isLoaded) {
+      fetchPrograms();
     }
-  }, [selectedOrganization]);
+  }, [selectedOrganization]); // ✅ Ici, c’est correct : on attend que l’organisation soit chargée
 
   const fetchPrograms = async () => {
-    if (selectedOrganization.id && isLoaded === false) {
-      try {
-        const response = await axios.get(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+    if (!selectedOrganization.id || isLoaded) return;
 
-        setPrograms(response.data.data); // Update programs list
-        setSelectedProgram(response.data.data[0]);
-        setIsLoaded(true);
-      } catch (error) {
-        console.log(`${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`);
-        console.error('Error fetching programs:', error);
-        setIsLoaded(false);
-      }
+    try {
+      const response = await axios.get(
+        `${API.boongo_url}/program/find_all_by_year_and_organization/${course_year}/${organization_id}`,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+          },
+        }
+      );
+
+      setPrograms(response.data.data);
+      setSelectedProgram(response.data.data[0]);
+      setIsLoaded(true);
+    } catch (error) {
+      console.error('Error fetching programs:', error);
+      setIsLoaded(false);
     }
-
-    setIsLoaded(false);
   };
 
-  // Ajouter un nouveau programme via API
+  // ================= Add new program =================
   const addNewProgram = async () => {
     setIsLoading(true);
 
@@ -125,17 +123,25 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       name: files[0].name,
     });
 
-    console.log(formData);
-
     try {
-      const response = await axios.post(`${API.boongo_url}/program/add_organization_program/${organization_id}`, formData, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+      const response = await axios.post(
+        `${API.boongo_url}/program/add_organization_program/${organization_id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-localization': 'fr',
+            'Authorization': `Bearer ${userInfo.api_token}`,
+          },
+        }
+      );
 
-      fetchPrograms(); // Reload programs after adding
+      await fetchPrograms();
       setSelectedProgram(response.data.data);
-      setFormProgramModalVisible(false); // Close modal
-      setIsLoading(false);
+      setFormProgramModalVisible(false);
     } catch (error) {
       console.error('Error adding program:', error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -143,12 +149,9 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   // ================= Handlers =================
   const onRefresh = async () => {
     setRefreshing(true);
+    setIsLoaded(false);
     setPrograms([]);
-
-    if (selectedOrganization.id && isLoaded === false) {
-      await fetchPrograms();
-    }
-
+    await fetchPrograms();
     setRefreshing(false);
   };
 
@@ -160,13 +163,20 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     setRefreshing(true);
 
     try {
-      const response = await axios.get(`${API.boongo_url}/program/${programId}`, { headers: { 'Content-Type': 'multipart/form-data', 'X-localization': 'fr', 'Authorization': `Bearer ${userInfo.api_token}` } });
+      const response = await axios.get(`${API.boongo_url}/program/${programId}`, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-localization': 'fr',
+          'Authorization': `Bearer ${userInfo.api_token}`,
+        },
+      });
 
       setSelectedProgram(null);
       setSelectedProgram(response.data.data);
       setRefreshing(false);
     } catch (error) {
       console.error('Error fetching program details:', error);
+    } finally {
       setRefreshing(false);
     }
   };
@@ -262,13 +272,17 @@ const Schedule = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
     }
   };
 
+  // ==================== UI rendering ====================
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
       <Spinner visible={isLoading} />
 
       {showBackToTop && (
-        <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
-          <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
+        <TouchableOpacity
+          style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]}
+          onPress={scrollToTop}
+        >
+          <Icon name="chevron-double-up" size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
 
@@ -509,7 +523,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // ================= Get current organization =================
   useEffect(() => {
     getOrganization();
-  }, [selectedOrganization]);
+  }, []);
 
   const getOrganization = () => {
     const config = {
@@ -550,7 +564,7 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }, [page]);
 
   const fetchEvents = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
+    if (isLoading || pageToFetch > lastPage || !selectedOrganization?.id) return;
 
     if (selectedOrganization && selectedOrganization.id) {
       try {
@@ -573,10 +587,9 @@ const Events = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           console.error(error);
         }
       } finally {
+        setIsLoading(false);
       }
     }
-
-    setIsLoading(false);
   };
 
   // =============== Handle Image Picker ===============
@@ -888,7 +901,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // ================= Get current organization =================
   useEffect(() => {
     getOrganization();
-  }, [selectedOrganization]);
+  }, []);
 
   const getOrganization = () => {
     const config = {
@@ -954,7 +967,7 @@ const Books = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }, [page]);
 
   const fetchBooks = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
+    if (isLoading || pageToFetch > lastPage || !selectedOrganization?.id) return;
     setIsLoading(true);
 
     const qs = require('qs');
@@ -1150,7 +1163,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // ================= Get current organization =================
   useEffect(() => {
     getOrganization();
-  }, [selectedOrganization]);
+  }, []);
 
   const getOrganization = () => {
     const config = {
@@ -1191,7 +1204,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   }, [page]);
 
   const fetchEvents = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
+    if (isLoading || pageToFetch > lastPage || !selectedOrganization?.id) return;
 
     const qs = require('qs');
     const url = `${API.boongo_url}/event/filter_for_organization/${selectedOrganization.id}?page=${pageToFetch}`;
@@ -1513,6 +1526,7 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   );
 };
 
+// OrganizationDataScreen
 const OrganizationDataScreen = () => {
   // =============== Colors ===============
   const COLORS = useColors();
@@ -1560,6 +1574,7 @@ const OrganizationDataScreen = () => {
     const sceneProps = {
       handleScroll,
       headerHeight,
+      selectedOrganization, // <-- important : on passe l'organisation aux scènes
     };
 
     if (type === 'government') {
@@ -1606,16 +1621,16 @@ const OrganizationDataScreen = () => {
     const newTabKey = (type === 'government' ? 'event' : (newIndex === 0 ? 'schedule' : (newIndex === 1 ? 'event' : (newIndex === 2 ? 'books' : 'teach'))));
     const offset = savedScrollOffsets.current[newTabKey] || 0;
 
-    // Animate scrollY back to 0 smoothly (for header + tabbar)
+    // Animate scrollY back to the saved offset smoothly (for header + tabbar)
     Animated.timing(scrollY, {
       toValue: offset,
       duration: 300, // 300ms for smooth effect
       useNativeDriver: true,
     }).start();
 
-    // Back to top according to selected tab
+    // Scroll the inner list to the saved offset
     if (type === 'government') {
-      eventListRef.current.scrollToOffset({ offset, animated: true });
+      eventListRef.current?.scrollToOffset({ offset, animated: true });
 
     } else {
       if (newIndex === 0 && scheduleListRef.current) {
@@ -1638,7 +1653,7 @@ const OrganizationDataScreen = () => {
   // ================= Get current organization =================
   useEffect(() => {
     getOrganization();
-  }, [selectedOrganization]);
+  }, []); // <-- CORRECTION : une seule fois au montage
 
   const getOrganization = () => {
     const config = {
@@ -1672,7 +1687,7 @@ const OrganizationDataScreen = () => {
 
         {/* Content */}
         <View style={{ backgroundColor: COLORS.white }}>
-          {/* Top */}
+          {/* Top buttons */}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', position: 'absolute', left: 7, top: -10, zIndex: 10, width: Dimensions.get('window').width - 20 }}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon name='chevron-left' size={37} color={COLORS.black} />
@@ -1684,7 +1699,7 @@ const OrganizationDataScreen = () => {
             )}
           </View>
 
-          {/* Profile */}
+          {/* Profile / Cover */}
           <View style={{ flexDirection: 'column', width: Dimensions.get('window').width, justifyContent: 'flex-start', alignItems: 'flex-start', paddingTop: PADDING.p02, paddingHorizontal: PADDING.p02 }}>
             <Image style={{ width: 160, height: 160, borderRadius: PADDING.p04, borderWidth: 3, borderColor: COLORS.light_secondary, alignSelf: 'center' }} source={{ uri: selectedOrganization.cover_url || `${WEB.boongo_url}/assets/img/banner-organization.png` }} />
             <View style={{ flexDirection: 'column', width: '100%', justifyContent: 'center', paddingTop: PADDING.p01 }}>
@@ -1726,39 +1741,11 @@ const OrganizationDataScreen = () => {
               {selectedOrganization.address &&
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start', marginTop: 8 }}>
                   <Icon name='map-marker' size={16} color={COLORS.black} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
-                  <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, textAlign: 'center', maxWidth: '80%' }}>
+                  <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black, textAlign: 'center' }}>
                     {selectedOrganization.address}
                   </Text>
                 </View>
               }
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingVertical: PADDING.p03 }}>
-                {selectedOrganization.p_o_box &&
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: COLORS.black }}>
-                      {t('navigation.establishment.data.p_o_box')}
-                    </Text>
-                    <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black }}>
-                      {` : `}
-                    </Text>
-                    <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black }}>
-                      {selectedOrganization.p_o_box}
-                    </Text>
-                  </View>
-                }
-                {selectedOrganization.year_of_creation &&
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: COLORS.black }}>
-                      {t('navigation.establishment.data.year_of_creation')}
-                    </Text>
-                    <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black }}>
-                      {` : `}
-                    </Text>
-                    <Text style={{ fontSize: 13, fontWeight: '400', color: COLORS.black }}>
-                      {selectedOrganization.year_of_creation}
-                    </Text>
-                  </View>
-                }
-              </View>
             </View>
           </View>
         </View>
@@ -1767,7 +1754,7 @@ const OrganizationDataScreen = () => {
         style={{
           transform: [{ translateY: headerTranslateY }],
           position: 'absolute',
-          top: headerHeight, // Positionnée juste en dessous du header
+          top: headerHeight,
           zIndex: 999,
           width: '100%',
           height: TAB_BAR_HEIGHT,
@@ -1792,8 +1779,8 @@ const OrganizationDataScreen = () => {
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={handleIndexChange}
-      initialLayout={{ width: Dimensions.get('window').width }}
-      renderTabBar={renderTabBar} // Using the Custom TabBar
+      initialLayout={{ width: 100 }}
+      renderTabBar={renderTabBar}
     />
   );
 };

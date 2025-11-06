@@ -22,7 +22,7 @@ import CommentItemComponent from '../../components/comment_item';
 const TAB_BAR_HEIGHT = 48;
 
 // About frame
-const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
+const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0, selectedEvent }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -33,39 +33,10 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const route = useRoute();
   const { event_id } = route.params;
   // =============== Get data ===============
-  const [selectedEvent, setSelectedEvent] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [percent, setPercent] = useState('50%');
   const scrollViewListRef = listRef || useRef(null);
-
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
-
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
-
-        setSelectedEvent(eventData);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
 
   // ================= Handlers =================
   const onRefresh = async () => {
@@ -79,18 +50,16 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 
   const ucfirst = (str) => {
     if (!str) return str;
-
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   const toggleText = () => {
     setIsExpanded(!isExpanded);
-
     !isExpanded ? setPercent('24%') : setPercent('50%');
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.light_secondary, marginTop: 1 }}>
       {showBackToTop && (
         <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.warning }]} onPress={scrollToTop}>
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
@@ -107,15 +76,12 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
         style={{ flex: 1 }}
       >
         <View style={{ backgroundColor: COLORS.white, padding: PADDING.p02 }}>
-          {selectedEvent.event_description && (
+          {selectedEvent?.event_description && (
             <View style={{ flexDirection: 'row', marginBottom: PADDING.p08 }}>
-              {/* <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black, maxWidth: percent }} onPress={toggleText}>
-                {isExpanded ? selectedEvent.event_description : `${selectedEvent.event_description.slice(0, 100)}...`}
-              </Text> */}
               <Text style={{ fontSize: 16, fontWeight: '300', color: COLORS.black }}>{selectedEvent.event_description}</Text>
             </View>
           )}
-          {selectedEvent.start_at && (
+          {selectedEvent?.start_at && (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
               <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
@@ -124,7 +90,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               </View>
             </View>
           )}
-          {selectedEvent.end_at && (
+          {selectedEvent?.end_at && (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: PADDING.p06 }}>
               <Icon name='calendar-outline' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
@@ -133,7 +99,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
               </View>
             </View>
           )}
-          {selectedEvent.event_place && (
+          {selectedEvent?.event_place && (
             <View style={{ flexDirection: 'row', marginBottom: PADDING.p06 }}>
               <Icon name='map-marker' size={30} color={COLORS.warning} style={{ marginTop: 1, marginRight: PADDING.p00 }} />
               <View>
@@ -153,7 +119,7 @@ const About = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 };
 
 // Chat frame
-const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
+const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0, selectedEvent, isMember }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -162,12 +128,8 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const navigation = useNavigation();
   // =============== Get contexts ===============
   const { userInfo } = useContext(AuthContext);
-  // =============== Get parameters ===============
-  const route = useRoute();
-  const { event_id } = route.params;
   // =============== Get data ===============
-  const [selectedEvent, setSelectedEvent] = useState({});
-  const [comments, seComments] = useState([]);
+  const [comments, setComments] = useState([]);
   const [ad, setAd] = useState(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -175,123 +137,75 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   const [text, setText] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const [inputHeight, setInputHeight] = useState(44);
-  const [isMember, setIsMember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const flatListRef = listRef || useRef(null);
 
-  // Get current event
-  useEffect(() => {
-    getEvent();
-  }, [selectedEvent]);
-
-  const getEvent = () => {
-    const config = {
-      method: 'GET',
-      url: `${API.boongo_url}/event/${event_id}`,
-      headers: {
-        'X-localization': 'fr',
-        'Authorization': `Bearer ${userInfo.api_token}`,
-      }
-    };
-
-    axios(config)
-      .then(res => {
-        const eventData = res.data.data;
-
-        setSelectedEvent(eventData);
-
-        const isAlreadyMember = userInfo.events.some(event => event.id === eventData.id);
-
-        setIsMember(isAlreadyMember);
-
-        return eventData;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
   const fetchComments = async (pageToFetch = 1) => {
-    if (isLoading || pageToFetch > lastPage) return;
+    if (!selectedEvent?.id || isLoading || pageToFetch > lastPage) return;
 
     setIsLoading(true);
-    // const qs = require('qs');
-
     const url = `${API.boongo_url}/message/find_by_group/event/${selectedEvent.id}?page=${pageToFetch}`;
     const mHeaders = {
       'X-localization': 'fr',
       'Authorization': `Bearer ${userInfo.api_token}`
     };
 
-    if (selectedEvent && selectedEvent.id) {
-      try {
-        const response = await axios.get(url, { headers: mHeaders });
+    try {
+      const response = await axios.get(url, { headers: mHeaders });
 
-        if (pageToFetch === 1) {
-          seComments(response.data.data);
-
-        } else {
-          seComments(prev => [...prev, ...response.data.data]);
-        }
-
-        setAd(response.data.ad);
-        setLastPage(response.data.lastPage);
-        setCount(response.data.count);
-      } catch (error) {
-        if (error.response?.status === 429) {
-          console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
-        } else {
-          console.error(error);
-        }
-      } finally {
-        setIsLoading(false);
+      if (pageToFetch === 1) {
+        setComments(response.data.data);
+      } else {
+        setComments(prev => [...prev, ...response.data.data]);
       }
-    }
 
-    setIsLoading(false);
+      setAd(response.data.ad);
+      setLastPage(response.data.lastPage);
+      setCount(response.data.count);
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.warn("Trop de requêtes envoyées. Attendez avant de réessayer.");
+      } else {
+        console.error(error);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const scrollToTop = () => {
-    flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
     setPage(1);
-
-    if (selectedEvent && selectedEvent.id) {
+    if (selectedEvent?.id) {
       await fetchComments(1);
     }
-
     setRefreshing(false);
   };
 
   const onEndReached = () => {
     if (!isLoading && page < lastPage) {
       const nextPage = page + 1;
-
-      setPage(nextPage); // Update the page
+      setPage(nextPage);
     }
   };
 
   const combinedData = [...comments];
-
-  if (ad) {
-    combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
-  }
+  if (ad) combinedData.push({ ...ad, realId: ad.id, id: 'ad' });
 
   useEffect(() => {
-    if (selectedEvent && selectedEvent.id) {
-      fetchComments(1); // Initial loading
+    if (selectedEvent?.id) {
+      fetchComments(1);
     }
-  }, [selectedEvent]);
+  }, [selectedEvent?.id]);
 
   useEffect(() => {
-    if (page > 1) {
-      if (selectedEvent && selectedEvent.id) {
-        fetchComments(page);
-      }
+    if (page > 1 && selectedEvent?.id) {
+      fetchComments(page);
     }
   }, [page]);
 
@@ -306,9 +220,10 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
       <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
         {/* Comments List */}
         <Animated.FlatList
+          key={`chat-${selectedEvent?.id}-${isMember ? 1 : 0}`}
           ref={flatListRef}
           data={combinedData}
-          extraData={combinedData}
+          extraData={isMember}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => <CommentItemComponent item={item} />}
           horizontal={false}
@@ -327,7 +242,7 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           ListHeaderComponent={() => {
             if (isMember) {
               return (
-                <View style={{ flexGrow: 0, flexDirection: 'row' }}>
+                <View style={{ flexGrow: 0, flexDirection: 'row', backgroundColor: COLORS.white, marginVertical: 1, paddingVertical: PADDING.p03, paddingHorizontal: PADDING.p02 }}>
                   <TextInput
                     multiline
                     value={text}
@@ -342,19 +257,19 @@ const Chat = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
                       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                     }}
                     placeholder={t('event.comment')}
-                    placeholderTextColor={COLORS.black}
-                    style={[homeStyles.authInput, { height: Math.max(44, inputHeight), maxHeight: 120, marginBottom: 0, borderRadius: PADDING.p08, borderColor: COLORS.dark_secondary, color: COLORS.black, textAlignVertical: 'top' }]}
+                    placeholderTextColor='black'
+                    style={[homeStyles.authInput, { height: Math.max(44, inputHeight), maxHeight: 120, backgroundColor: COLORS.dark_light, marginBottom: 0, borderRadius: PADDING.p08, borderColor: COLORS.light_secondary, color: COLORS.black, textAlignVertical: 'top' }]}
                   />
                 </View>
               );
-
             } else {
-              <View style={{ flexGrow: 0, padding: PADDING.p00, borderWidth: 1, borderColor: COLORS.dark_secondary, borderRadius: PADDING.p03 }}>
-                <Text style={{ fontSize: TEXT_SIZE.normal, textAlign: 'center', color: COLORS.black }}>{t('event.participate_before_comment')}</Text>
-              </View>
+              return (
+                <View style={{ flexGrow: 0, flexDirection: 'row', backgroundColor: COLORS.white, marginVertical: 1, paddingVertical: PADDING.p03, paddingHorizontal: PADDING.p02 }}>
+                  <Text style={{ fontSize: TEXT_SIZE.paragraph, fontWeight: '300', textAlign: 'center', color: COLORS.black, width: '100%' }}>{t('event.participate_before_comment')}</Text>
+                </View>
+              );
             }
-          }
-          }
+          }}
           ListFooterComponent={() => isLoading ? (<Text style={{ color: COLORS.black, textAlign: 'center', padding: PADDING.p01, }} >{t('loading')}</Text>) : null}
         />
       </SafeAreaView>
@@ -408,6 +323,8 @@ const EventScreen = () => {
     const sceneProps = {
       handleScroll,
       headerHeight,
+      selectedEvent,
+      isMember,
     };
 
     switch (route.key) {
@@ -423,7 +340,7 @@ const EventScreen = () => {
   // Get current event
   useEffect(() => {
     getEvent();
-  }, [selectedEvent]);
+  }, []);
 
   const getEvent = () => {
     const config = {
@@ -438,13 +355,9 @@ const EventScreen = () => {
     axios(config)
       .then(res => {
         const eventData = res.data.data;
-
         setSelectedEvent(eventData);
-
         const isAlreadyMember = userInfo.events.some(event => event.id === eventData.id);
-
         setIsMember(isAlreadyMember);
-
         return eventData;
       })
       .catch(error => {
@@ -452,13 +365,12 @@ const EventScreen = () => {
       });
   };
 
-  const handleToggleMembership = (user_id, event_id) => {
+  const handleToggleMembership = async (user_id, event_id) => {
     if (isMember) {
-      removeMembership(user_id, event_id);
+      await removeMembership(user_id, event_id);
       setIsMember(false);
-
     } else {
-      addMembership(user_id, event_id);
+      await addMembership(user_id, event_id);
       setIsMember(true);
     }
   };
@@ -466,11 +378,9 @@ const EventScreen = () => {
   // Get system language
   const getLanguage = () => {
     const locales = RNLocalize.getLocales();
-
     if (locales && locales.length > 0) {
       return locales[0].languageCode;
     }
-
     return 'fr';
   };
 
@@ -485,9 +395,7 @@ const EventScreen = () => {
       listener: (event) => {
         const offsetY = event.nativeEvent.contentOffset.y;
         const currentTab = (index === 0 ? 'about' : 'chat');
-
         savedScrollOffsets.current[currentTab] = offsetY;
-
         const isAtTop = (offsetY <= 0);
         setShowBackToTopByTab(prev => ({
           ...prev,
@@ -501,22 +409,16 @@ const EventScreen = () => {
   const handleIndexChange = (newIndex) => {
     const newTabKey = (newIndex === 0 ? 'about' : 'chat');
     const offset = savedScrollOffsets.current[newTabKey] || 0;
-
-    // Animate scrollY back to 0 smoothly (for header + tabbar)
     Animated.timing(scrollY, {
       toValue: offset,
-      duration: 300, // 300ms for smooth effect
+      duration: 300,
       useNativeDriver: true,
     }).start();
-
-    // Back to top according to selected tab
     if (newIndex === 0 && aboutListRef.current) {
       aboutListRef.current.scrollTo({ offset, animated: true });
-
     } else if (newIndex === 1 && chatListRef.current) {
       chatListRef.current.scrollToOffset({ offset, animated: true });
     }
-
     setIndex(newIndex);
   };
 
@@ -560,7 +462,7 @@ const EventScreen = () => {
         style={{
           transform: [{ translateY: headerTranslateY }],
           position: 'absolute',
-          top: headerHeight, // Positionnée juste en dessous du header
+          top: headerHeight,
           zIndex: 999,
           width: '100%',
           height: TAB_BAR_HEIGHT,
@@ -574,7 +476,6 @@ const EventScreen = () => {
           inactiveColor={COLORS.dark_secondary}
         />
       </Animated.View>
-      {/* <FloatingActionsButton /> */}
     </>
   );
 
@@ -584,7 +485,7 @@ const EventScreen = () => {
       renderScene={renderScene}
       onIndexChange={handleIndexChange}
       initialLayout={{ width: 100 }}
-      renderTabBar={renderTabBar} // Using the Custom TabBar
+      renderTabBar={renderTabBar}
     />
   );
 };
