@@ -245,7 +245,7 @@ const HomeStackNav = () => {
                     <TextInput
                       value={searchQuery}
                       onChangeText={setSearchQuery}
-                      style={[homeStyles.searchInputText, { fontSize: 18, width: Dimensions.get('window').width - 120, height: 37, color: COLORS.black, marginVertical: 0, paddingVertical: 5, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, borderColor: 'white' }]}
+                      style={[homeStyles.searchInputText, { fontSize: 18, width: Dimensions.get('window').width - 120, height: 37, color: COLORS.black, marginVertical: 0, paddingVertical: 5, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0, borderColor: COLORS.black }]}
                       placeholder={t('search')}
                       placeholderTextColor={COLORS.secondary}
                     />
@@ -262,12 +262,12 @@ const HomeStackNav = () => {
                 {isSearchActive ?
                   (
                     <TouchableOpacity onPress={handleCloseSearch}>
-                      <Icon name='close' color='white' style={{ fontSize: 24 }} />
+                      <Icon name='close' color={COLORS.black} style={{ fontSize: 24 }} />
                     </TouchableOpacity>
                   ) :
                   (
                     <TouchableOpacity onPress={handleSearchPress}>
-                      <Icon name='magnify' color='white' style={{ fontSize: 24 }} />
+                      <Icon name='magnify' color={COLORS.black} style={{ fontSize: 24 }} />
                     </TouchableOpacity>
                   )}
               </>

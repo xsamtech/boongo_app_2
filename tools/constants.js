@@ -58,7 +58,7 @@ export const PADDING = {
 
 export const API = {
     boongo_url: 'https://boongo7.com/api',
-    // boongo_url: 'http://192.168.112.238/boongo/public/api',
+    dicolink_key: 'GjsKGqDnjXXwcqOEcuOjrbOx9MqQ6Ugo',
     open_emoji_key: 'c9e9a10792fc18040b51f71924c3f8e031711c95',
     baquiz_key: 'xJLIAuEnORjrAc0Cnr47yIrWEkEXCFIxLPIv4edPwL9YD2ro8zEuMyIKQQd4b1fG',
 };

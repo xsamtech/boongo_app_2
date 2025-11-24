@@ -10,7 +10,7 @@ import ThemeContext from '../contexts/ThemeContext';
 import useColors from '../hooks/useColors';
 import homeStyles from './style';
 
-const FooterComponent = ({color}) => {
+const FooterComponent = ({ color }) => {
   // =============== Colors ===============
   const COLORS = useColors();
   // =============== Language ===============
@@ -31,15 +31,12 @@ const FooterComponent = ({color}) => {
   return (
     <View>
       {/* Dark mode */}
-      {/* {!userInfo.id &&} */}
-        <>
-          <View style={[homeStyles.langButton, { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', justifyContent: 'space-between', width: 230, marginBottom: PADDING.p05, borderWidth: 1, borderColor: COLORS.light_secondary }]}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={[homeStyles.cardLabelSettings, { color: COLORS.black }]}>{t('dark_theme')}</Text>
-            </View>
-            <Switch value={theme === 'dark'} onValueChange={handleToggleTheme} trackColor={{ false: COLORS.black, true: COLORS.primary }} thumbColor={COLORS.light} />
-          </View>
-        </>
+      <View style={[homeStyles.langButton, { flexDirection: 'row', alignItems: 'center', alignSelf: 'center', justifyContent: 'space-between', width: 230, marginBottom: PADDING.p05, borderWidth: 1, borderColor: COLORS.light_secondary }]}>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={[homeStyles.cardLabelSettings, { color: COLORS.black }]}>{t('dark_theme')}</Text>
+        </View>
+        <Switch value={theme === 'dark'} onValueChange={handleToggleTheme} trackColor={{ false: COLORS.black, true: COLORS.primary }} thumbColor={COLORS.light} />
+      </View>
 
       {/* Copyright */}
       <Text style={{ textAlign: 'center', color: COLORS.dark_secondary, marginBottom: PADDING.p00 }}>{t('copyright', { year })} <Text style={{ fontWeight: '700' }}>Reborn</Text></Text>

@@ -247,30 +247,32 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState(null);
   const [audio, setAudio] = useState(null); // Pour gérer l'audio avec react-native-sound
-  const [videoRef, setVideoRef] = useState(null); // Pour gérer la vidéo
+  const videoRef = useRef(null); // Utiliser useRef pour la référence vidéo
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const handleNext = () => {
-    if (currentItemIndex < favorites.length - 1) {
-      setCurrentItemIndex(currentItemIndex + 1);
-    } else {
-      setCurrentItemIndex(0); // Revenir au début si c'est la dernière vidéo
-    }
-  };
-
   const handleItemPress = (index, item) => {
     setCurrentItemIndex(index);
+
+    console.log(JSON.stringify(item));
+
     if (item.video_url) {
-      videoRef.seek(0);
-      videoRef.play();
+      if (videoRef.current) {
+        // Au lieu de chercher et de jouer immédiatement, on attend que la vidéo soit prête
+        console.log('Vidéo prête à être lue.');
+        // Ne pas appeler `seek(0)` ici, on le fait dans `onLoad`
+      } else {
+        console.log('Erreur: vidéo non prête');
+      }
     } else if (item.audio_url) {
       playAudio(item.audio_url);
     }
     setIsPlaying(true);
   };
+
+
 
   const playAudio = (uri) => {
     if (audio) {
@@ -283,13 +285,24 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       } else {
         newAudio.play(() => {
           newAudio.release();
-          handleNext(); // Passe à l’élément suivant à la fin
+          // Appeler handleNext() seulement si l'index a changé
+          if (currentItemIndex !== null && currentItemIndex < favorites.length - 1) {
+            handleNext();
+          }
         });
       }
     });
 
     setAudio(newAudio);
     newAudio.play();
+  };
+
+  const handleNext = () => {
+    const nextIndex = currentItemIndex < favorites.length - 1 ? currentItemIndex + 1 : 0;
+    if (nextIndex !== currentItemIndex) {
+      setCurrentItemIndex(nextIndex);
+      setIsPlaying(true); // Assurez-vous que l'état est correctement mis à jour
+    }
   };
 
   const stopAudio = () => {
@@ -317,7 +330,7 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
             data={favorites}
             extraData={favorites}
             keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => {
+            renderItem={({ item, index }) => {
               return (
                 <View style={[homeStyles.workTop, { backgroundColor: COLORS.white, marginBottom: 1, padding: PADDING.p03 }]}>
                   <Image source={{ uri: item.photo_url }} style={{ width: IMAGE_SIZE.s13, height: IMAGE_SIZE.s13, borderRadius: PADDING.p00, borderWidth: 1, borderColor: COLORS.light_secondary }} />
@@ -353,7 +366,14 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       {currentItemIndex !== null && favorites[currentItemIndex].video_url && (
         <Video
           source={{ uri: favorites[currentItemIndex].video_url }}
-          ref={ref => setVideoRef(ref)}
+          ref={videoRef} // Assurez-vous d'utiliser `videoRef` ici
+          onReadyForDisplay={() => {
+            console.log('Vidéo prête pour affichage');
+            if (videoRef.current) {
+              videoRef.current.seek(0);  // Chercher le début de la vidéo
+              videoRef.current.resume();   // Lire la vidéo
+            }
+          }}
           onEnd={handleNext}
           paused={!isPlaying}
           resizeMode="contain"
