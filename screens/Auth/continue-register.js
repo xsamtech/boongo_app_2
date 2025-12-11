@@ -192,6 +192,7 @@ const ContinueRegisterScreen = () => {
             style={[homeStyles.authInput, { color: COLORS.black, borderColor: COLORS.light_secondary }]}
             value={birthdate}
             placeholder={t('auth.birthdate')}
+            placeholderTextColor={COLORS.dark_secondary}
             onChangeText={setBirthdate}
             onPressIn={toggleDatePicker} />
         )}
@@ -204,6 +205,8 @@ const ContinueRegisterScreen = () => {
           search
           labelField='label'
           valueField='value'
+          textStyle={{ color: COLORS.black }}
+          itemContainerStyle={{ backgroundColor: COLORS.dark_secondary }}
           placeholder={!isFocus ? t('auth.country.title') : '...'}
           placeholderStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}
           selectedTextStyle={{ color: (theme === 'light' ? COLORS.dark_secondary : COLORS.secondary) }}

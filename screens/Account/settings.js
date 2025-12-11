@@ -255,7 +255,8 @@ const SettingsScreen = () => {
             style={[homeStyles.authInput, { height: 50 }]}
             borderColor={COLORS.dark_secondary}
             textStyle={{ color: COLORS.black }}
-            itemContainerStyle={{ backgroundColor: COLORS.white }}
+            itemContainerStyle={{ backgroundColor: COLORS.dark_secondary }}
+            itemTextStyle={{ color: COLORS.white }}
             placeholderStyle={{ color: COLORS.black }}
             arrowIconStyle={{ tintColor: COLORS.black }}
             data={organizations}
