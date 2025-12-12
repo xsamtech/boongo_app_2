@@ -19,6 +19,7 @@ import useColors from '../hooks/useColors';
 import homeStyles from './style';
 import Spinner from 'react-native-loading-spinner-overlay';
 import MediaItemComponent from '../components/media_item';
+import { useNavigation } from '@react-navigation/native';
 
 const TAB_BAR_HEIGHT = 48;
 
@@ -235,6 +236,8 @@ const Medias = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
 const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
   // =============== Colors ===============
   const COLORS = useColors();
+  // =============== Navigation ===============
+  const navigation = useNavigation();
   // =============== Language ===============
   const { t } = useTranslation();
   // =============== Get contexts ===============
@@ -319,9 +322,9 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
       {/* Content */}
       <View style={{ flex: 1, backgroundColor: COLORS.light_secondary }}>
         {/* Contrôle global play/pause */}
-        <TouchableOpacity style={[homeStyles.floatingButton, { left: 20, bottom: 30, backgroundColor: COLORS.black }]} onPress={handlePlayPause}>
+        {/* <TouchableOpacity style={[homeStyles.floatingButton, { left: 20, bottom: 30, backgroundColor: COLORS.black }]} onPress={handlePlayPause}>
           <Icon name={isPlaying ? 'pause' : 'play'} size={IMAGE_SIZE.s09} color={COLORS.white} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <SafeAreaView contentContainerStyle={{ flexGrow: 1 }}>
           {/* Favorites List */}
@@ -341,8 +344,8 @@ const Favorite = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) =>
                     <TouchableOpacity style={{ backgroundColor: COLORS.white, marginRight: PADDING.p00, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.danger }} onPress={() => { removeFromCart(userInfo.favorite_works_cart.id, item.id, null); }}>
                       <Icon name="trash-can-outline" size={20} color={COLORS.danger} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={{ backgroundColor: COLORS.white, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.link_color }} onPress={() => handleItemPress(index, item)}>
-                      <Icon name="play" size={20} color={COLORS.link_color} />
+                    <TouchableOpacity style={{ backgroundColor: COLORS.white, padding: 3, borderRadius: 3, borderWidth: 1, borderColor: COLORS.link_color }} onPress={() => navigation.navigate('WorkData', { itemId: item.id })}>
+                      <Icon name="arrow-right" size={20} color={COLORS.link_color} />
                     </TouchableOpacity>
                   </View>
                 </View>

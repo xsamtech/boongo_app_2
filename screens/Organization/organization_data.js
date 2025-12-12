@@ -1365,7 +1365,8 @@ const Teach = ({ handleScroll, showBackToTop, listRef, headerHeight = 0 }) => {
           <Icon name='chevron-double-up' size={IMAGE_SIZE.s09} style={{ color: 'black' }} />
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}>
+      {/* <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => setFormEventModalVisible(true)}> */}
+      <TouchableOpacity style={[homeStyles.floatingButton, { bottom: 30, backgroundColor: COLORS.primary }]} onPress={() => { ToastAndroid.show('Boongo Teach sera bientôt disponible', ToastAndroid.LONG) }}>
         <Icon name='plus' size={IMAGE_SIZE.s07} style={{ color: 'white' }} />
       </TouchableOpacity>
 
