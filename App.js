@@ -340,13 +340,13 @@ const App = () => {
   }, []);
 
   // =============== Lock screen captures ===============
-  // useEffect(() => {
-  //   const applySecurity = async () => {
-  //     await forbid();
-  //   };
+  useEffect(() => {
+    const applySecurity = async () => {
+      await forbid();
+    };
 
-  //   applySecurity();
-  // }, []);
+    applySecurity();
+  }, []);
 
   // =============== Setup Track Player ===============
   useEffect(() => {
