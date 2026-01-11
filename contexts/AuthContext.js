@@ -125,13 +125,38 @@ export const AuthProvider = ({ children }) => {
 
             setIsLoading(false);
 
-            // === Email first ===
-            if (email) {
-                // === User has phone ===
-                if (userData.phone) {
-                    // Phone is verified
-                    if (phoneVerified) {
-                        // Everything is good, we save "endRegisterInfo"
+            if (res.data.success === false) {
+                ToastAndroid.show(`${message}`, ToastAndroid.LONG);
+                console.log(`${message}`);
+                setRegisterError(`${message}`);
+
+            } else {
+                setRegisterError(null);
+
+                // === Email first ===
+                if (email) {
+                    // === User has phone ===
+                    if (userData.phone) {
+                        // Phone is verified
+                        if (phoneVerified) {
+                            // Everything is good, we save "endRegisterInfo"
+                            await AsyncStorage.removeItem('startRegisterInfo');
+                            await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                            setStartRegisterInfo({});
+                            setEndRegisterInfo(userData);
+
+                            return 'done';
+
+                            // Phone NOT yet verified
+                        } else {
+                            // We do NOT save "endRegisterInfo"
+                            return 'phone_not_validated';
+                        }
+
+                        // === User hasn't phone ===
+                    } else {
+                        // We can save "endRegisterInfo" directly
                         await AsyncStorage.removeItem('startRegisterInfo');
                         await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
 
@@ -139,33 +164,33 @@ export const AuthProvider = ({ children }) => {
                         setEndRegisterInfo(userData);
 
                         return 'done';
-
-                        // Phone NOT yet verified
-                    } else {
-                        // We do NOT save "endRegisterInfo"
-                        return 'phone_not_validated';
                     }
-
-                    // === User hasn't phone ===
-                } else {
-                    // We can save "endRegisterInfo" directly
-                    await AsyncStorage.removeItem('startRegisterInfo');
-                    await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
-
-                    setStartRegisterInfo({});
-                    setEndRegisterInfo(userData);
-
-                    return 'done';
                 }
-            }
 
-            // === Phone first ===
-            if (phone) {
-                // === User has email ===
-                if (userData.email) {
-                    // Email is verified
-                    if (emailVerified) {
-                        // Everything is good, we save "endRegisterInfo"
+                // === Phone first ===
+                if (phone) {
+                    // === User has email ===
+                    if (userData.email) {
+                        // Email is verified
+                        if (emailVerified) {
+                            // Everything is good, we save "endRegisterInfo"
+                            await AsyncStorage.removeItem('startRegisterInfo');
+                            await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
+
+                            setStartRegisterInfo({});
+                            setEndRegisterInfo(userData);
+
+                            return 'done';
+
+                            // Phone NOT yet verified
+                        } else {
+                            // We do NOT save "endRegisterInfo"
+                            return 'email_not_validated';
+                        }
+
+                        // === User hasn't email ===
+                    } else {
+                        // We can save "endRegisterInfo" directly
                         await AsyncStorage.removeItem('startRegisterInfo');
                         await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
 
@@ -173,23 +198,7 @@ export const AuthProvider = ({ children }) => {
                         setEndRegisterInfo(userData);
 
                         return 'done';
-
-                        // Phone NOT yet verified
-                    } else {
-                        // We do NOT save "endRegisterInfo"
-                        return 'email_not_validated';
                     }
-
-                    // === User hasn't email ===
-                } else {
-                    // We can save "endRegisterInfo" directly
-                    await AsyncStorage.removeItem('startRegisterInfo');
-                    await AsyncStorage.setItem('endRegisterInfo', JSON.stringify(userData));
-
-                    setStartRegisterInfo({});
-                    setEndRegisterInfo(userData);
-
-                    return 'done';
                 }
             }
 

@@ -204,10 +204,21 @@ const RegisterScreen = () => {
         {/* Submit / Cancel */}
         <Button style={[homeStyles.authButton, { backgroundColor: COLORS.success }]}
           onPress={() => {
-            startRegister(firstname, lastname, null, null, null, city, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null)
+            startRegister(firstname, lastname, null, null, null, city, null, null, null, email, (phoneCode && phone ? `${phoneCode}${phone}` : null), username, null, null, null, role.id, null);
 
             if (!registerError) {
-              navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: (phoneCode && phone ? `${phoneCode}${phone}` : null) });
+              if (email && phone) {
+                navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: (phoneCode && phone ? `${phoneCode}${phone}` : null) });
+
+              } else {
+                if (email) {
+                  navigation.navigate('CheckEmailOTP', { emailAddress: email, phoneNumber: (phoneCode && phone ? `${phoneCode}${phone}` : null) });
+                }
+
+                if (phone) {
+                  navigation.navigate('CheckPhoneOTP', { emailAddress: email, phoneNumber: (phoneCode && phone ? `${phoneCode}${phone}` : null) });
+                }
+              }
             }
           }}>
           <Text style={[homeStyles.authButtonText, { color: 'white' }]}>{t('start')}</Text>

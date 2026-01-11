@@ -26,18 +26,22 @@ const CheckEmailOTPScreen = ({ route }) => {
   // =============== Navigation ===============
   const navigation = useNavigation();
   // =============== Get contexts ===============
-  const { isLoading, checkOTP } = useContext(AuthContext);
+  const { isLoading, checkOTP, registerError } = useContext(AuthContext);
   // =============== Get data ===============
   const [code, setCode] = useState('');
 
   const handleCheckEmailCode = async () => {
     const result = await checkOTP(emailAddress, null, code);
 
-    if (result === 'phone_not_validated') {
-      navigation.navigate('CheckPhoneOTP', { emailAddress: emailAddress, phoneNumber: phoneNumber });
+    console.log(registerError);
 
-    } else {
-      navigation.navigate('ContinueRegister');
+    if (!registerError) {
+      if (result === 'phone_not_validated') {
+        navigation.navigate('CheckPhoneOTP', { emailAddress: emailAddress, phoneNumber: phoneNumber });
+
+      } else {
+        navigation.navigate('ContinueRegister');
+      }
     }
   };
 
